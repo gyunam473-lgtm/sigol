@@ -284,3 +284,19 @@ body{margin:0}
 .kingbox{text-align:center;padding:8px 0}.kingbox h2{font-size:22px}
 .kingstar{font-size:46px;color:#e0a020;line-height:1}
 .kingkg{font-family:var(--display);font-size:30px;margin:4px 0;color:#c8572f}
+
+/* 위 정보칸 접기 (휴대폰 세로): 꼭 필요한 줄만, ▾ 누르면 펼쳐요 */
+.card .more{display:none;background:none;border:1px solid var(--line);border-radius:99px;font-size:12px;line-height:1;padding:4px 9px;color:var(--muted);min-width:32px;min-height:26px}
+.stat{position:relative}
+@media (max-width:700px) and (min-height:521px){
+  .cols .card{padding:6px 8px;gap:3px;border-radius:11px}
+  .card .more{display:inline-block}
+  .stat .more{position:absolute;right:6px;top:5px}
+  .stat .lvrow{padding-right:38px}
+  .stat{width:min(190px,48vw)}
+  .side{width:min(200px,46vw)}
+  .side .clockrow{width:100%;justify-content:flex-end}
+  .side .clock{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:calc(100% - 40px);font-size:11px}
+  .card:not(.open) #hint,.card:not(.open) #xpNum,.card:not(.open) #wxNote,.card:not(.open) .sidebtns{display:none}
+  .card.open .clock{white-space:normal}
+}

@@ -27,6 +27,8 @@ $("plazaBtn").onclick=openVillage; // "마을" 지도
 $("mapBtn").onclick=()=>{if(!S.mapUsed){S.mapUsed=1;save();$("mapBtn").classList.remove("pulse")}openVillage()};
 function mapBtnTip(){if(S.mapUsed)return;$("mapBtn").classList.add("pulse")}
 $("homeBtn").onclick=goHome;
+// 휴대폰 세로 화면: 위 정보칸은 작게 접어 두고 ▾ 로 펼쳐요
+[["statMore","statCard"],["sideMore",null]].forEach(([b,c])=>{const btn=$(b),card=c?$(c):btn.closest(".card");btn.onclick=e=>{e.stopPropagation();const o=card.classList.toggle("open");btn.textContent=o?"▴":"▾";btn.setAttribute("aria-expanded",o)}});
 $("lvBtn").onclick=openLevels;
 $("skyHud").onclick=()=>standSky(true);
 // 냇가: 지금 있는 곳에서 가까운 물가로 가서 낚시해요

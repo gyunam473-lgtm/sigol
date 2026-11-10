@@ -25,14 +25,14 @@
       <!-- 왼쪽 위: 내 몸 상태 -->
       <div class="card stat" id="statCard">
         <button class="lvrow" id="lvBtn" title="눌러서 귀농 레벨 보기"><span class="lvname" id="lvName"></span><span class="xpbar"><i id="xpFill"></i></span></button>
-        <span class="xpnum small" id="xpNum"></span>
+        <span class="xpnum small" id="xpNum"></span><button class="more" id="statMore" aria-label="내 상태 더 보기" aria-expanded="false">▾</button>
         <div class="meter" title="일하면 줄고 먹으면 차요"><span class="mname">든든함</span><span class="xpbar"><i id="fullFill"></i></span><span class="xpnum" id="fullNum"></span></div>
         <div class="meter" title="일하면 줄고 우물에서 마시면 차요"><span class="mname">물</span><span class="xpbar"><i id="waterFill"></i></span><span class="xpnum" id="waterNum"></span></div>
         <p class="hint" id="hint">땅을 누르면 걸어가요.</p>
       </div>
       <!-- 오른쪽 위: 시간과 날씨 -->
       <div class="card side">
-        <button class="clock" id="clock" title="눌러서 날씨 미리보기"></button>
+        <div class="clockrow"><button class="clock" id="clock" title="눌러서 날씨 미리보기"></button><button class="more" id="sideMore" aria-label="날씨와 단추 더 보기" aria-expanded="false">▾</button></div>
         <p class="hint" id="wxNote"></p>
         <p class="hint warn" id="wxWarn" hidden></p>
         <div class="sidebtns"><button class="snd" id="skyHud">하늘 보기</button><button class="snd" id="sndBtn">소리 켜기</button></div>
