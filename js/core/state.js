@@ -12,7 +12,7 @@ if(!S.woodInit){S.woodInit=1;S.inv.jangjak=(S.inv.jangjak||0)+10}
 S.reports=S.reports||[];S.skill=S.skill||{};S.fishDex=S.fishDex||{};S.forageDex=S.forageDex||{};
 // 망태 속 물고기 하나하나의 크기 (값이 크기 따라 달라요). 예전 저장은 보통 크기로 채워요
 S.bag=S.bag||[];Object.keys(FRESH).forEach(k=>{const have=S.bag.filter(b=>b.k===k).length;for(let i=have;i<(S.inv[k]||0);i++)S.bag.push({k,cm:Math.round((FRESH[k].cm[0]+FRESH[k].cm[1])/2)})});
-const save=()=>{S.lastSeen=Date.now();try{localStorage.setItem("sigol1",JSON.stringify(S))}catch(e){}};
+const save=()=>{if(window.RESETTING)return;S.lastSeen=Date.now();try{localStorage.setItem("sigol1",JSON.stringify(S))}catch(e){}};
 
 function toast(t){const e=$("toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("on"),Math.max(2200,t.length*75))}
 

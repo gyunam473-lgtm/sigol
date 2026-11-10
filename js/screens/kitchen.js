@@ -42,7 +42,7 @@ function openKitchen(){
   h+=cN?row(cL?"닭장 넓히기":"닭장 짓기",cL?"닭 "+cN.max+"마리까지":"집 아래쪽 빈 땅에 · 닭은 장터 닭집에서 사 와요",cN.cost,"coop"):row("닭장","닭 "+coopMax()+"마리까지",0,"","다 넓혔어요");
   h+=bN?row(bL?"외양간 넓히기":"외양간 짓기",(bL?"":"닭장 왼쪽에 · ")+"소 "+bN.cow+"마리, 염소 "+bN.goat+"마리까지",bN.cost,"barn"):row("외양간","소 4마리, 염소 4마리",0,"","다 넓혔어요");
   h+=`<p class="hint">요리는 마당 부뚜막에서 · 닭은 장터 닭집 아저씨 · 송아지와 새끼 염소는 우시장 소장수 아저씨</p>`;
-  h+=`<h3>체험용 · 정식 공개 전에 빼기</h3><div class="cheats">
+  h+=`<h3>체험용 · 정식 공개 전에 빼기</h3><div class="cheats"><button id="chReset">처음부터 (기록 지우기)</button>
     <button id="tlapse">하루 빨리 보기</button><button id="cheat">+1,000원</button><button data-storm="heavy">1분 반 뒤 큰비</button><button data-storm="typhoon">1분 반 뒤 태풍</button><button data-storm="frost">1분 반 뒤 서리</button><button id="sndTest">밤 소리 들어 보기</button></div>`;
   openSheet(h);sheet.classList.add("ledger");
   sheet.querySelectorAll("[data-up]").forEach(b=>b.onclick=()=>{const t=b.dataset.up;let msg="";
@@ -54,6 +54,7 @@ function openKitchen(){
     sfx("coin");save();applyLand();refresh();openKitchen();toast(msg)});
   $("tlapse").onclick=()=>{closeSheet();startTimelapse()};
   $("cheat").onclick=()=>{S.money+=1000;save();refresh();openKitchen()};
+  $("chReset").onclick=askReset;
   $("sndTest").onclick=()=>{closeSheet();soundTest()};
   sheet.querySelectorAll("[data-storm]").forEach(b=>b.onclick=()=>{closeSheet();testStorm(b.dataset.storm)});
 }

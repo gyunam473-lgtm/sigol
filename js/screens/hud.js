@@ -27,6 +27,10 @@ $("plazaBtn").onclick=openVillage; // "마을" 지도
 $("mapBtn").onclick=()=>{if(!S.mapUsed){S.mapUsed=1;save();$("mapBtn").classList.remove("pulse")}openVillage()};
 function mapBtnTip(){if(S.mapUsed)return;$("mapBtn").classList.add("pulse")}
 $("homeBtn").onclick=goHome;
+// 시험 서버용 "처음부터": 한 번 더 물어보고 이 기기의 기록을 지워요 (정식 공개 전에 빼기)
+function askReset(){openSheet(`<h2>처음부터 다시 할까요?</h2><p class="hint">이 기기에 저장된 돈·밭·창고·도감·숙련도가 <b>모두 지워지고</b> 첫날로 돌아가요. 되돌릴 수 없어요.</p><div class="sitbtns"><button class="close go danger" id="resetYes">지우고 처음부터</button></div>`);
+  $("resetYes").onclick=()=>{window.RESETTING=true;try{localStorage.removeItem("sigol1")}catch(e){}location.reload()}}
+$("resetBtn").onclick=askReset;
 // 휴대폰 세로 화면: 위 정보칸은 작게 접어 두고 ▾ 로 펼쳐요
 [["statMore","statCard"],["sideMore",null]].forEach(([b,c])=>{const btn=$(b),card=c?$(c):btn.closest(".card");btn.onclick=e=>{e.stopPropagation();const o=card.classList.toggle("open");btn.textContent=o?"▴":"▾";btn.setAttribute("aria-expanded",o)}});
 $("lvBtn").onclick=openLevels;

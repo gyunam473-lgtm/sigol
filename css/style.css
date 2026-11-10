@@ -300,3 +300,5 @@ body{margin:0}
   .card:not(.open) #hint,.card:not(.open) #xpNum,.card:not(.open) #wxNote,.card:not(.open) .sidebtns{display:none}
   .card.open .clock{white-space:normal}
 }
+
+.danger{background:#b8432f!important;color:#fff!important;border-color:#b8432f!important}
