@@ -1,0 +1,286 @@
+/* 화면 모양(색깔, 글씨, 버튼, 창). 어두운 화면 설정도 여기 있어요. */
+
+/* 레이아웃: 화면 전체가 3D 마을. 정보칸은 네 귀퉁이에 나눠 둬요
+   왼쪽 위: 장소·돈, 레벨·든든함·물 / 오른쪽 위: 이웃·장터·도감, 시간·날씨 / 왼쪽 아래: 씨앗 / 오른쪽 아래: 창고·돌아가기
+   장터·창고·살림 장부는 아래에서 올라오는 창 */
+:root{
+  --bg:#cfe6ee; --panel:#fbf8f0; --ink:#2b2a24; --muted:#6f6b5c; --line:#ddd5c0;
+  --accent:#4f7a3a; --accent-soft:#e3eed6; --warm:#c8572f;
+  --display:"Gowun Batang","Nanum Myeongjo",serif;
+  --body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#1c2226; --panel:#24261f; --ink:#ede7d4; --muted:#a49f8a; --line:#3b3c33;
+  --accent:#8fbf6f; --accent-soft:#2f3a27; --warm:#e07a52; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#1c2226; --panel:#24261f; --ink:#ede7d4; --muted:#a49f8a; --line:#3b3c33;
+  --accent:#8fbf6f; --accent-soft:#2f3a27; --warm:#e07a52; color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);overflow:hidden}
+.app{position:relative;height:100%;overflow:hidden}
+#c{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:manipulation;cursor:pointer}
+.top{position:absolute;top:max(10px,env(safe-area-inset-top,0px));left:max(10px,env(safe-area-inset-left,0px));right:max(10px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.cols{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.cols .card{background:color-mix(in srgb,var(--panel) 88%,transparent);padding:8px 10px;gap:5px;border-radius:12px}
+.stat{width:min(220px,52vw)}
+.side{width:min(170px,40vw);align-items:flex-end;text-align:right}
+.side .clock{text-align:right}
+.side .hint{font-size:11px}
+.hint.warn{color:#fff;background:#b5523b;border-radius:8px;padding:4px 7px;font-size:11px;line-height:1.35}
+.meter{display:flex;align-items:center;gap:6px;font-size:11px}
+.mname{font-size:12px;flex:none;width:3em}
+.meter .xpbar{height:7px}
+.xpnum.small{font-size:11px;margin-top:-4px}
+#hint{font-size:11px;line-height:1.35}
+.chip{pointer-events:auto;background:var(--panel);border:1px solid var(--line);border-radius:99px;padding:6px 12px;font-size:14px;box-shadow:0 2px 8px rgba(0,0,0,.12);white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--ink);font-family:var(--body)}
+.brand{font-family:var(--display);font-size:16px}
+.left{display:flex;gap:6px;align-items:center}
+.toast{position:absolute;bottom:128px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--panel);padding:8px 16px;border-radius:14px;font-size:14px;line-height:1.4;text-align:center;opacity:0;transition:opacity .3s;pointer-events:none;width:max-content;max-width:min(92%,460px)}
+.fade{position:absolute;inset:0;background:#120e0a;opacity:0;pointer-events:none;transition:opacity .25s}
+.fade.on{opacity:1}
+.toast.on{opacity:1}
+.bottom{position:absolute;left:max(10px,env(safe-area-inset-left,0px));right:max(10px,env(safe-area-inset-right,0px));bottom:max(12px,env(safe-area-inset-bottom,0px));display:flex;justify-content:space-between;align-items:flex-end;gap:8px;pointer-events:none}
+.br{display:flex;flex-direction:column;align-items:flex-end;gap:6px;margin-left:auto}
+.chip.big{padding:9px 16px;font-size:15px;border-radius:99px}
+.chip.go{background:var(--accent);color:var(--panel);border-color:var(--accent)}
+.card{pointer-events:auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px;box-shadow:0 2px 10px rgba(0,0,0,.14);display:flex;flex-direction:column;gap:8px}
+.hint{font-size:12px;color:var(--muted);margin:0}
+.seeds{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;width:min(176px,46vw);pointer-events:auto}
+.seeds .seed{padding:6px 4px;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,.12);border-radius:10px}
+button{font-family:var(--body);font-size:14px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 6px;cursor:pointer;min-width:0}
+button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button:disabled{opacity:.4;cursor:default}
+.seed small{display:block;font-size:11px;color:var(--muted)}
+.seed.on{border-color:var(--accent);background:var(--accent-soft);font-weight:700}
+.inv{font-size:13px;display:flex;gap:10px;flex-wrap:wrap;font-variant-numeric:tabular-nums}
+.inv b{font-weight:400;color:var(--muted)}
+.modal{position:absolute;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--panel);width:100%;max-width:520px;border-radius:18px 18px 0 0;padding-block:16px 20px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:6px;max-height:75%;overflow-y:auto}
+.sheet h2{font-family:var(--display);margin:0;font-size:20px}
+.sheet h3{font-size:13px;color:var(--muted);margin:10px 0 0;font-weight:400;letter-spacing:.04em}
+.item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.item div{min-width:0}
+.item small{display:block;color:var(--muted);font-size:12px}
+.item .look{cursor:pointer;flex:1}
+.item button{flex:none;padding:7px 12px}
+.go{background:var(--accent);color:var(--panel);border-color:var(--accent)}
+.done{color:var(--accent);font-size:12px}
+.close{margin-top:8px}
+.sitbtns{display:flex;gap:8px}.sitbtns .close{flex:1}
+.loading{position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;padding-left:max(24px,env(safe-area-inset-left,0px));padding-right:max(24px,env(safe-area-inset-right,0px));transition:opacity .5s}
+.loading.done{opacity:0;pointer-events:none}
+.loading .lt{font-family:var(--display);font-size:28px;margin:0}
+.loading p{margin:0;color:var(--muted)}
+.clockrow{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.clock{font-size:12px;color:var(--ink);margin:0;font-variant-numeric:tabular-nums;background:none;border:none;padding:0;text-align:left;text-decoration:underline dotted var(--muted);text-underline-offset:3px;min-width:0}
+.snd{flex:none;font-size:12px;padding:4px 10px;border-radius:99px}
+.snd.on{background:var(--accent-soft);border-color:var(--accent)}
+.sidebtns{display:flex;gap:4px;justify-content:flex-end;flex-wrap:wrap}
+/* 기본 설정: 크기 계산 방식을 맞추고, 숨긴 창은 확실히 숨겨요 */
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0}
+
+/* ---------- 귀농 레벨 (아래 정보칸 맨 위) ---------- */
+.lvrow{display:flex;align-items:center;gap:8px;padding:0;border:none;background:none;font-size:12px;text-align:left;width:100%}
+.lvname{font-family:var(--display);font-size:14px;flex:none}
+.xpbar{flex:1;height:8px;border-radius:99px;background:var(--line);overflow:hidden;min-width:40px}
+.fullrow{display:flex;align-items:center;gap:8px;font-size:12px;margin-top:4px}
+.fullrow .lvname{font-size:13px}
+#fullFill{background:#c9873a}#fullFill.low,#waterFill.low{background:#b5523b}#waterFill{background:#4f8fb5}
+#fullNum.boost{color:var(--accent);font-weight:700}
+.xpbar i{display:block;height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .4s}
+.xpnum{flex:none;color:var(--muted);font-variant-numeric:tabular-nums}
+.lvbig{font-family:var(--display);font-size:26px;margin:6px 0 4px;color:var(--accent)}
+
+/* ---------- 작업 화면 (밭 한 칸 가까이) ---------- */
+.work{position:absolute;inset:0;touch-action:none;user-select:none;-webkit-user-select:none;cursor:pointer}
+.wlayer{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.wguide{stroke:#fff;stroke-width:4;stroke-dasharray:10 9;stroke-linecap:round;opacity:.9}
+.wguide.done{display:none}
+.wtarget{fill:rgba(255,255,255,.18);stroke:#fff;stroke-width:3;stroke-dasharray:6 5}
+.wtop{position:absolute;top:max(10px,env(safe-area-inset-top,0px));left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
+.wsteps{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;margin:0;padding:0;list-style:none}
+.wsteps li{font-size:12px;padding:4px 10px;border-radius:99px;background:var(--panel);border:1px solid var(--line);color:var(--muted);opacity:.85}
+.wsteps li.on{background:var(--accent);border-color:var(--accent);color:var(--panel);opacity:1;font-weight:700}
+.wsteps li.done{text-decoration:line-through}
+
+.wtip{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 14px;font-size:15px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.12);max-width:420px}
+.wbot{position:absolute;bottom:16px;left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));display:flex;justify-content:space-between;align-items:center;gap:8px;pointer-events:none}
+.wbot button{pointer-events:auto;padding:8px 16px;border-radius:99px;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.wcare{font-size:13px;letter-spacing:.1em;color:var(--ink);background:var(--panel);border-radius:99px;padding:5px 12px;border:1px solid var(--line)}
+.wcare:empty{visibility:hidden}
+.wgauge{position:absolute;left:50%;bottom:72px;transform:translateX(-50%);width:min(300px,72%);height:22px;border-radius:99px;background:var(--panel);border:1px solid var(--line);overflow:hidden;pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.wgauge i{position:absolute;top:0;bottom:0;display:block}
+.wgauge .zone{background:var(--accent-soft);border-left:2px solid var(--accent);border-right:2px solid var(--accent)}
+.wgauge .fill{left:0;background:rgba(80,150,200,.55)}
+.wpop{position:absolute;transform:translate(-50%,-50%);font-family:var(--display);font-size:20px;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.6);pointer-events:none;white-space:nowrap;animation:wpop .9s ease-out forwards}
+@keyframes wpop{from{opacity:1;margin-top:0}to{opacity:0;margin-top:-34px}}
+/* 손가락 안내: 어떤 손동작을 할지 보여 줘요 */
+.finger{position:absolute;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;background:rgba(255,255,255,.7);border:2px solid #2b2a24;pointer-events:none;display:none}
+.f-till{animation:fTill 1.1s ease-in-out infinite}
+@keyframes fTill{0%,100%{transform:translateX(-60px)}50%{transform:translateX(60px)}}
+.f-ridge{animation:fRidge 1.4s ease-in-out infinite}
+@keyframes fRidge{0%{transform:translate(0,0);opacity:0}15%{opacity:1}85%{opacity:1}100%{transform:translate(var(--dx),var(--dy));opacity:0}}
+.f-seed,.f-harvest{animation:fTap .9s ease-in-out infinite}
+@keyframes fTap{0%,100%{transform:scale(1)}50%{transform:scale(.7)}}
+.f-cover{animation:fCover 1.3s linear infinite}
+@keyframes fCover{0%{transform:rotate(0) translateX(45px) rotate(0)}100%{transform:rotate(360deg) translateX(45px) rotate(-360deg)}}
+.f-water{animation:fHold 1.6s ease-in-out infinite}
+@keyframes fHold{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,255,255,.7)}50%{transform:scale(.8);box-shadow:0 0 0 14px rgba(255,255,255,0)}}
+
+/* ---------- 앉은 화면 (평상·정자) ---------- */
+.sit{position:absolute;inset:0;pointer-events:none;display:flex;align-items:flex-end;justify-content:center}
+.sitpanel{pointer-events:auto;background:var(--panel);width:100%;max-width:520px;max-height:45%;overflow-y:auto;border-radius:18px 18px 0 0;padding:14px max(16px,env(safe-area-inset-right,0px)) 18px max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:6px;box-shadow:0 -2px 12px rgba(0,0,0,.15)}
+.sithead{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.sithead h2{font-family:var(--display);margin:0;font-size:20px}
+.sithead small{color:var(--muted);font-size:12px}
+.sitpanel h3{font-size:13px;color:var(--muted);margin:6px 0 0;font-weight:400}
+.sitpanel .hint{margin:4px 0}
+/* 차림표: 나무판 느낌 */
+.menuboard{background:#6b4a2e;color:#f6ecd2;border-radius:10px;padding:10px 12px;border:3px solid #4a3220}
+.menuboard h3{font-family:var(--display);color:#f6ecd2;font-size:17px;margin:0 0 4px;text-align:center;letter-spacing:.2em}
+.mrow{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px dashed rgba(246,236,210,.3)}
+.mrow:last-child{border-bottom:none}
+.mrow div{flex:1;min-width:0}
+.mrow small{display:block;font-size:11px;opacity:.75}
+.mrow span{font-variant-numeric:tabular-nums;flex:none}
+.mrow button{flex:none;padding:5px 10px;background:#f6ecd2;color:#4a3220;border-color:#f6ecd2}
+
+/* ---------- 부뚜막 요리 손가락 안내 ---------- */
+.f-rubY{animation:fRubY 1.1s ease-in-out infinite}
+@keyframes fRubY{0%,100%{transform:translateY(-45px)}50%{transform:translateY(45px)}}
+.f-flick{animation:fFlick 1.2s ease-out infinite}
+@keyframes fFlick{0%{transform:translateY(40px);opacity:0}20%{opacity:1}80%{opacity:1}100%{transform:translateY(-70px);opacity:0}}
+.wto{stroke:#ffe08a}
+.wghost{fill:rgba(255,255,255,.45);stroke:#fff;stroke-width:2}
+
+/* 요리 도구 이름표 (양푼, 솥뚜껑, 접시 …) */
+.ctag{position:absolute;transform:translate(-50%,-50%);background:rgba(43,42,36,.82);color:#fbf8f0;font-size:12px;padding:3px 9px;border-radius:99px;white-space:nowrap;pointer-events:none}
+
+/* ---------- 가게 주인과 말하며 사고팔기 (장터) ---------- */
+.talkhead{display:flex;gap:12px;align-items:flex-start}
+.ava{flex:none;width:64px;height:64px;border-radius:50%;overflow:hidden;border:3px solid #c8572f;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.ava svg{display:block;width:100%;height:100%}
+.who{flex:1;min-width:0}
+.who b{font-family:var(--display);font-size:18px}
+.who small{color:#fff;background:#c8572f;border-radius:99px;padding:1px 8px;font-size:11px;margin-left:6px;vertical-align:2px}
+.bubble{position:relative;margin:8px 0 2px;background:var(--accent-soft);border-radius:4px 14px 14px 14px;padding:9px 12px;font-size:15px;line-height:1.45}
+.goods{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:6px}
+.good{border:1px solid var(--line);border-radius:12px;padding:9px 10px;display:flex;flex-direction:column;gap:7px;justify-content:space-between}
+.gname{font-size:15px}
+.gname small{display:block;color:var(--muted);font-size:11px;line-height:1.35;margin-top:2px}
+.gbtn{display:flex;gap:5px}
+.gbtn button{flex:1;padding:7px 4px;font-size:13px}
+.hint.mine{text-align:right;font-variant-numeric:tabular-nums}
+
+/* ---------- 창마다 다른 모양 ---------- */
+.wide{width:100%;margin-top:8px;padding:10px}
+/* 부뚜막: 흙빛, 요리 카드 */
+.sheet.stove{background:linear-gradient(#f3e6d0,#efe0c6 40%,var(--panel));}
+.stovehead{display:flex;align-items:baseline;justify-content:space-between;gap:8px;border-bottom:2px solid #a8835a;padding-bottom:6px}
+.stovehead h2{color:#6b3e1f}.stovehead small{color:#8a6a48;font-size:12px}
+.recipes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.rc{background:#fffaf0;border:1px solid #d9c3a0;border-radius:12px;padding:9px 10px;display:flex;flex-direction:column;gap:5px}
+.rc.lack{opacity:.62}.good.lack{opacity:.55}
+.rtop{display:flex;justify-content:space-between;align-items:baseline;gap:4px}.rtop b{font-family:var(--display);font-size:15px}
+.rc small{color:var(--muted);font-size:11px;line-height:1.35}.rc em{font-style:normal;color:var(--warm);font-size:11px}
+.ings{display:flex;flex-wrap:wrap;gap:4px}
+.ing{font-size:11px;border-radius:99px;padding:2px 7px;background:#e3eed6;color:#3d5f2c}.ing.no{background:#f6dcd2;color:#9a3f22}
+.rc button{margin-top:auto;padding:7px 4px;font-size:13px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .sheet.stove{background:var(--panel)}:root:not([data-theme="light"]) .rc{background:#2b2a22}}
+/* 살림 장부: 줄 쳐진 한지 공책 */
+.sheet.ledger{background-color:#f7f0dc;background-image:repeating-linear-gradient(transparent 0 27px,rgba(140,110,70,.18) 27px 28px);border-left:6px solid #7a4a2a}
+.lhead{display:flex;align-items:baseline;justify-content:space-between;gap:8px}.lhead h2{color:#5a3418}.lhead small{color:#8a6a48;font-size:12px}
+.ltab{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:14px;padding:6px 2px}.ltab span{color:#8a6a48}.ltab b{font-weight:400;font-family:var(--display)}
+.lrow{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px dashed rgba(122,74,42,.35)}
+.lrow div{flex:1;min-width:0}.lrow small{display:block;color:#8a6a48;font-size:11px}
+.lrow .cost{font-variant-numeric:tabular-nums;color:#5a3418;font-size:13px}.lrow button{padding:6px 12px}
+.cheats{display:flex;flex-wrap:wrap;gap:6px}.cheats button{font-size:12px;padding:6px 10px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .sheet.ledger{background-color:#2a261c;color:var(--ink)}}
+/* 이어지는 대화 */
+.chatlog{display:flex;flex-direction:column;gap:6px;margin:8px 0 4px}
+.cb{max-width:84%;margin:0;padding:8px 12px;font-size:15px;line-height:1.45;border-radius:14px}
+.cb.npc{align-self:flex-start;background:var(--accent-soft);border-top-left-radius:4px}
+.cb.me{align-self:flex-end;background:#3a68a0;color:#fff;border-top-right-radius:4px}
+.cb small{font-size:12px;opacity:.8}
+.typing i{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--muted);margin:0 2px;animation:tdot 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes tdot{0%,100%{opacity:.3}50%{opacity:1}}
+.choices{display:flex;flex-direction:column;gap:6px}
+.choices>button{text-align:left;padding:10px 12px;border-radius:12px}
+.choices textarea{width:100%;font-family:var(--body);font-size:15px;padding:10px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--ink);resize:vertical}
+.sheet.chat .close{display:none}
+/* 마을 지도 */
+.places{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.place{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;padding:10px;border-radius:12px;border:1px solid var(--line);background:var(--panel)}
+.place b{font-family:var(--display);font-size:16px}.place small{color:var(--muted);font-size:11px;line-height:1.35}
+.place .tag{margin-top:auto;font-size:12px;padding:2px 9px;border-radius:99px;background:var(--accent);color:var(--panel)}
+.place .tag.off{background:var(--line);color:var(--muted)}
+.place.here{border-color:var(--accent);opacity:1}.place.soon{opacity:.6}
+/* 외양간 */
+.barnhead{display:flex;align-items:baseline;justify-content:space-between}.barnhead small{color:var(--muted)}
+.dots{display:flex;gap:4px;margin-top:6px}.dots i{width:12px;height:12px;border-radius:50%;background:var(--line)}.dots i.on{background:#c9a24a}
+/* 게시판 */
+.sheet.board{background:#c9a87a}
+.sheet.board h2,.sheet.board h3{color:#3a2414}
+.notes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:6px 0}
+.note{background:#fbf8f0;padding:10px;border-radius:2px;box-shadow:0 2px 6px rgba(0,0,0,.2);transform:rotate(-1deg);color:#2b2a24}
+.note:nth-child(2n){transform:rotate(1.2deg)}.note.y{background:#f6e7a8}.note.g{background:#e2efd8}
+.note b{font-family:var(--display)}.note.warnnote{background:#f2c8b8}.note p{margin:4px 0 0;font-size:12px;line-height:1.4}
+.sheet.board .item{background:#fbf8f0;border-radius:8px;padding:8px 10px;margin-top:4px;color:#2b2a24}
+
+/* 앉거나 누웠을 때 카메라 단추 */
+.camctl{position:absolute;top:max(12px,env(safe-area-inset-top,0px));right:max(12px,env(safe-area-inset-right,0px));display:flex;gap:6px;pointer-events:auto}
+.camctl button{min-width:42px;height:42px;border-radius:99px;font-size:18px;box-shadow:0 2px 8px rgba(0,0,0,.15);padding:0 12px}
+.camctl #camReset{font-size:13px}
+
+/* 도끼질: 위에서 아래로 내리찍는 손가락 */
+.f-chop{animation:fChop 1s ease-in infinite}
+@keyframes fChop{0%{transform:translateY(-50px);opacity:0}20%{opacity:1}70%{transform:translateY(60px);opacity:1}100%{transform:translateY(60px);opacity:0}}
+
+/* ---------- 폰마다 맞추기 ---------- */
+/* 가로로 눕혔거나 화면이 낮을 때: 안내 글은 숨기고 정보창을 작게 */
+@media (max-height:520px){
+  .cols .card{padding:5px 8px;gap:3px}
+  #hint,.side .hint:not(.warn),#xpNum{display:none}
+  .stat{width:min(200px,30vw)}.side{width:min(170px,26vw)}
+  .toast{bottom:70px}
+  .sitpanel{max-height:60%}
+  .sheet{max-height:88%}
+}
+/* 아주 작은 폰(폭 360 이하): 글씨와 칸을 조금 줄여요 */
+@media (max-width:360px){
+  .chip{padding:5px 9px;font-size:13px}.brand{font-size:15px}
+  .stat{width:52vw}.side{width:42vw}
+}
+/* 큰 폰·태블릿: 창이 너무 넓어지지 않게 가운데 */
+@media (min-width:700px){.sitpanel,.sheet{max-width:560px}}
+
+/* 그림 마을 지도 */
+.vmap{display:block;flex-shrink:0;width:100%;height:auto;margin:4px 0 10px;border-radius:14px;user-select:none;-webkit-user-select:none}
+.vmap .vm-bg{fill:#e6dcb8}.vmap .vm-hill{fill:#8fae86}.vmap .vm-hill2{fill:#a7c299}
+.vmap .vm-paddy{fill:#c4d68a;stroke:#9aaa66;stroke-width:1.5}
+.vmap .vm-river{fill:none;stroke:#7fb4d0;stroke-width:12;stroke-linecap:round}
+.vmap .vm-road{fill:none;stroke:#f4ead0;stroke-width:5;stroke-linecap:round;stroke-dasharray:1 0}
+.vmap .vm-tree circle{fill:#7aa862}
+.vmap .vpin{cursor:pointer}
+.vmap .vpin circle{fill:#c8572f;stroke:#fffaf0;stroke-width:2.5}
+.vmap .vpin rect{fill:rgba(255,251,240,.95);stroke:#b9a77e;stroke-width:1}
+.vmap .vpin text{font-size:13px;text-anchor:middle;fill:#2b2a24;font-family:"Gowun Dodum",sans-serif}
+.vmap .vpin text.me{font-size:11px;fill:#3a68a0;font-weight:700}
+.vmap .vpin.here circle{fill:#3a68a0}.vmap .vpin.here rect{stroke:#3a68a0;stroke-width:2}
+.vmap .vpin.shut circle{fill:#9a9a9a}.vmap .vpin.shut text{fill:#888}
+.vmap .vpin:active rect,.vmap .vpin:focus rect{fill:#fff1c8}
+
+/* 마을 지도 단추 (이정표 대신) */
+.mapbtn{display:inline-flex;align-items:center;gap:6px}
+.mapbtn.pulse{animation:mapPulse 1.6s ease-in-out infinite}
+@keyframes mapPulse{0%,100%{box-shadow:0 0 0 0 rgba(200,87,47,.55)}50%{box-shadow:0 0 0 9px rgba(200,87,47,0)}}
+@media (prefers-reduced-motion:reduce){.mapbtn.pulse{animation:none;outline:3px solid #c8572f}}
+
+/* 왕 작물 */
+.kingbox{text-align:center;padding:8px 0}.kingbox h2{font-size:22px}
+.kingstar{font-size:46px;color:#e0a020;line-height:1}
+.kingkg{font-family:var(--display);font-size:30px;margin:4px 0;color:#c8572f}
