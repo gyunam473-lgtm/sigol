@@ -336,3 +336,13 @@ body{margin:0}
 .dextabs button small{font-size:11px;color:var(--muted)}
 .dextabs button.on{border-color:#c8572f;box-shadow:inset 0 0 0 2px #c8572f}
 .dextabs button.full small{color:#4f8a3a;font-weight:700}
+
+/* 마을 안내서 */
+.guide details{border:1px solid var(--line);border-radius:12px;background:var(--panel);margin:0 0 6px}
+.guide summary{cursor:pointer;padding:11px 12px;font-family:var(--display);font-size:16px;list-style:none;display:flex;justify-content:space-between;align-items:center}
+.guide summary::-webkit-details-marker{display:none}
+.guide summary::after{content:"▾";color:var(--muted);font-size:13px}.guide details[open] summary::after{content:"▴"}
+.guide .gbody{padding:0 12px 10px;font-size:14px;line-height:1.55}
+.guide ul{margin:0;padding-left:18px}.guide li{margin:3px 0}
+.gtable{width:100%;border-collapse:collapse;font-size:13px}.gtable th,.gtable td{border-bottom:1px solid var(--line);padding:5px 4px;text-align:left;vertical-align:top}
+.gtable td:first-child{white-space:nowrap;font-weight:700}

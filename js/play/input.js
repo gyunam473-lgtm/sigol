@@ -7,7 +7,7 @@ canvas.addEventListener("click",e=>{
   const r=canvas.getBoundingClientRect();ndc.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);
   const list=inHouse?[...roomFloors,roomMaru,roomYo,roomDesk,roomDoor,...roomWins,roomCloset,agungi,...furnObjs].filter(Boolean)
     :PLACES[mode]?PLACES[mode].clicks().concat(npcs.filter(n=>n.g.visible).map(n=>n.g))
-    :[...npcs.filter(n=>n.g.visible&&!n.stay).map(n=>n.g)].concat([ground,house,maruCushion,paddy,toPlaza,well,motang,woodpile,...woodTrees.filter(t=>t.visible),...plots.filter(p=>p.g.visible).map(p=>p.g)],chickens.visible?[chickens]:[],myBarn.visible?[myBarn]:[],bench.visible?[bench]:[],stove.visible?[stove]:[]);
+    :[...npcs.filter(n=>n.g.visible&&!n.stay).map(n=>n.g)].concat([ground,house,maruCushion,paddy,toPlaza,well,motang,woodpile,...woodTrees.filter(t=>t.visible),...plots.filter(p=>p.g.visible).map(p=>p.g)],chickens.visible?[chickens]:[],myBarn.visible?[myBarn]:[],bench.visible?[bench]:[],stove.visible?[stove]:[],typeof homeClicks==="function"?homeClicks():[]);
   ray.setFromCamera(ndc,camera);const hits=ray.intersectObjects(list,true);if(!hits.length)return;
   let o=hits[0].object;while(o&&!o.userData.kind)o=o.parent;if(!o)return;const k=o.userData.kind;
   if(k==="ground"||k==="roomfloor"||k==="dabangfloor"||k==="sanground"){const p=hits[0].point;go(p.x,p.z,null);showMark(me.tx,me.tz)}
@@ -142,6 +142,7 @@ function obstacles(){
   woodTrees.forEach(t=>{if(t.visible)R.push([t.position.x-0.9,t.position.z-0.5,t.position.x+0.9,t.position.z+0.5])});
   R.push([PADDY.x-3.5,PADDY.z-2.3,PADDY.x+3.5,PADDY.z+2.3]);
   if(bench.visible)R.push([BENCH.x-BENCH.W/2,BENCH.z-BENCH.D/2,BENCH.x+BENCH.W/2,BENCH.z+BENCH.D/2]);
+  if(typeof extraHomeObs==="function"&&mode==="home")R.push(...extraHomeObs());
   if(ijang.visible)R.push([-15.5,3.6,-10.9,9.1],[-6.8,-2.3,-2.4,0.5],[-17.6,-10,-1,-9.2],[-17.7,-9.6,-16.9,3.6]);
   return R}
 var OBS=[];const PAD=0.35;

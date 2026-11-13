@@ -41,10 +41,12 @@ function openVillage(){
   PLACES_SOON.forEach(([n,s])=>h+=`<div class="place soon"><b>${n}</b><small>${s}</small><span class="tag off">준비 중</span></div>`);
   h+=`</div>`;
   if(mode!=="home")h+=`<button class="go wide" id="mapHome">우리 땅으로 돌아가기</button>`;
+  h+=`<button class="wide" id="mapGuide">마을 안내서 보기 · 무엇을 어디서 하나</button>`;
   openSheet(h);sheet.classList.add("map");
   sheet.querySelectorAll("[data-place]").forEach(b=>b.onclick=()=>{closeSheet();goPlace(b.dataset.place)});
   sheet.querySelectorAll("[data-vgo]").forEach(b=>{const fn=()=>{const k=b.dataset.vgo;if(k===mode)return;closeSheet();if(k==="home")goHome();else goPlace(k)};b.onclick=fn;b.onkeydown=e=>{if(e.key==="Enter")fn()}});
   if($("mapHome"))$("mapHome").onclick=()=>{closeSheet();goHome()};
+  $("mapGuide").onclick=()=>openGuide();
 }
 // 냇물 떠 마시기
 function drinkStream(){const before=waterNow();S.water=100;save();refresh();sfx("water");buzz(15);

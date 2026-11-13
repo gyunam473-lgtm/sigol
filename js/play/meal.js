@@ -41,9 +41,12 @@ function nourish(id,where){
    우리 평상에 앉으면 "찬장에서 꺼내기"로 골라서 소반에 올려 먹어요 */
 const PANTRY_MAX=20;
 function toPantry(id,n=1){S.pantry=S.pantry||[];let k=0;for(let i=0;i<n&&S.pantry.length<PANTRY_MAX;i++){S.pantry.push(id);k++}return k}
-function pantryHtml(){const P=S.pantry||[];if(!P.length)return "";const cnt={};P.forEach(id=>cnt[id]=(cnt[id]||0)+1);
-  return `<h3>찬장 · 넣어 둔 음식 ${P.length}개</h3>`+Object.entries(cnt).map(([id,n])=>`<div class="item"><div>${dishName(id)}<small>${n}개 · 꺼내서 소반에 올려요</small></div><button data-pan="${id}" ${S.dishes.length<DISH_MAX?"":"disabled"}>꺼내기</button></div>`).join("")}
-function bindPantry(after){document.querySelectorAll("[data-pan]").forEach(b=>b.onclick=()=>{const id=b.dataset.pan,i=(S.pantry||[]).indexOf(id);if(i<0||S.dishes.length>=DISH_MAX)return;
+const SNACKS=["gotgam_top","gotgam","bangeonsi"]; // 창고에서 바로 꺼내 먹는 주전부리
+function pantryHtml(){const P=S.pantry||[],sn=SNACKS.filter(k=>S.inv[k]>0);if(!P.length&&!sn.length)return "";const cnt={};P.forEach(id=>cnt[id]=(cnt[id]||0)+1);
+  const snack=sn.map(k=>`<div class="item"><div>${ITEMS[k].name}<small>창고에 ${S.inv[k]}개 · 하나 꺼내 소반에</small></div><button data-snack="${k}" ${S.dishes.length<DISH_MAX?"":"disabled"}>꺼내기</button></div>`).join("");
+  return `<h3>찬장 · 넣어 둔 음식 ${P.length}개</h3>`+snack+Object.entries(cnt).map(([id,n])=>`<div class="item"><div>${dishName(id)}<small>${n}개 · 꺼내서 소반에 올려요</small></div><button data-pan="${id}" ${S.dishes.length<DISH_MAX?"":"disabled"}>꺼내기</button></div>`).join("")}
+function bindPantry(after){document.querySelectorAll("[data-snack]").forEach(b=>b.onclick=()=>{const k=b.dataset.snack;if(!(S.inv[k]>0)||S.dishes.length>=DISH_MAX)return;S.inv[k]--;S.dishes.push(k);drawHomeTable();sfx("pop");save();toast(josa(ITEMS[k].name,"을","를")+" 하나 꺼내 소반에 올렸어요");if(after)after()});
+document.querySelectorAll("[data-pan]").forEach(b=>b.onclick=()=>{const id=b.dataset.pan,i=(S.pantry||[]).indexOf(id);if(i<0||S.dishes.length>=DISH_MAX)return;
   S.pantry.splice(i,1);S.dishes.push(id);drawHomeTable();sfx("pop");save();toast(josa(dishName(id),"을","를")+" 찬장에서 꺼내 소반에 올렸어요");if(after)after()})}
 
 /* ---------- 들고 가기 ---------- */

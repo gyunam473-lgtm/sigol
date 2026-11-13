@@ -49,7 +49,7 @@ function openShop(k,line){if(SHOPS[k].open)return SHOPS[k].open(line);
   if(k==="dabang"){toast("다방 사장님: \""+pickOne(["어서 와요~ 아무 데나 편히 앉아요","쌍화차에 노른자 동동 띄워 줄까?","소파에 앉으면 차 갖다줄게"])+"\"");sfx("pop");return}
   const hello=line||pickOne(SHOP_HELLO[k]);let b='<div class="goods">';
   if(k==="veg"||k==="egg"){
-    const list=k==="veg"?Object.keys(CROPS).concat(Object.keys(ITEMS).filter(i=>ITEMS[i].grade&&S.inv[i]>0)):["egg"];
+    const list=k==="veg"?Object.keys(CROPS).concat(Object.keys(ITEMS).filter(i=>(ITEMS[i].grade||ITEMS[i].snack||i==="gam")&&S.inv[i]>0)):["egg"];
     list.forEach(i=>{const n=S.inv[i]||0;b+=goods(ITEMS[i].name,`가진 것 ${n}개 · 하나에 ${ITEMS[i].price}원`,`<button class="go" data-sell="${i}" ${n?"":"disabled"}>1개 팔기</button><button data-sellall="${i}" ${n>1?"":"disabled"}>다 팔기</button>`)});
     if(k==="veg"){const fo=Object.keys(FORAGE).filter(i=>S.inv[i]>0);if(fo.length){b+='</div><h3>뒷산에서 캔 것도 사 줘요</h3><div class="goods">';
       fo.forEach(i=>{const n=S.inv[i];b+=goods(FORAGE[i].name,`가진 것 ${n}개 · 하나에 ${FORAGE[i].sell.toLocaleString()}원`,`<button class="go" data-sell="${i}">1개 팔기</button><button data-sellall="${i}" ${n>1?"":"disabled"}>다 팔기</button>`)})}}
