@@ -179,7 +179,9 @@ const KJ_STATIONS=[[-3.2,3.0],[0,3.0],[3.2,3.0]]; // 내가 거드는 자리 (�
   kjSite.add(hitBox(w+0.4,1.2,d+0.4,0,0.6,0));kjSite.position.set(KJ_C.x,0,KJ_C.z);hall.add(kjSite);poke(kjSite,()=>openKimjang(),[KJ_C.x,KJ_C.z+KJ_C.d/2+0.9])})();
 addToPlace("hall",[kjSite],[[KJ_C.x-KJ_C.w/2-0.2,KJ_C.z-KJ_C.d/2-0.2,KJ_C.x+KJ_C.w/2+0.2,KJ_C.z+KJ_C.d/2+0.2]]);
 let kjPeople=null;
-function kjApply(){const on=kjSeason();kjSite.visible=on;if(kjPeople)kjPeople.forEach(p=>p.g.visible=on);if(!on||kjPeople||!me)return;
+// 김장은 해 있을 때만: 해 뜨고 30분 뒤 ~ 해 지고 30분 뒤. 밤엔 아주머니들이 집에 가고 대야·배추만 남아요 (2026-11-13)
+function kjDaytime(){const t=sunTimes(new Date()),h=hourNow();return h>=t.rise+0.5&&h<=t.set+0.5}
+function kjApply(){const on=kjSeason(),day=kjDaytime();kjSite.visible=on;if(kjPeople)kjPeople.forEach(p=>p.g.visible=on&&day);if(!on||kjPeople||!me)return;
   const who=[["김장 품앗이 아주머니",0xb85a6a,{scarf:0xf2e6c8,apron:0xf6f0e2}],["동네 아저씨",0x6a7a5a,{cap:0x3a4a3a}],["옆마을 할머니",0x9a7aa8,{scarf:0xe8d8c8,apron:0xf6f0e2}],["새댁",0xd8a0b0,{hat:false,hair:0x2a1a14,apron:0xf2e6c8}],
     ["부녀회장님",0xc84a6a,{scarf:0xf6f0e2,apron:0xe8e0d0}],["동네 할아버지",0x7a6a54,{hat:true,hair:0xdedad2}],["윗마을 아주머니",0xd8785a,{scarf:0xf2e6c8,apron:0xf6f0e2}],["귀농 새내기",0x5a8a6a,{apron:0xe8e0d0}],
     ["이장님 사모님",0x8a6aa8,{scarf:0xf2f0e8,apron:0xf6f0e2}],["동네 청년",0x4a6a8a,{cap:0x2a3a4a}]];
@@ -188,6 +190,7 @@ function kjApply(){const on=kjSeason();kjSite.visible=on;if(kjPeople)kjPeople.fo
 CH.jeorim={name:"배추 절이기",g:"rub",n:4,guide:n=>`반 가른 배추에 굵은소금을 슥슥 뿌려 절여요 · ${n}번 남음`,pop:"솔솔",sfx:"scrape"};
 CH.sok={name:"속 넣기",g:"tap",guide:()=>"배춧잎 사이사이 콕콕 빨간 속을 넣어요"};
 function openKimjang(){if(!kjSeason()){toast("다음 마을 행사는 준비 중이에요. 입동·소설 무렵엔 여기서 다같이 김장해요");return}
+  if(!kjDaytime()){const t=sunTimes(new Date());toast("김장은 해 있을 때 해요. 아주머니들은 "+(hourNow()<t.rise?"":"내일 ")+fmt12(t.rise+0.5)+"쯤 다시 모여요 · 배추는 소금물에서 밤새 절여져요");return}
   const tot=kjTotal(),done=tot>=KJ.goal,K=(S.kj=S.kj||{})[kjKey()]=(S.kj||{})[kjKey()]||{mine:0},cab=(S.inv.cabbage||0)+(S.inv.cabbage_top||0);
   let h=`<h2>마을 공동 김장</h2><p class="hint">입동·소설 무렵, 온 마을 사람이 회관 앞마당에 모여 크게 김장해요. 다같이 ${KJ.goal}포기를 채우면 마을 잔치!</p>
     <div class="kjbar"><i style="width:${tot/KJ.goal*100}%"></i><span>${tot}/${KJ.goal}포기</span></div><p class="hint">내가 보탠 것 ${K.mine}포기 · 나머지는 마을 사람들이 조금씩 보태요</p><div class="goods">`;
