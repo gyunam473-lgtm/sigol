@@ -394,3 +394,11 @@ body{margin:0}
 }
 /* 레벨 막대는 칭호 아래 한 줄로 (칭호가 길어도 ▾ 와 안 겹치게) */
 @media (max-width:700px),(max-height:520px){.stat .lvrow{flex-wrap:wrap;row-gap:4px;padding-right:0}.stat .lvname{max-width:calc(100% - 46px)}.stat .xpbar{flex-basis:100%;height:6px}}
+/* 폰 위쪽 정리 (2026-11-14): ▾ 단추는 작고 가볍게, 레벨 막대는 칭호 밑 가는 줄(빈 칸처럼 안 보이게) */
+@media (max-width:700px),(max-height:520px){
+  .card .more{min-width:26px;min-height:22px;padding:2px 7px;border:none;background:rgba(120,100,70,.10);font-size:11px}
+  .stat .more{top:6px;right:6px}
+  .stat .xpbar{height:4px;min-width:0;background:rgba(120,100,70,.18)}
+  .stat .lvname{font-size:14px}
+  .side .clockrow{align-items:center;gap:4px}
+}
