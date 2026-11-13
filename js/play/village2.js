@@ -145,11 +145,11 @@ const kjSite=new THREE.Group();
     for(let i=0;i<4;i++){const c=sph(0.13,i%2?0xe6f2c6:0x8ac060,x+(i-1.5)*0.18,0.42,z+((i%2)-0.5)*0.15);c.scale.set(1,0.6,1.3);kjSite.add(c)}});
   for(let i=0;i<9;i++){const c=sph(0.16,0x9ac078,1.2+(i%3)*0.3,0.14+Math.floor(i/3)*0.2,0.7-(i%2)*0.1);c.scale.set(1,0.85,1.2);kjSite.add(c)} // 배추 더미
   kjSite.add(cyl(0.22,0.18,0.12,0xf2f0ea,1.3,0.08,-0.7,12));kjSite.add(cyl(0.2,0.2,0.02,0xc0392b,1.3,0.14,-0.7,12)); // 고춧가루 양푼
-  kjSite.add(hitBox(3.8,1.2,2.8,0,0.6,0));kjSite.position.set(-1.5,0,3.9);hall.add(kjSite);poke(kjSite,()=>openKimjang(),[-1.5,5.7])})();
-addToPlace("hall",[kjSite],[[-3.3,2.6,0.3,5.2]]);
+  kjSite.add(hitBox(3.8,1.2,2.8,0,0.6,0));kjSite.position.set(-3.6,0,3.9);hall.add(kjSite);poke(kjSite,()=>openKimjang(),[-3.6,5.8])})();
+addToPlace("hall",[kjSite],[[-5.4,2.6,-1.8,5.2]]); // 들어오는 길(가운데)은 비워 둬요
 let kjPeople=null;
 function kjApply(){const on=kjSeason();kjSite.visible=on;if(!on||kjPeople||!me)return;
-  kjPeople=[["김장 품앗이 아주머니",0xb85a6a,{scarf:0xf2e6c8,apron:0xf6f0e2},[-2.9,3.4,1.2]],["동네 아저씨",0x6a7a5a,{cap:0x3a4a3a},[0.1,4.6,-1.6]]].map(([n,c,o,[x,z,r]])=>{const p=person(c,n,Object.assign({style:"nb"},o));
+  kjPeople=[["김장 품앗이 아주머니",0xb85a6a,{scarf:0xf2e6c8,apron:0xf6f0e2},[-5.0,3.4,1.2]],["동네 아저씨",0x6a7a5a,{cap:0x3a4a3a},[-2.0,4.6,-1.6]]].map(([n,c,o,[x,z,r]])=>{const p=person(c,n,Object.assign({style:"nb"},o));
     scene.remove(p.g);p.g.position.set(x,0,z);p.g.rotation.y=r;p.b.scale.y=0.72;hall.add(p.g);return p})}
 CH.jeorim={name:"배추 절이기",g:"rub",n:4,guide:n=>`반 가른 배추에 굵은소금을 슥슥 뿌려 절여요 · ${n}번 남음`,pop:"솔솔",sfx:"scrape"};
 CH.sok={name:"속 넣기",g:"tap",guide:()=>"배춧잎 사이사이 콕콕 빨간 속을 넣어요"};
