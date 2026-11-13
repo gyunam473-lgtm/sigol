@@ -60,6 +60,8 @@ function useGotgamRack(){S.gotgam=S.gotgam||[];const L=S.gotgam,ready=L.filter(s
 function hangGam(){const n=Math.min(GOTGAM.perStrand,S.inv.gam||0);if(!n)return;const R=gRack.position,F=new THREE.Vector3(R.x,0.9,R.z+0.9);let gams=[];
   startChore({steps:["kkakgi","kkokji","maedalgi"],focus:F,cam:new THREE.Vector3(R.x+0.4,1.9,R.z+2.6),look:new THREE.Vector3(R.x,1.0,R.z+0.4),
     targets:s=>s==="maedalgi"?[new THREE.Vector3(R.x-0.6+(S.gotgam.length)*0.6,2.2,R.z)]:gams.map(g=>g.position.clone().add(new THREE.Vector3(0,0.09,0))),
+    // 매달기 차례엔 덕장 막대(높이 2.2)가 화면에 들어오게 카메라를 올려다봐요 (전엔 화면 밖이라 동그라미가 안 보였어요)
+    stepSetup(st){if(st==="maedalgi"){this.cam=new THREE.Vector3(R.x+0.3,1.7,R.z+3.2);this.look=new THREE.Vector3(R.x,1.75,R.z)}},
     setup(){const tb=box(1.2,0.06,0.6,0x8a6a48,F.x,0.8,F.z);this.g.add(tb);for(let i=0;i<n;i++){const m=sph(0.075,0xe8782a,F.x-0.45+i*0.18,0.9,F.z);m.scale.y=1.15;this.g.add(m);gams.push(m);m.add(cyl(0.025,0.03,0.02,0x3a5a2a,0,0.08,0,6))}},
     onRub(s,k,need){const j=Math.min(gams.length-1,Math.floor(k/need*gams.length));gams.slice(0,j+1).forEach(g=>g.material=M(0xf0a050));for(let i=0;i<3;i++)this.g.add(box(0.06,0.005,0.02,0xd8682a,F.x+fr(-0.5,0.5),0.84,F.z+fr(-0.25,0.25)))},
     onTap(s,t){sfx(s==="maedalgi"?"pop":"seed");if(s==="kkokji"){const g=gams.find(q=>q.position.distanceTo(t.p)<0.15);if(g)g.add(cyl(0.004,0.004,0.25,0xe8e0c8,0,0.2,0,4))}
@@ -71,7 +73,9 @@ function kneadGam(i){const s=(S.gotgam||[])[i];if(!s)return;const R=gRack.positi
 let gotgamT=0;
 function gotgamFrame(dt){gRack.visible=mode==="home";if(mode!=="home")return;
   // 이름표 (글씨체 준비 뒤에 한 번만)
-  if(!gRack.userData.lab){const a=label("곶감 덕장",1);a.position.set(0,3.0,0);gRack.add(a);gRack.userData.lab=a;if(gamTree){const b=label("감나무",1);b.position.set(0,3.4,0);gamTree.add(b)}}
+  if(!gRack.userData.lab){const a=label("곶감 덕장",1);a.position.set(0,3.0,0);gRack.add(a);gRack.userData.lab=a;if(gamTree){const b=label("감나무",1);b.position.set(0,3.4,0);gamTree.add(b);gamTree.userData.lab=b}}
+  // 감 따기·깎기·매달기 하는 동안엔 이름표가 화면을 가려서 숨겨요
+  gRack.userData.lab.visible=!PD;if(gamTree&&gamTree.userData.lab)gamTree.userData.lab.visible=!PD;
   gotgamT+=dt;if(gotgamT>3){gotgamT=0;const k=(S.gotgam||[]).map(gStage).join();if(k!==gotgamFrame.k){gotgamFrame.k=k;drawStrands()}applyGamTree()}}
 // 집 땅에선 덕장을 돌아가요
 function extraHomeObs(){return gRack.visible?[[GRACK.x-1.2,GRACK.z-0.4,GRACK.x+1.2,GRACK.z+0.4],[GTREE.x-0.4,GTREE.z-0.4,GTREE.x+0.4,GTREE.z+0.4]]:[]}

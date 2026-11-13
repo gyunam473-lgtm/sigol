@@ -24,13 +24,13 @@ CH.peel={name:"껍질 벗기기",g:"rub",n:3,guide:n=>`앗 뜨거! 호호 불며
   fireBind=function(){fb();document.querySelectorAll("[data-roast]").forEach(b=>b.onclick=()=>startRoast(b.dataset.roast))}}
 Object.keys(FIRE_LOGS).forEach(i=>{const s=FREE_SEATS["fireLog"+i];if(s){s.panel=()=>firePanel();s.bind=()=>fireBind()}});
 function startRoast(k){const r=ROAST[k];if(!SIT||!(S.inv[r.item]>0))return;if(fireLv()<0.2){toast("불이 너무 약해요. 장작을 하나 넣고 구워요");return}
-  const F=new THREE.Vector3(FIRE.x,0,FIRE.z),me0=SIT.seat.clone(),dir=F.clone().sub(me0).setY(0).normalize(),tip=F.clone().addScaledVector(dir,-1.9).add(new THREE.Vector3(0,r.peel?0.12:0.9,0));
+  const F=new THREE.Vector3(FIRE.x,0,FIRE.z),me0=SIT.seat.clone(),dir=F.clone().sub(me0).setY(0).normalize(),tip=F.clone().addScaledVector(dir,r.peel?-1.15:-1.9).add(new THREE.Vector3(0,r.peel?0.24:0.9,0)); // 은박지는 돌 테두리(반지름 1.8) 안쪽 잿불 위에 (전엔 돌 뒤에 묻혀 안 보였어요)
   let food;const raw=new THREE.Color(k==="marsh"?0xf6f4ee:0xb8bcc0),gold=new THREE.Color(k==="marsh"?0xd8a040:0xa8a8a8),burnt=new THREE.Color(0x2a1a10);
   startChore({steps:r.peel?["roast","peel"]:["roast"],zone:r.zone,holdSec:r.sec,roastGuide:r.guide,focus:tip.clone(),
-    cam:me0.clone().addScaledVector(dir,0.6).add(new THREE.Vector3(dir.z*0.9,1.2,-dir.x*0.9)),look:tip.clone().add(new THREE.Vector3(0,-0.1,0)),
+    cam:me0.clone().addScaledVector(dir,r.peel?1.0:0.6).add(new THREE.Vector3(dir.z*0.9,r.peel?1.75:1.2,-dir.x*0.9)),look:tip.clone().add(new THREE.Vector3(0,-0.1,0)),
     setup(){if(k==="marsh"){const st=cyl(0.01,0.012,1.5,0x8a6a48,0,0,0,5);st.position.copy(tip).addScaledVector(dir,-0.7);st.lookAt(tip);st.rotateX(Math.PI/2);this.g.add(st);
         food=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,0.09,14),new THREE.MeshLambertMaterial({color:raw}));food.position.copy(tip);food.lookAt(tip.clone().add(dir));food.rotateX(Math.PI/2);this.g.add(food)}
-      else{food=new THREE.Mesh(new THREE.SphereGeometry(0.09,12,8),new THREE.MeshPhongMaterial({color:raw,shininess:80}));food.scale.set(1.6,0.8,1);food.position.copy(tip);this.g.add(food)}},
+      else{food=new THREE.Mesh(new THREE.SphereGeometry(0.13,14,10),new THREE.MeshPhongMaterial({color:raw,shininess:80}));food.scale.set(1.6,0.8,1);food.position.copy(tip);this.g.add(food)}},
     onHolding(g){const c=g<0.65?raw.clone().lerp(gold,g/0.65):gold.clone().lerp(burnt,Math.min(1,(g-0.65)/0.3));food.material.color.copy(c);if(Math.random()<0.2)burst(0.03,2600,0.03)},
     onHold(g){const ok=g>=r.zone[0]&&g<=r.zone[1];this.res=ok?"ok":g<r.zone[0]?"raw":"burnt";const m=r.msgs[ok?0:g<r.zone[0]?1:2];setTimeout(()=>{const c=sp(tip);wPop(c.x,c.y-50,m)},50);
       if(r.peel&&this.res!=="burnt"){food.material.color.set(k==="goguma"?0xe8a83a:0xf2e0a0)}},
@@ -128,3 +128,6 @@ function startKimjangWork(){const st=pickOne(KJ_STATIONS),C=new THREE.Vector3(KJ
       endChore(`배추 한 포기 김장 끝! (+5포기, 마을 김장 ${kjTotal()}/${KJ.goal})`+(q>0.85?" · 솜씨가 좋다고 칭찬받았어요":"")+home);
       if(feed)setTimeout(()=>{const tmp=dish3D("suyuk");tmp.position.copy(me.g.localToWorld(new THREE.Vector3(0,me.b.position.y+0.95,0.42)));scene.add(tmp);toast("아주머니가 갓 버무린 김치에 수육 한 점을 싸서 입에 쏙!");
         playEat({dish:tmp,id:"suyuk",onDone:()=>{scene.remove(tmp);nourish("suyuk");toast("아삭아삭 매콤달콤… 김장하는 날은 이 맛이지! 든든함 가득")}})},900)}})}
+
+// 앉아서 굽기 같은 손동작을 할 땐 아래 앉은 자리 창과 카메라 단추를 숨겨요 (화면 반을 가려서 구운 게 안 보였어요)
+function sitChoreUi(){const busy=!!(PD&&SIT);const s=$("sit"),c=$("camctl");if(s)s.style.visibility=busy?"hidden":"";if(c)c.style.visibility=busy?"hidden":""}

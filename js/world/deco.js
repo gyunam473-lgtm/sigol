@@ -33,11 +33,11 @@ function scatter(key,src,n){
   const pts=[];for(let i=0;i<n*3&&pts.length<n;i++){
     // 둘레(길가·물건 옆)에 더 몰리게: 덩어리로 모여 나요
     const x=(Math.random()-0.5)*64,z=-24+Math.random()*54;if(!free(x,z))continue;pts.push([x,z]);
-    const c=1+Math.floor(Math.random()*3);for(let k=0;k<c&&pts.length<n;k++){const xx=x+(Math.random()-0.5)*0.9,zz=z+(Math.random()-0.5)*0.9;if(free(xx,zz))pts.push([xx,zz])}}
+    const c=Math.floor(Math.random()*2);for(let k=0;k<c&&pts.length<n;k++){const xx=x+(Math.random()-0.5)*0.9,zz=z+(Math.random()-0.5)*0.9;if(free(xx,zz))pts.push([xx,zz])}}
   const g=new THREE.Group(),m4=new THREE.Matrix4(),q=new THREE.Quaternion(),e=new THREE.Euler(),s=new THREE.Vector3(),p=new THREE.Vector3(),col=new THREE.Color();
   const GC=grassCols(),FC=flowerCols();
   const tufts=new THREE.InstancedMesh(tuftGeo,tuftMat,pts.length);tufts.receiveShadow=true;
-  pts.forEach(([x,z],i)=>{const k=1.0+Math.random()*0.9;m4.compose(p.set(x,0,z),q.setFromEuler(e.set(0,Math.random()*6.3,0)),s.set(k,k*(0.8+Math.random()*0.5),k));tufts.setMatrixAt(i,m4);
+  pts.forEach(([x,z],i)=>{const k=0.8+Math.random()*0.6;m4.compose(p.set(x,0,z),q.setFromEuler(e.set(0,Math.random()*6.3,0)),s.set(k,k*(0.8+Math.random()*0.5),k));tufts.setMatrixAt(i,m4);
     tufts.setColorAt(i,col.setHex(GC[i%GC.length]).multiplyScalar(0.9+Math.random()*0.2))});
   g.add(tufts);
   if(FC){const fl=pts.filter(()=>Math.random()<0.07),f=new THREE.InstancedMesh(flowerGeo,flowerMat,fl.length);
@@ -50,8 +50,9 @@ function scatter(key,src,n){
   g.userData.src=src;scene.add(g);DECO[key]=g;return g}
 
 // 시작할 때 장소마다 차례로 (한꺼번에 하면 잠깐 멈칫해서 나눠서)
-function scatterAll(){const jobs=[["home",land,2200]];
-  Object.entries(PLACES).forEach(([k,P])=>{if(k!=="dwitsan"&&k!=="dabang"&&!P.indoor)jobs.push([k,P.g,1400])});
+function scatterAll(){const jobs=[["home",land,650]];
+  Object.entries(PLACES).forEach(([k,P])=>{if(k!=="dwitsan"&&k!=="dabang"&&!P.indoor)jobs.push([k,P.g,450])});
   jobs.forEach(([k,src,n],i)=>setTimeout(()=>{try{scatter(k,src,n)}catch(e){console.warn("deco",k,e)}},300+i*120))}
 // 그 장소가 보일 때만, 집 안에선 안 보여요
-function decoFrame(){for(const k in DECO){const g=DECO[k];g.visible=g.userData.src.visible&&ground.visible&&!(typeof inHouse!=="undefined"&&inHouse)}}
+function decoFrame(){if(typeof ywG!=="undefined")ywG.visible=mode==="home"&&!PD; // 마당 잡초: 우리 땅에서만, 뽑는 동안엔 숨겨요
+  for(const k in DECO){const g=DECO[k];g.visible=g.userData.src.visible&&ground.visible&&!(typeof inHouse!=="undefined"&&inHouse)}}
