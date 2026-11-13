@@ -99,7 +99,7 @@ const PLACES={
   plaza:{g:plaza,name:"마을 장터",sub:"가게 넷, 먹거리 천막(국밥·순대), 평상·정자 · 날마다",
     hint:"말풍선 달린 가게 주인을 누르면 사고팔고, 정자에 앉으면 음식을 시켜 먹어요.",way:WAYP,
     clicks:()=>[ground,toHome,pav,...STALLS].concat(seaTruck.visible?[seaTruck]:[]),
-    obs:()=>{const R=STALLS.map(s=>[s.position.x-1.8,s.position.z-0.8,s.position.x+1.8,s.position.z+0.8]);R.push([4.2,1.7,7.8,5.3],[-7.5,3,-6.5,4]);if(seaTruck.visible)R.push([-4.5,1.7,-2.7,6.0]);return R}},
+    obs:()=>{const R=STALLS.map(s=>[s.position.x-1.8,s.position.z-0.8,s.position.x+1.8,s.position.z+0.8]);R.push([4.2,1.7,7.8,5.3]);if(seaTruck.visible)R.push([-4.5,1.7,-2.7,6.0]);return R}},
   hall:{g:hall,name:"마을회관",sub:"이장님 · 마을 안내, 불편한 점 접수, 게시판",
     hint:"이장님을 누르면 이야기해요. 게시판엔 마을 소식이, 의자에 앉아 쉬어 가요.",way:[[-5,1],[4,1.5],[-2,3],[2,4],[6,0.5],[-6,4],[0,2],[3,5]],
     clicks:()=>[ground,placeSigns.hall,hallBldg,hallBoard,hallSpeaker],

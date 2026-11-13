@@ -362,3 +362,11 @@ body{margin:0}
 
 /* 화면 가장자리 살짝 어둡게 · 따뜻하게 */
 #vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 85% 75% at 50% 48%,rgba(0,0,0,0) 58%,rgba(46,34,16,.16) 100%)}
+/* 요리 재미: 오늘의 부탁 · 별점 */
+.cookreq{margin:6px 0 4px;padding:9px 12px;border-radius:12px;background:#fff6dc;border:1px dashed #c8a050;color:#5a4220;font-size:13px;line-height:1.5}
+.cookreq small{display:block;color:#8a6a3a;font-size:11.5px}.cookreq em{color:#3f7a3a;font-style:normal;font-weight:600}
+.cookreq.done{background:#eef6e6;border-color:#8ab070}
+.cooklv{margin:2px 0 6px}
+.rtop .stars{color:#e0a020;font-size:12px;letter-spacing:1px;margin-left:6px}
+.rtop .reqtag{margin-left:6px;padding:1px 7px;border-radius:99px;background:#e8803a;color:#fff;font-size:11px}
+.toolh{margin:10px 0 4px;font-size:14px}

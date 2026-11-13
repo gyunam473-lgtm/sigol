@@ -131,3 +131,32 @@ function village4Frame(dt,now){if(!me)return;makeV4People();if(!cjPeople)return;
 // 마을 지도 설명
 PLACES.mill.sub="떡메치기로 인절미 만들기 · 쌀가마 나르기 일손 · 떡 뽑기 · 쌀 팔기";
 PLACES.clinic.sub="아침 건강 체조(해 뜰 녘~11시) · 건강 수첩 · 하루 한 번 비타민";
+
+/* ================= 분교: 낮엔 모닥불을 치우고 아이들이 뛰놀아요 (2026-11-13) =================
+   해 뜨고 1시간 뒤 ~ 해 지기 1시간 전까지는 모닥불·통나무 의자를 치워 둬요(운동장을 아이들이 써요).
+   해 지기 한 시간 전부터 다시 모닥불 자리를 펴요. 아이들은 낮에만, 술래잡기하며 뛰어다니고 둘은 줄넘기 */
+function schoolDay(){const t=sunTimes(new Date()),h=hourNow();return h>=t.rise+1&&h<t.set-1}
+{const fireSet=new Set([fireG,...fireLogMeshes]),fireRects=new Set([[FIRE.x-2.0,FIRE.z-2.0,FIRE.x+2.0,FIRE.z+2.0],...FIRE_LOGS.map(L=>[L.x-0.35,L.z-0.35,L.x+0.35,L.z+0.35])].map(r=>r.join()));
+  const c0=PLACES.school.clicks,o0=PLACES.school.obs;
+  PLACES.school.clicks=()=>schoolDay()?c0().filter(o=>!fireSet.has(o)):c0();
+  PLACES.school.obs=()=>schoolDay()?o0().filter(r=>!fireRects.has(r.join())):o0()}
+let kids=null;
+function makeKids(){if(kids||!me)return;const cols=[0xe85a5a,0x5a8ae8,0xf2c84a,0x6ac86a,0xe88ac8,0xf29a4a];
+  kids=cols.map((c,i)=>{const p=person(c,i?"":"분교 아이들",{hat:false,hair:0x2a1a14,style:"nb",pants:i%2?0x2a3a6a:0x6a2a3a});scene.remove(p.g);p.g.scale.setScalar(0.6);if(i)p.label.visible=false;
+    p.g.position.set(fr(-8,8),0,fr(-6,6));p.tx=p.g.position.x;p.tz=p.g.position.z;p.rope=i>=4;if(p.rope)p.g.position.set(i===4?5.2:6.4,0,4.5);
+    p.g.userData={kind:"poke",poke:()=>{sfx("pop");toast(pickOne(["아이: \"술래 잡아 봐라~!\"","아이: \"아저씨도 같이 놀아요!\"","아이: \"선생님이 그네는 줄 서서 타래요\"","아이: \"이따 저녁에 모닥불 피우면 마시멜로 구워 먹을 거예요!\""]))}};school.add(p.g);return p});
+  // 줄넘기 줄 (둘 사이)
+  const rope=new THREE.Mesh(new THREE.TorusGeometry(0.6,0.012,4,24,Math.PI),M(0xf2f0ea));rope.position.set(5.8,0.05,4.5);rope.rotation.y=0;school.add(rope);kids.rope=rope;
+  addToPlace("school",kids.map(k=>k.g),[])}
+function schoolFrame(dt,now){if(mode!=="school"||!me)return;makeKids();const day=schoolDay(),t=now/1000;
+  fireG.visible=!day;fireLogMeshes.forEach(m=>m.visible=!day);if(fireCrowd&&day)fireCrowd.forEach(p=>p.g.visible=false);
+  kids.rope.visible=day;
+  kids.forEach((k,i)=>{k.g.visible=day;if(!day)return;
+    if(k.rope){k.b.position.y=Math.max(0,Math.sin(t*6+i))*0.25;k.arms.forEach((a,j)=>{a.rotation.x=-0.6+Math.sin(t*6+i)*0.4;a.rotation.z=(j?1:-1)*0.5});k.g.rotation.y=i===4?Math.PI/2:-Math.PI/2;return}
+    const p=k.g.position;let dx=k.tx-p.x,dz=k.tz-p.z,d=Math.hypot(dx,dz);
+    // 술래(0번)는 가까운 아이를 쫓고, 나머지는 도망다녀요
+    if(i===0){const tg=kids[1+Math.floor(t/6)%3].g.position;k.tx=tg.x;k.tz=tg.z;dx=k.tx-p.x;dz=k.tz-p.z;d=Math.hypot(dx,dz)}
+    else if(d<0.3){k.tx=fr(-9,9);k.tz=fr(-7,6.5)}
+    const sp=(i===0?2.6:2.3)*dt;if(d>0.05){p.x+=dx/d*Math.min(sp,d);p.z+=dz/d*Math.min(sp,d);k.g.rotation.y=Math.atan2(dx,dz)}
+    k.b.position.y=Math.abs(Math.sin(t*9+i))*0.12;k.arms.forEach((a,j)=>{a.rotation.x=Math.sin(t*9+i+(j?Math.PI:0))*0.8;a.rotation.z=(j?1:-1)*0.2})})}
+{const _v4=village4Frame;village4Frame=function(dt,now){_v4(dt,now);schoolFrame(dt,now)}}

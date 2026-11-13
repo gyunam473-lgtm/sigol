@@ -1,6 +1,6 @@
 /* 마을 다같이 (2026-11-13): 사람들이 모이는 곳에 깔아 두는 은근한 힐링
    1) 분교 운동장 큰 모닥불: 해가 지면 불이 피어요. 통나무 의자 두 겹(스무 자리 넘게)에 앉아 불멍, 장작을 보태면 불이 커지고 곁에 앉으면 덜 지쳐요
-   2) 당산나무 소원 매듭: 장터 느티나무에 한마디 적은 천을 매달고, 남이 단 것도 읽어요
+   2) 당산나무 소원 매듭: 마을회관 앞마당 당산나무에 한마디 적은 천을 매달고, 남이 단 것도 읽어요
    3) 마을 꽃길: 장터 남쪽 길가·냇가 둑 빈자리에 꽃씨를 심으면 마을이 점점 예뻐져요 (누가 심었는지 살짝)
    5) 노을 정자: 해 질 녘 장터 정자·꼭대기 정자에 앉으면 "노을 보기"
    6) 공동 김장: 입동·소설 무렵 넓힌 마을회관 앞마당에서 크게. 배추를 보태고 일손을 거들어 100포기를 채우면 마을 잔치
@@ -56,7 +56,8 @@ function fireCrowdApply(){if(mode!=="school"||!me)return;
   const on=fireBase()>0;fireCrowd.forEach(p=>p.g.visible=on)}
 function fireBase(){return (skyNow.night||0)>0.35?0.35:0} // 밤엔 마을 사람들이 늘 지펴 둬요
 function fireOwn(){const f=S.fire;if(!f)return 0;return Math.max(0,f.lv-(Date.now()-f.t)/FIRE.decay*0.1)}
-const fireLv=()=>Math.min(1,Math.max(fireBase(),fireOwn()));
+// 낮엔 운동장을 아이들이 써서 모닥불을 치워 둬요 (play/village4.js 의 schoolDay)
+const fireLv=()=>typeof schoolDay==="function"&&schoolDay()?0:Math.min(1,Math.max(fireBase(),fireOwn()));
 function addFireWood(who){if(!who){if(!((S.inv.jangjak||0)>0)){toast("장작이 없어요. 모탕에서 패 오거나 목공소에서 한 짐 사 와요");return false}S.inv.jangjak--}
   S.fire={lv:Math.min(1,Math.max(fireOwn(),fireBase())+0.35),t:Date.now()};save();refresh();burst(0.5,700,0.16);burst(0.12,3000,0.06,0.15);
   toast(who?josa(who,"이","가")+" 모닥불에 장작을 보탰어요. 불길이 확!":pickOne(["장작을 넣으니 불길이 하늘 높이 솟아요","타닥타닥, 불꽃이 별까지 튀어 올라요","불이 커졌어요. 운동장이 환해요"]));
@@ -84,13 +85,27 @@ const WISH_BASE=[["옆집 할머니","손주들 건강하게 해 주이소",0xd8
   ["국밥집 아주머니","장사 잘되게 해 주세요 ㅎㅎ",0xe8b830],["분교 선생님","아이들이 늘 웃기를",0xe88aa8],["방앗간 아저씨","허리 안 아프게",0xf2f0ea],
   ["다방 사장님","단골 손님 많이 오세요",0xb84aa8],["보건소 선생님","모두 아프지 말아요",0x5aaa8a],["구멍가게 할머니","버스 자주 다니게",0xd8a040],["지나가던 사람","여기 오면 마음이 편해져요",0x8aa8d8]];
 const WISH_COL=[0xd8321e,0x3f6f9a,0x4f8a3a,0xe8b830,0xe88aa8,0xf2f0ea];
-const wishG=new THREE.Group();zel.add(wishG);
+// 당산나무 (2026-11-13 장터 가운데 → 마을회관 앞마당 서쪽으로 옮김): 굵은 줄기, 넓은 가지, 금줄, 둥근 돌단, 돌무더기
+plaza.remove(zel);const DS={x:-12,z:0.8};
+const dang=new THREE.Group();
+(function(){dang.add(cyl(1.9,2.2,0.38,0xa8a090,0,0.19,0,20));dang.add(cyl(1.75,1.75,0.04,0xbab2a2,0,0.4,0,20)); // 돌단
+  dang.add(cyl(0.5,0.75,3.2,0x6a4e34,0,1.9,0,10));
+  [[0,1],[2.1,0.9],[4.2,1.1],[1.1,-0.8],[3.3,-0.7]].forEach(([a,l])=>{const b=cyl(0.14,0.24,2.4,0x6a4e34,Math.cos(a)*1.0,2.75+l*0.15,Math.sin(a)*1.0,7);b.rotation.z=Math.cos(a)*-1.0;b.rotation.x=Math.sin(a)*1.0;dang.add(b)});
+  [[0,4.4,0,2.3],[1.7,4.0,0.6,1.7],[-1.6,4.1,-0.4,1.8],[0.4,4.1,-1.7,1.7],[-0.6,4.0,1.7,1.7],[0.2,5.3,0.2,1.6]].forEach(([x,y,z,r])=>{const s=sph(r,0x5f8d4a,x,y,z);s.scale.y=0.75;dang.add(s)});
+  const rope=new THREE.Mesh(new THREE.TorusGeometry(0.66,0.04,6,24),M(0xd8c89a));rope.rotation.x=Math.PI/2;rope.position.y=1.5;dang.add(rope); // 금줄
+  for(let i=0;i<10;i++){const a=i/10*TAU,p=box(0.06,0.18,0.01,0xfaf8f0,Math.cos(a)*0.68,1.38,Math.sin(a)*0.68);p.rotation.y=-a+Math.PI/2;dang.add(p)}
+  for(let i=0;i<9;i++)dang.add(sph(0.18-(i>5?0.06:0),0x8a8478,2.5+(i%3)*0.25-0.25,0.14+Math.floor(i/3)*0.2,-1.2+(i%2)*0.15)); // 돌무더기
+  dang.position.set(DS.x,0,DS.z);hall.add(dang)})();
+const wishG=new THREE.Group();dang.add(wishG);
 function allWishes(){return WISH_BASE.map(([who,text,c])=>({who,text,c,t:0})).concat((S.wishes||[]).map(w=>Object.assign({who:"나"},w)))}
 function drawWishes(){while(wishG.children.length)wishG.remove(wishG.children[0]);const L=allWishes().slice(-40);
   L.forEach((w,i)=>{const a=i*2.399,r=0.75+(i%3)*0.18,y=0.95+(i%4)*0.12,g=new THREE.Group();g.position.set(Math.cos(a)*r,y,Math.sin(a)*r);
     const rb=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.3,0.008),M(w.c));rb.geometry.translate(0,-0.15,0);g.add(rb);g.add(sph(0.02,w.c,0,0,0));g.userData.ph=i;wishG.add(g)})}
 drawWishes();
-poke(zel,()=>openWishTree(),[-5.6,3.6]);addToPlace("plaza",[zel],[]);
+poke(dang,()=>openWishTree(),[DS.x+1.2,DS.z+3.0]);addToPlace("hall",[dang],[[DS.x-2.2,DS.z-2.2,DS.x+2.2,DS.z+2.2],[DS.x+1.9,DS.z-1.6,DS.x+2.9,DS.z-0.7]]);
+addBench("hall",hall,"dangsanB",DS.x,DS.z+4.2,Math.PI,"당산나무 아래 의자","오래된 당산나무 그늘. 소원 매듭이 바람에 하늘하늘해요");
+// 소원 매듭은 넓은 가지 끝에 매달려요
+{const dw=drawWishes;drawWishes=function(){dw();wishG.children.forEach((g,i)=>{g.position.x*=1.9;g.position.z*=1.9;g.position.y=2.35+(i%4)*0.12})};drawWishes()}
 function openWishTree(){const L=allWishes().slice().reverse(),today=new Date().toDateString(),mine=(S.wishes||[]).filter(w=>new Date(w.t).toDateString()===today).length;
   let h=`<h2>당산나무 소원 매듭</h2><p class="hint">마을 사람들이 한마디씩 적어 가지에 매달아 뒀어요. 바람에 하늘하늘</p><div class="wishes">`;
   L.slice(0,24).forEach(w=>h+=`<div class="wish" style="border-left-color:#${w.c.toString(16).padStart(6,"0")}"><p>${esc(w.text)}</p><small>${esc(w.who)}</small></div>`);
@@ -205,6 +220,6 @@ function openKimjang(){if(!kjSeason()){toast("다음 마을 행사는 준비 중
 
 /* ---------- 매 순간 ---------- */
 function village2Frame(dt,now){fireFrame(dt,now);
-  if(mode==="plaza")wishG.children.forEach(g=>g.rotation.z=Math.sin(now/700+g.userData.ph)*0.25);
+  if(mode==="hall")wishG.children.forEach(g=>g.rotation.z=Math.sin(now/700+g.userData.ph)*0.25);
   flowerT+=dt;if(flowerT>5){flowerT=0;if(mode==="plaza"||mode==="stream"){const k=Object.values(S.flowers||{}).filter(f=>Date.now()-f.t>=FLOWER_GROW).length;if(k!==village2Frame.bloomN){village2Frame.bloomN=k;drawFlowers()}}}
   if(mode==="hall")kjApply()}

@@ -25,7 +25,7 @@ const FREE_SEATS={
     get:()=>({pos:[HF.x-1.3,0.68,HF.z-2.15],face:0,stand:[HF.x-1.3,HF.z-0.75],cam:[1.9,1.5,3.6],look:[0,0.7,0],yaw:[-1.3,1.3]})},
   desk:{title:"책상 앞",where:"room",note:"방석에 앉아 앉은뱅이 책상 앞에 붙어 앉았어요.",ledger:true,
     get:()=>({pos:[ROOM.x+roomDesk.position.x,0.06,ROOM.z+roomDesk.position.z+0.72],face:Math.PI,stand:deskStand(),cam:[1.2,1.8,-2.4],look:[0,0.45,0.9],block:[room],yaw:[-1,1]})},
-  plazaBench:{title:"느티나무 아래 의자",where:"plaza",note:"느티나무 그늘이 시원해요. 장터 사람들 구경하기 좋아요.",
+  plazaBench:{title:"장터 긴 의자",where:"plaza",note:"장터 사람들 오가는 걸 구경하기 좋아요.",
     get:()=>({pos:[-7.6,0.5,6.35],face:Math.PI/2,stand:[-6.7,6.4],cam:[-1.5,1.7,-2.8],look:[0,0.8,3]})},
   hallBench:{title:"회관 마당 의자",where:"hall",note:"회관 앞에 앉으니 확성기 소리가 가까이 들려요.",
     get:()=>({pos:[-5.2,0.5,0.75],face:Math.PI,stand:[-5.2,1.6],cam:[1.4,1.8,-2.8],look:[0,0.8,3]})},
