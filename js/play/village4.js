@@ -160,3 +160,25 @@ function schoolFrame(dt,now){if(mode!=="school"||!me)return;makeKids();const day
     const sp=(i===0?2.6:2.3)*dt;if(d>0.05){p.x+=dx/d*Math.min(sp,d);p.z+=dz/d*Math.min(sp,d);k.g.rotation.y=Math.atan2(dx,dz)}
     k.b.position.y=Math.abs(Math.sin(t*9+i))*0.12;k.arms.forEach((a,j)=>{a.rotation.x=Math.sin(t*9+i+(j?Math.PI:0))*0.8;a.rotation.z=(j?1:-1)*0.2})})}
 {const _v4=village4Frame;village4Frame=function(dt,now){_v4(dt,now);schoolFrame(dt,now)}}
+
+/* ================= 목공소 작업대 (2026-11-13) =================
+   작업대를 앞으로 꺼내고 지붕을 높여 잘 보이게. 작업대를 누르면: 가구 고르기(목수 할아버지) · 대패질 거들기(하루 한 번, 슥슥 → 품삯 + 대팻밥 불쏘시개로 장작 2) */
+CH.daepae={name:"대패질",g:"rub",n:6,guide:n=>`대패를 나뭇결 따라 좌우로 쓱싹 밀어요. 대팻밥이 돌돌 말려 나와요 · ${n}번 남음`,pop:"쓱싹",sfx:"scrape"};
+const WB={x:-1.6,z:-3.3};
+const wsBench=hitBox(2.6,1.3,1.4,WB.x,0.65,WB.z);workshop.add(poke(wsBench,()=>openWorkbench(),[WB.x+0.4,WB.z+1.5]));
+addToPlace("workshop",[wsBench],[]);
+function openWorkbench(){const d=dayKey(new Date()),done=S.daepaeDay===d;
+  openSheet(`<h2>작업대</h2><p class="hint">톱, 대패, 끌이 놓여 있어요. 목수 할아버지: "어여 와. 구경만 해도 재밌을 걸세."</p>
+    <div class="goods">${goods("가구 고르기","목수 할아버지가 짜 둔 가구를 집에 들여요",`<button class="go" id="wbFurn">고르기</button>`)}
+    ${goods("대패질 거들기",done?"오늘은 거들었어요. 내일 또 와요":"하루 한 번 · 널빤지를 대패로 쓱싹 · 품삯 50원 + 대팻밥(불쏘시개) 장작 2",`<button class="go" id="wbWork" ${done?"disabled":""}>거들기</button>`)}</div>`);
+  $("wbFurn").onclick=()=>{closeSheet();openShop("furniture")};if($("wbWork"))$("wbWork").onclick=()=>{closeSheet();startDaepae()}}
+function startDaepae(){if(PD)return;const F=new THREE.Vector3(WB.x,0.95,WB.z);let plank,plane,sh=[];
+  startChore({steps:["daepae"],focus:F,cam:new THREE.Vector3(WB.x+0.3,1.9,WB.z+1.6),look:new THREE.Vector3(WB.x,0.85,WB.z),
+    setup(){plank=box(1.4,0.05,0.24,0xc89a62,WB.x,0.93,WB.z);this.g.add(plank);plane=new THREE.Group();plane.add(box(0.28,0.07,0.09,0x8a5a32,0,0,0));plane.add(box(0.07,0.1,0.05,0x8a5a32,-0.06,0.06,0));plane.position.set(WB.x-0.5,1.0,WB.z);this.g.add(plane)},
+    onRub(s,k,need){const t=k/need;plank.material.color.setHex(0xc89a62).lerp(new THREE.Color(0xf0dcb0),t);const x0=plane.position.x;plane.position.x=x0<WB.x?WB.x+0.5:WB.x-0.5;
+      for(let i=0;i<3;i++){const c=new THREE.Mesh(new THREE.TorusGeometry(0.03,0.008,4,10,Math.PI*1.5),M(0xf2deb0));c.position.set(plane.position.x+fr(-0.1,0.1),1.02,WB.z+fr(-0.08,0.08));c.rotation.set(fr(0,3),fr(0,3),0);c.userData.v=1;this.g.add(c);sh.push(c)}},
+    frame(dt){sh.forEach(c=>{if(c.position.y>0.06){c.position.y-=dt*0.6;c.position.z+=dt*0.3;c.rotation.x+=dt*4}})},
+    onTap:noop,onHold:noop,
+    finish(){S.daepaeDay=dayKey(new Date());S.money+=50;const add=Math.min(2,FUEL.pileMax-(S.inv.jangjak||0));S.inv.jangjak=(S.inv.jangjak||0)+Math.max(0,add);save();refresh();if(typeof drawWoodpile==="function")drawWoodpile();
+      endChore(`목수 할아버지: "허허, 결이 매끈하구먼!" 품삯 50원`+(add>0?` · 대팻밥 불쏘시개로 장작 ${add}개`:""))}})}
+PLACES.workshop.sub="목수 할아버지 · 가구 들이기 · 작업대에서 대패질 거들기";

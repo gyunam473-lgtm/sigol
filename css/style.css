@@ -370,3 +370,9 @@ body{margin:0}
 .rtop .stars{color:#e0a020;font-size:12px;letter-spacing:1px;margin-left:6px}
 .rtop .reqtag{margin-left:6px;padding:1px 7px;border-radius:99px;background:#e8803a;color:#fff;font-size:11px}
 .toolh{margin:10px 0 4px;font-size:14px}
+
+/* 걸어 다닐 때 카메라 단추 (움직였을 때만) */
+.fcctl{position:absolute;top:calc(max(12px,env(safe-area-inset-top,0px)) + 92px);right:max(12px,env(safe-area-inset-right,0px));display:flex;gap:6px;z-index:5}
+.fcctl[hidden]{display:none}
+.fcctl button{min-width:40px;height:40px;border-radius:99px;font-size:17px;box-shadow:0 2px 8px rgba(0,0,0,.15);padding:0 12px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-family:inherit}
+.fcctl #fcReset{font-size:13px}

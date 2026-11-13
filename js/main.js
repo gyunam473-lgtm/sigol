@@ -42,7 +42,7 @@ function loop(now){
     else if(LIE)lieCam(); // 누우면 이불 옆 위에서
     else if(inHouse)roomCam(); // 집 안: 앞쪽 위에서 방을 들여다봐요
     else if(mode==="dabang")dabangCam(); // 다방 안
-    else{const p=me.g.position;camPos.set(p.x,p.y+10,p.z+11);lookT.set(p.x,1,p.z-1)}
+    else freeCam(me.g.position,camPos,lookT); // 걸어 다닐 때: 끌어서 둘러보기·크게 작게 (play/freecam.js)
     camera.position.lerp(camPos,0.07);look.lerp(lookT,0.12);camera.lookAt(look);
     workFrame(dt);cookFrame(dt,now);choreFrame(dt,now);fishFrame(dt,now);eatFrame(dt);placesFrame(dt,now);grindFrame(dt,now);village2Frame(dt,now);gotgamFrame(dt);decoFrame();armsFrame(dt,now);sitChoreUi();village4Frame(dt,now);
   }

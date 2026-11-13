@@ -58,6 +58,8 @@
   </div>
 
   <!-- 앉은 화면: 평상·정자 소반 앞 (js/play/sit.js) -->
+  <!-- 걸어 다닐 때 카메라 (js/play/freecam.js) -->
+  <div class="fcctl" id="fcctl" hidden><button id="fcIn" aria-label="크게 보기">＋</button><button id="fcOut" aria-label="작게 보기">－</button><button id="fcReset">처음 시점</button></div>
   <div class="sit" id="sit" hidden>
     <!-- 카메라 돌리기·크게·작게 (js/play/camctl.js) -->
     <div class="camctl" id="camctl" hidden><button id="camIn" aria-label="크게 보기">＋</button><button id="camOut" aria-label="작게 보기">－</button><button id="camReset">처음 시점</button></div>
@@ -113,6 +115,7 @@ window.addEventListener("error",function(){showFail("화면을 그리다 문제�
 <script src="js/play/house.js"></script>
 <script src="js/play/animals.js"></script>
 <script src="js/play/camctl.js"></script>
+<script src="js/play/freecam.js"></script>
 <script src="js/play/farming.js"></script>
 <script src="js/play/tend.js"></script>
 <script src="js/play/neighbors.js"></script>
