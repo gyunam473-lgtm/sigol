@@ -103,6 +103,7 @@ function applyTime(){
     sky.lerp(cloud,0.7);he*=0.85;su*=0.35}
   scene.background=sky;scene.fog=scene.fog||new THREE.Fog(0,1,2);scene.fog.color.copy(sky);scene.fog.near=clear?32:20;scene.fog.far=clear?75:55;
   hemi.intensity=he;sun.intensity=su;
+  syncTopColor(sky);
   hemi.color.setHex(0xe4eeff).lerp(_cb.setHex(0x9ab0e8),night);hemi.groundColor.setHex(0x93a46c).lerp(_cb.setHex(0x3a4660),night); // 밤엔 푸르스름한 달빛
   winMat.emissive.setRGB(1,0.7,0.28).multiplyScalar(s.glow); // 밤엔 창호지에 불이 켜져요
   lampMat.emissive.setRGB(1,0.62,0.25).multiplyScalar(s.lamp);
@@ -136,3 +137,7 @@ function openTimePick(){const t=sunTimes(new Date()),cur=hourNow();
   $("tpRange").oninput=e=>upd(+e.target.value);
   sheet.querySelectorAll("[data-tp]").forEach(b=>b.onclick=()=>{const h=+b.dataset.tp;$("tpRange").value=h;upd(h)});
   $("tpNow").onclick=()=>{setTimePick(null);closeSheet();toast("실제 시간으로 돌아왔어요")}}
+
+// 휴대폰 맨 위(시계·배터리 줄)와 바탕색을 지금 하늘색에 맞춰요 (2026-11-14: 비 오는 밤인데 위 줄만 하늘색이라 띠처럼 보였어요)
+let _topHex="";
+function syncTopColor(c){const h="#"+c.getHexString();if(h===_topHex)return;_topHex=h;const m=document.querySelector("meta[name=theme-color]");if(m)m.setAttribute("content",h);document.documentElement.style.background=h;document.body.style.background=h}

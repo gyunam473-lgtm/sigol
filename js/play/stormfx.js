@@ -51,7 +51,7 @@ function stormFrame(dt,now){
   FX.wasOn=true;
   // 하늘: 큰비·태풍은 시커멓게, 서리는 차갑고 푸르게
   const dark=wet?new THREE.Color(0x3c444a):new THREE.Color(0xc4d4e4);
-  scene.background=SKY0.bg.clone().lerp(dark,k*(wet?0.85:0.45));scene.fog.color.copy(SKY0.fog).lerp(dark,k*(wet?0.85:0.45));
+  scene.background=SKY0.bg.clone().lerp(dark,k*(wet?0.85:0.45));syncTopColor(scene.background);scene.fog.color.copy(SKY0.fog).lerp(dark,k*(wet?0.85:0.45));
   scene.fog.near=SKY0.near+(wet?10-SKY0.near:0)*k;scene.fog.far=SKY0.far+(wet?38-SKY0.far:0)*k;
   hemi.intensity=SKY0.hemi*(1-(wet?0.45:0.1)*k);sun.intensity=SKY0.sun*(1-(wet?0.8:0.3)*k);
   // 땅
