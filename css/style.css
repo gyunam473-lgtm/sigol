@@ -320,3 +320,9 @@ body{margin:0}
 .tpquick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 .tpquick button{display:flex;flex-direction:column;align-items:center;padding:8px 4px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font:inherit;font-size:14px}
 .tpquick small{color:var(--muted);font-size:11px}
+
+/* 모닥불에 구워 먹기 */
+.roastrow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.roastrow button{display:flex;flex-direction:column;align-items:center;padding:8px 4px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font:inherit}
+.roastrow button.go{background:#c8572f;color:#fff;border-color:#c8572f}.roastrow button:disabled{opacity:.5}
+.roastrow small{font-size:11px;opacity:.8}

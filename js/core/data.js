@@ -5,7 +5,9 @@ const CROPS={
   lettuce:{name:"상추",grow:30,yield:2,price:100,seed:50},
   potato:{name:"감자",grow:45,yield:3,price:120,seed:70},
   tomato:{name:"토마토",grow:60,yield:3,price:180,seed:90},
-  cabbage:{name:"배추",grow:90,yield:2,price:250,seed:120}};
+  cabbage:{name:"배추",grow:90,yield:2,price:250,seed:120},
+  goguma:{name:"고구마",grow:75,yield:4,price:160,seed:90}}; // 고구마: 줄기 밑을 호미로 캐요
+const ROOT_CROPS=["potato","goguma"]; // 땅속 작물: 거둘 땐 호미로 캐고 → 하나씩 주워요
 // 해산물: 우리 마을은 논농사 짓는 내륙이라 바다 것은 생선 트럭이 날마다 싣고 와요.
 // 철마다 들어오는 게 달라요. 멀리서 오니까 값이 비싸고, 되팔 순 없어요(sea:true).
 const SEA={
@@ -74,7 +76,7 @@ const FISH_LV=[{name:"초보 낚시꾼",xp:0},{name:"동네 낚시꾼",xp:25},{n
 const ITEMS=Object.assign({},CROPS,Object.fromEntries(Object.entries(FORAGE).map(([k,v])=>[k,{name:v.name,price:v.sell,forage:true}])),Object.fromEntries(Object.entries(FRESH).map(([k,v])=>[k,{name:v.name,price:0,fresh:true}])),{egg:{name:"달걀",price:60}},STUFF,{makgeolli:{name:"막걸리 한 병",price:0,stuff:true}},
   Object.fromEntries(Object.entries(MEAT).map(([k,v])=>[k,{name:v.name,price:0,meat:true}])),Object.fromEntries(Object.entries(SEA).map(([k,v])=>[k,{name:v.name,price:0,sea:true}])));
 /* ---------- 밭 품질 (2026-11-10): 잘 돌볼수록 특상(값 2배)이 많이, 아주 가끔 왕(값 8배) ---------- */
-const KING_KG={lettuce:[0.8,1.6],potato:[1.2,2.6],tomato:[0.6,1.2],cabbage:[5,9]}; // 왕 작물 무게 (kg)
+const KING_KG={lettuce:[0.8,1.6],potato:[1.2,2.6],tomato:[0.6,1.2],cabbage:[5,9],goguma:[1.0,2.2]}; // 왕 작물 무게 (kg)
 Object.keys(CROPS).forEach(k=>{ITEMS[k+"_top"]={name:"특상 "+CROPS[k].name,price:CROPS[k].price*2,grade:"top",base:k};ITEMS[k+"_king"]={name:"왕"+CROPS[k].name,price:CROPS[k].price*8,grade:"king",base:k}});
 /* ---------- 곤충 채집 (잠자리채): 냇가·분교·뒷산. season 0봄 1여름 2가을 3겨울, time day/night/any, sell 분교 선생님이 사 줘요 ---------- */
 const INSECTS={
@@ -113,7 +115,7 @@ const JOBS=[
 // 그 밖에 줍는 것
 const DASEULGI={sell:30}; // 다슬기 한 줌 (국밥집 아주머니가 사 줘요)
 Object.assign(ITEMS,Object.fromEntries(Object.entries(INSECTS).map(([k,v])=>["bug_"+k,{name:v.name,price:v.sell,bug:true}])),
-  {jip:{name:"볏짚",price:0,stuff:true},daseulgi:{name:"다슬기",price:DASEULGI.sell,stuff:true}},Object.fromEntries(Object.entries(JIP).map(([k,v])=>[k,{name:v.name,price:v.sell,jip:true}])));
+  {marsh:{name:"마시멜로",price:0,stuff:true},jip:{name:"볏짚",price:0,stuff:true},daseulgi:{name:"다슬기",price:DASEULGI.sell,stuff:true}},Object.fromEntries(Object.entries(JIP).map(([k,v])=>[k,{name:v.name,price:v.sell,jip:true}])));
 const EGG_SEC=40;
 // fill: 먹으면 차는 든든함, drink: 마시면 차는 물 (0~100). sea: 해산물 요리 (장날 생선 트럭 재료)
 const RECIPES=[
@@ -151,9 +153,17 @@ const JANG_FOOD=[
 const MILL_FOOD=[
   {id:"garaetteok",name:"가래떡",rice:2,fee:50,fill:30,desc:"방앗간에서 갓 뽑은 말랑한 가래떡"},
   {id:"injeolmi",name:"인절미",rice:2,fee:80,fill:30,desc:"콩고물 듬뿍 묻힌 쫀득한 인절미"}];
-const MILL={ssalSell:120}; // 쌀 한 되 파는 값
+const MILL={ssalSell:120};
+// 모닥불에 구워 먹는 것 (분교 운동장 큰 모닥불, play/village3.js)
+const FIRE_FOOD=[
+  {id:"s_marsh",name:"구운 마시멜로",fill:6,desc:"겉은 노릇 바삭, 속은 쭉 늘어나요"},
+  {id:"tan_marsh",name:"까맣게 탄 마시멜로",fill:3,desc:"탔지만 그래도 달아요"},
+  {id:"gun_goguma",name:"군고구마",fill:35,desc:"호호 불며 껍질 벗기는 노란 속살"},
+  {id:"gun_gamja",name:"구운 감자",fill:30,desc:"포슬포슬, 소금 콕 찍어서"},
+  {id:"tan_goguma",name:"덜 익은 고구마",fill:15,desc:"속이 아직 딱딱해요"},
+  {id:"suyuk",name:"김장 수육 쌈",fill:30,desc:"갓 버무린 김치에 수육 한 점"}]; // 쌀 한 되 파는 값
 // 아무 음식이나 이름·든든함·물 찾기
-const anyFood=id=>RECIPES.find(r=>r.id===id)||MARKET_FOOD.find(f=>f.id===id)||DABANG_MENU.find(f=>f.id===id)||JANG_FOOD.find(f=>f.id===id)||MILL_FOOD.find(f=>f.id===id);
+const anyFood=id=>RECIPES.find(r=>r.id===id)||MARKET_FOOD.find(f=>f.id===id)||DABANG_MENU.find(f=>f.id===id)||JANG_FOOD.find(f=>f.id===id)||MILL_FOOD.find(f=>f.id===id)||FIRE_FOOD.find(f=>f.id===id);
 const dishName=id=>(anyFood(id)||{name:"음식"}).name;
 // 받침 붙이기: josa("감자전","을","를") → "감자전을"
 const josa=(w,a,b)=>{const c=w.charCodeAt(w.length-1)-0xAC00;return w+(c>=0&&c<11172&&c%28?a:b)};

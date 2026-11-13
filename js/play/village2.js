@@ -158,7 +158,7 @@ const kjTotal=()=>Math.min(KJ.goal,kjBase()+kjMine());
 hall.add(box(38,0.02,26,0xd5d0c4,4,0.01,3)); // 회관 앞마당 넓히기 (옛 마당보다 살짝 낮게)
 const KJ_C={x:12,z:4.6,w:11,d:7};
 const kjSite=new THREE.Group();
-const KJ_STATIONS=[[-4,2.4],[-1.3,2.4],[1.3,2.4],[4,2.4],[-4,-0.6],[4,-0.6]]; // 내가 거드는 자리 (깔개 기준)
+const KJ_STATIONS=[[-3.2,3.0],[0,3.0],[3.2,3.0]]; // 내가 거드는 자리 (깔개 기준)
 // 깔개는 바닥(0.04)보다 띄워요. 같은 높이면 번쩍거려요
 (function(){const {w,d}=KJ_C;kjSite.add(box(w,0.02,d,0x3f6fa8,0,0.065,0));
   [[-4,-1.6],[-1.3,-1.6],[1.3,-1.6],[4,-1.6]].forEach(([x,z])=>{kjSite.add(cyl(0.75,0.6,0.42,0xc8322a,x,0.23,z,18));kjSite.add(cyl(0.7,0.7,0.02,0x9ac078,x,0.44,z,18));
@@ -172,7 +172,7 @@ function kjApply(){const on=kjSeason();kjSite.visible=on;if(kjPeople)kjPeople.fo
   const who=[["김장 품앗이 아주머니",0xb85a6a,{scarf:0xf2e6c8,apron:0xf6f0e2}],["동네 아저씨",0x6a7a5a,{cap:0x3a4a3a}],["옆마을 할머니",0x9a7aa8,{scarf:0xe8d8c8,apron:0xf6f0e2}],["새댁",0xd8a0b0,{hat:false,hair:0x2a1a14,apron:0xf2e6c8}],
     ["부녀회장님",0xc84a6a,{scarf:0xf6f0e2,apron:0xe8e0d0}],["동네 할아버지",0x7a6a54,{hat:true,hair:0xdedad2}],["윗마을 아주머니",0xd8785a,{scarf:0xf2e6c8,apron:0xf6f0e2}],["귀농 새내기",0x5a8a6a,{apron:0xe8e0d0}],
     ["이장님 사모님",0x8a6aa8,{scarf:0xf2f0e8,apron:0xf6f0e2}],["동네 청년",0x4a6a8a,{cap:0x2a3a4a}]];
-  const spots=[[-5.6,-1.6,Math.PI/2],[-2.7,-3.0,0],[-0.1,-3.0,0],[2.7,-3.0,0],[5.6,-1.6,-Math.PI/2],[-5.8,1.4,Math.PI/2],[5.8,1.4,-Math.PI/2],[-2.6,2.2,Math.PI],[2.6,2.2,Math.PI],[0,-3.6,0]];
+  const spots=[[-5.6,-1.6,Math.PI/2],[-2.7,-3.0,0],[-0.1,-3.0,0],[2.7,-3.0,0],[5.6,-1.6,-Math.PI/2],[-5.8,1.4,Math.PI/2],[5.8,1.4,-Math.PI/2],[-1.6,2.2,Math.PI],[1.6,2.2,Math.PI],[0,-3.6,0]];
   kjPeople=who.map(([n,c,o],k)=>{const p=person(c,n,Object.assign({style:"nb"},o)),[x,z,r]=spots[k];scene.remove(p.g);p.g.position.set(KJ_C.x+x,0,KJ_C.z+z);p.g.rotation.y=r;p.b.scale.y=0.72;if(k%3)p.label.visible=false;hall.add(p.g);return p})}
 CH.jeorim={name:"배추 절이기",g:"rub",n:4,guide:n=>`반 가른 배추에 굵은소금을 슥슥 뿌려 절여요 · ${n}번 남음`,pop:"솔솔",sfx:"scrape"};
 CH.sok={name:"속 넣기",g:"tap",guide:()=>"배춧잎 사이사이 콕콕 빨간 속을 넣어요"};
@@ -181,15 +181,11 @@ function openKimjang(){if(!kjSeason()){toast("다음 마을 행사는 준비 중
   let h=`<h2>마을 공동 김장</h2><p class="hint">입동·소설 무렵, 온 마을 사람이 회관 앞마당에 모여 크게 김장해요. 다같이 ${KJ.goal}포기를 채우면 마을 잔치!</p>
     <div class="kjbar"><i style="width:${tot/KJ.goal*100}%"></i><span>${tot}/${KJ.goal}포기</span></div><p class="hint">내가 보탠 것 ${K.mine}포기 · 나머지는 마을 사람들이 조금씩 보태요</p><div class="goods">`;
   if(!done){h+=goods("배추 보태기",`가진 배추 ${cab}포기 · 특상은 두 포기로 쳐요`,`<button class="go" id="kjCab" ${cab?"":"disabled"}>한 포기</button>`);
-    h+=goods("일손 거들기","배추 절이고 속 넣기 · 세 포기만큼 일한 셈이에요",`<button class="go" id="kjHelp">거들기</button>`)}
+    h+=goods("김장하기 (한 포기 끝까지)","다듬기 → 반 가르기 → 소금 치기 → 절이기 → 헹구기 → 무채 썰기 → 양념 → 버무리기 → 속 넣기 → 김치통에 · 다섯 포기만큼 · 내가 담근 김치 한 접시",`<button class="go" id="kjHelp">시작</button>`)}
   else h+=goods("마을 김장 잔치!",K.feast?"김장김치를 받아 왔어요. 내년에 또 만나요":"다 채웠어요! 김장김치 두 접시를 받아 가요",K.feast?"":`<button class="go" id="kjFeast">받기</button>`);
   openSheet(h+"</div>");
   if($("kjCab"))$("kjCab").onclick=()=>{let add=1;if(S.inv.cabbage>0)S.inv.cabbage--;else{S.inv.cabbage_top--;add=2}K.mine+=add;sfx("pop");save();refresh();toast("배추를 대야에 보탰어요 · 아주머니: \"아이고 실하다!\"");openKimjang()};
-  if($("kjHelp"))$("kjHelp").onclick=()=>{closeSheet();const st=pickOne(KJ_STATIONS),F=new THREE.Vector3(KJ_C.x+st[0],0.45,KJ_C.z+st[1]);
-    startChore(Object.assign(camAt(F.x,F.y,F.z,1.5,1.2),{steps:["jeorim","sok"],targets:()=>near(F,{n:5,d:0.25}),
-      onRub(){for(let i=0;i<3;i++){const s=sph(0.012,0xffffff,F.x+fr(-0.2,0.2),F.y+0.05,F.z+fr(-0.15,0.15));this.g.add(s)}},onTap(s,t){sfx("pluck");this.g.add(sph(0.03,0xc0392b,t.p.x,t.p.y+0.02,t.p.z))},onHold:noop,
-      finish(){K.mine+=3;let ext="";const d=new Date().toDateString();if(K.suyuk!==d){K.suyuk=d;S.full=Math.min(100,fullNow()+10);ext=" · 아주머니가 수육 한 점에 김치를 싸서 입에 넣어 주셨어요! 든든함 +10"}
-        endChore(`김장 일손을 거들었어요 (+3포기, 지금 ${kjTotal()}/${KJ.goal})`+ext)}}))};
+  if($("kjHelp"))$("kjHelp").onclick=()=>{closeSheet();startKimjangWork()}; // play/village3.js
   if($("kjFeast"))$("kjFeast").onclick=()=>{K.feast=1;let n=0;for(let i=0;i<2;i++)if(S.dishes.length<DISH_MAX){S.dishes.push("kimjang");n++}drawHomeTable();S.jeong=S.jeong||{};NB.forEach(q=>S.jeong[q.name]=(S.jeong[q.name]||0)+1);
     save();sfx("level");closeSheet();toast(`마을 김장 잔치! 김장김치 ${n}접시를 우리 평상에 올려 뒀어요 · 이웃 모두와 정 +1`)}}
 

@@ -146,10 +146,13 @@ function drawPlot(i,force){
   if(st==="ripe"){const s=sph(0.12,0xf6d54a,0,1.3,0);s.userData.spark=true;c.add(s)}
   else drawIssues(c,p); // 목마름·잡초·벌레 (play/tend.js)
 }
+// 땅속에서 캐낸 감자·고구마 한 무더기
+function tuberAt(c,crop,x,z){const col=crop==="goguma"?0x9a3a4a:0xc9a66b;for(let k=0;k<3;k++){const t=sph(crop==="goguma"?0.07:0.075,col,x+(k-1)*0.1,0.05,z+(k%2)*0.06);t.scale.set(crop==="goguma"?1.8:1.2,0.8,1);t.rotation.y=k;c.add(t)}}
 // 다 자란 작물 한 포기 모습 (거두기 작업 화면에서도 같이 써요)
 function ripeAt(c,crop,x,z){
   if(crop==="lettuce"){const m=sph(0.32,0x7cc36a,x,0.18,z);m.scale.y=0.6;c.add(m);c.add(sph(0.2,0xa6dc84,x,0.3,z))}
   if(crop==="potato"){c.add(sph(0.3,0x5f8f45,x,0.3,z));c.add(sph(0.06,0xf5f0e0,x+0.1,0.6,z));c.add(sph(0.1,0xc9a66b,x+0.25,0.05,z+0.15))}
   if(crop==="cabbage"){const b=sph(0.36,0xb9dc8a,x,0.22,z);b.scale.y=0.85;c.add(b);c.add(sph(0.26,0xe6f2c6,x,0.38,z))}
+  if(crop==="goguma"){for(let k=0;k<4;k++){const a=k*1.6+x,l=sph(0.16,0x4f7a3a,x+Math.cos(a)*0.22,0.1,z+Math.sin(a)*0.22);l.scale.set(1.3,0.35,1);c.add(l);const st=cyl(0.015,0.015,0.4,0x8a3a5a,x+Math.cos(a)*0.12,0.08,z+Math.sin(a)*0.12,4);st.rotation.z=1.3;st.rotation.y=-a;c.add(st)}}
   if(crop==="tomato"){c.add(cyl(0.025,0.025,0.9,0x9a7a52,x,0.45,z,5));c.add(sph(0.24,0x5f8f45,x,0.5,z));[[0.15,0.35],[-0.12,0.55],[0.05,0.7]].forEach(([dx,y])=>c.add(sph(0.09,0xd9483b,x+dx,y,z+0.15)))}
 }

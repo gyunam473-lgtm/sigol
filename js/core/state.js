@@ -3,7 +3,7 @@
 const $=id=>document.getElementById(id);
 let S={money:500,seeds:{lettuce:3,potato:2,tomato:1,cabbage:0},inv:{},plots:Array(15).fill(null),dex:{},sel:"lettuce",fieldCols:3,houseLv:1,coop:false,hens:0,eggT:0,dishes:[],meals:[]};
 try{const s=JSON.parse(localStorage.getItem("sigol1")||"null");if(s)S=Object.assign(S,s)}catch(e){}
-S.inv=Object.assign(Object.fromEntries(Object.keys(ITEMS).map(k=>[k,0])),S.inv);S.seeds=Object.assign({lettuce:0,potato:0,tomato:0,cabbage:0},S.seeds);
+S.inv=Object.assign(Object.fromEntries(Object.keys(ITEMS).map(k=>[k,0])),S.inv);S.seeds=Object.assign(Object.fromEntries(Object.keys(CROPS).map(k=>[k,0])),S.seeds); // 새 작물이 늘어도 0부터
 while(S.plots.length<15)S.plots.push(null);
 if(S.coop&&!S.coopLv)S.coopLv=1; // 예전 저장: 닭장 있으면 1단계
 S.herd=S.herd||[];S.furn=S.furn||{};

@@ -6,10 +6,10 @@
 const SPOTS=[[-0.45,-0.45],[0.45,-0.45],[-0.45,0.45],[0.45,0.45]]; // 한 칸에 네 포기
 const ROWS=[-0.45,0.45]; // 이랑 두 줄
 const SOIL_HARD=new THREE.Color(0x9a6b45),SOIL_SOFT=new THREE.Color(0x6e4a2e),SOIL_WET=new THREE.Color(0x4a2f1c);
-const STEP_NAME={weed:"김매기",bug:"벌레 잡기",till:"밭 갈기",ridge:"이랑",seed:"씨 심기",cover:"흙 덮기",water:"물 주기",harvest:"거두기",drain:"물꼬 트기",stake:"지주대 묶기",vinyl:"비닐 덮기"};
-const SWEAT={weed:2,bug:1,till:2,ridge:1,seed:1,cover:1,water:1,drain:2,stake:2,vinyl:2};
+const STEP_NAME={dig:"호미로 캐기",weed:"김매기",bug:"벌레 잡기",till:"밭 갈기",ridge:"이랑",seed:"씨 심기",cover:"흙 덮기",water:"물 주기",harvest:"거두기",drain:"물꼬 트기",stake:"지주대 묶기",vinyl:"비닐 덮기"};
+const SWEAT={dig:2,weed:2,bug:1,till:2,ridge:1,seed:1,cover:1,water:1,drain:2,stake:2,vinyl:2};
 // 궂은 날씨 대비(play/storm.js)는 손동작이 이미 있는 것과 같아요: 물꼬 = 줄 긋기, 지주대 = 콕콕, 비닐 = 쓸기
-const GEST={drain:"ridge",stake:"seed",vinyl:"cover",weed:"seed",bug:"seed"},gest=s=>GEST[s]||s;
+const GEST={dig:"cover",drain:"ridge",stake:"seed",vinyl:"cover",weed:"seed",bug:"seed"},gest=s=>GEST[s]||s;
 const DRAIN_ROWS=[-0.8,0.8]; // 밭 칸 가장자리 고랑
 // 레벨이 오르면 손이 빨라져요
 // 출출하거나 목마르면 한 번 더, 새참 기운이 나면 한 번 덜 (play/meal.js)
@@ -35,7 +35,7 @@ const meTags=on=>me.g.children.forEach(c=>{if(c.isSprite)c.visible=on}); // 나 
 /* ---------- 시작과 끝 ---------- */
 function startWork(i,kind){ // kind: plant(빈 칸 심기) · water(심어 둔 칸 물 주기) · harvest(거두기) · prep(궂은 날씨 대비)
   const P=plots[i],p=S.plots[i];stashHold();const ev=kind==="prep"?stormWarn():null;
-  const steps=kind==="plant"?["till","ridge","seed","cover","water"]:kind==="water"?["water"]:kind==="prep"?[WX_EV[ev.kind].step]:kind==="tend"?["weed","bug","dry"].filter(k=>activeIssues(p).some(x=>x.k===k)).map(k=>ISSUE[k].step):["harvest"];
+  const steps=kind==="plant"?["till","ridge","seed","cover","water"]:kind==="water"?["water"]:kind==="prep"?[WX_EV[ev.kind].step]:kind==="tend"?["weed","bug","dry"].filter(k=>activeIssues(p).some(x=>x.k===k)).map(k=>ISSUE[k].step):ROOT_CROPS.includes(p.crop)?["dig","harvest"]:["harvest"];
   W={i,P,kind,crop:p?p.crop:S.sel,steps,si:-1,scores:[],g:new THREE.Group(),fly:[],planted:kind!=="plant",
      mat:new THREE.MeshLambertMaterial({color:kind==="plant"?SOIL_HARD:SOIL_SOFT})};
   W.ev=ev;P.g.add(W.g);P.soil.material=W.mat;P.crop.visible=kind==="water"||kind==="prep"||kind==="tend";if(kind==="tend")P.crop.children.forEach(c=>{if(c.isSprite||c.userData.iss)c.visible=false});
@@ -68,16 +68,19 @@ function nextStep(){
   if(s==="till"){st.need=tillNeed();st.n=0;st.run=0;st.dir=0}
   if(gest(s)==="ridge"){st.rows=s==="drain"?DRAIN_ROWS:ROWS;st.done=[0,0];st.sc=[];st.lines=st.rows.map(()=>svgEl("line","wguide"))}
   if(gest(s)==="seed"){st.pos=s==="weed"?WEED_POS:SPOTS;st.t=st.pos.map(([x,z])=>({el:svgEl("circle","wtarget"),done:false,g:s==="weed"?weedTuft(x,z,W.g,0.28):s==="bug"?bugMesh(x+0.08,z,W.g,0.62):null}));st.sc=[]}
-  if(gest(s)==="cover"){st.need=s==="vinyl"?3:coverNeed();st.n=0;st.len=0}
+  if(gest(s)==="cover"){st.need=s==="vinyl"?3:s==="dig"?3:coverNeed();st.n=0;st.len=0}
+  if(s==="dig"){W.P.crop.visible=false;SPOTS.forEach(([x,z])=>{const g=new THREE.Group();g.position.set(x,0.25,z);ripeAt(g,W.crop,0,0);g.userData.dig=1;W.g.add(g);const m=new THREE.Mesh(new THREE.SphereGeometry(0.2,10,8),W.mat);m.scale.y=0.45;m.position.set(x,0.3,z);m.userData.mound=1;W.g.add(m)})}
   if(s==="water"){st.g=0;st.z=waterZone();st.tick=0;$("wZone").style.left=st.z[0]*100+"%";$("wZone").style.width=(st.z[1]-st.z[0])*100+"%";$("wFill").style.width="0%"}
-  if(s==="harvest")st.t=SPOTS.map(([x,z])=>{const g=new THREE.Group();g.position.set(x,0.25,z);ripeAt(g,W.crop,0,0);W.g.add(g);return {g,el:svgEl("circle","wtarget"),done:false}});
+  if(s==="harvest"&&ROOT_CROPS.includes(W.crop))W.g.children.slice().forEach(c=>{if(c.userData.dig||c.userData.mound)W.g.remove(c)});
+  if(s==="harvest")st.t=SPOTS.map(([x,z])=>{const g=new THREE.Group();g.position.set(x,0.25,z);if(ROOT_CROPS.includes(W.crop))tuberAt(g,W.crop,0,0);else ripeAt(g,W.crop,0,0);W.g.add(g);return {g,el:svgEl("circle","wtarget"),done:false}});
   guide();
 }
 function guide(){
   const s=W.steps[W.si],st=W.st,c=CROPS[W.crop].name;
   $("wGuide").textContent={till:`호미로 흙을 좌우로 슥슥 문질러요 · ${st.need-st.n}번 남음`,ridge:"점선을 따라 손가락으로 길게 그어 이랑을 만들어요",
     seed:`동그라미 자리를 콕콕 눌러 ${c} 씨를 넣어요`,cover:`손으로 흙을 살살 쓸어 씨를 덮어요 · ${st.need-st.n}번 남음`,
-    water:"꾹 누르고 있다가 초록 칸에서 손을 떼요",harvest:`잘 자란 ${c}를 하나씩 톡톡 따요`,
+    water:"꾹 누르고 있다가 초록 칸에서 손을 떼요",harvest:ROOT_CROPS.includes(W.crop)?`캐낸 ${c}를 하나씩 톡톡 주워 담아요`:`잘 자란 ${c}를 하나씩 톡톡 따요`,
+    dig:`호미로 ${c} 포기 밑 흙을 슥슥 파헤쳐요 · ${st.need-st.n}번 남음`,
     weed:"잡초를 콕콕 눌러 뿌리째 쑥 뽑아요",bug:`${c} 잎에 붙은 벌레를 콕콕 눌러 떼어 내요`,
     drain:"밭 가장자리 점선을 따라 그어 물이 빠질 고랑을 터요",stake:"동그라미를 콕콕 눌러 포기마다 지주대를 꽂고 묶어요",vinyl:`손으로 쓸어 비닐을 덮어요 · ${st.need-st.n}번 남음`}[s];
 }
@@ -169,6 +172,10 @@ function stakeIn(t){const st=W.st,k=st.t.indexOf(t),[x,z]=SPOTS[k];const m=stake
   if(st.t.every(t=>t.done))stepDone(1)}
 /* 흙 덮기: 살살 쓸면 씨앗 자리가 흙으로 덮여요 */
 function coverStroke(p){
+  if(W.steps[W.si]==="dig"){const st=W.st;st.n++;W.hint=false;sfx("scrape");buzz(12);workT=0.5;wPop(p.x,p.y-30,"푹");
+    const k=st.n/st.need;W.g.children.forEach(c=>{if(c.userData.dig){c.position.y=0.25+k*0.25;c.rotation.z=k*0.6}if(c.userData.mound)c.scale.set(1+k*0.5,0.45*(1-k*0.7),1+k*0.5)});
+    for(let i=0;i<4;i++){const d=sph(0.04,0x6e4a2e,(Math.random()-.5)*1.4,0.35,(Math.random()-.5)*1.4);W.g.add(d)}
+    guide();if(st.n>=st.need)stepDone(1);return}
   if(W.steps[W.si]==="vinyl"){const st=W.st;st.n++;W.hint=false;sfx("scrape");buzz(10);workT=0.5;wPop(p.x,p.y-30,"사락");
     W.g.children.filter(c=>c.userData.vinyl).forEach(c=>W.g.remove(c));const v=vinylMesh(st.n/st.need);v.userData.vinyl=true;v.position.y=0.25;W.g.add(v);guide();if(st.n>=st.need)stepDone(1);return}
   const st=W.st;st.n++;W.hint=false;sfx("scrape");buzz(10);workT=0.5;wPop(p.x,p.y-30,"살살");

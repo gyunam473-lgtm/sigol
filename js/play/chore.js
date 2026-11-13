@@ -79,7 +79,7 @@ function choreFrame(dt,now){
   if(d.g==="tap")st.t.forEach(t=>{if(t.done)return;const q=sp(t.p),R=spR(t.p);t.el.setAttribute("cx",q.x);t.el.setAttribute("cy",q.y);t.el.setAttribute("r",R);if(!f)f=q});
   if(d.g==="rub"||d.g==="hold")f=sp(PD.focus);
   if(d.g==="down"){const c=sp(PD.chopAt());f={x:c.x,y:c.y-60}}
-  if(d.g==="hold"&&st.hold&&!PD.busy){st.g+=dt/2.2;$("wFill").style.width=Math.min(100,st.g*100)+"%";if(PD.onHolding)PD.onHolding(st.g);
+  if(d.g==="hold"&&st.hold&&!PD.busy){st.g+=dt/(PD.holdSec||2.2);$("wFill").style.width=Math.min(100,st.g*100)+"%";if(PD.onHolding)PD.onHolding(st.g);
     if(st.g>=1){st.hold=false;PD.down=false;PD.onHold(1);choreDone(d.miss??0.4,d.over||"물이 넘쳤어요!")}}
   const show=PD.hint&&!PD.busy&&f;wFinger.style.display=show?"block":"none";if(show){wFinger.style.left=f.x+"px";wFinger.style.top=f.y+"px"}
 }
