@@ -73,6 +73,8 @@ function loop(now){
   if(me&&!loop.shown){loop.shown=true;$("loading").classList.add("done")}
   requestAnimationFrame(loop)}
 camera.position.set(0,12,24);camera.lookAt(0,0,4);
+// 작은 물건(지름 30cm 아래)은 그림자를 안 드리워요. 그림자 계산이 훨씬 가벼워져요
+function trimShadows(){let n=0;scene.traverse(o=>{if(o.isMesh&&o.castShadow&&o.geometry){if(!o.geometry.boundingSphere)o.geometry.computeBoundingSphere();const s=o.getWorldScale(new THREE.Vector3()),r=o.geometry.boundingSphere.radius*Math.max(s.x,s.y,s.z);if(r<0.15){o.castShadow=false;n++}}});return n}
 const start=()=>{if(me)return;makePeople();setHold(S.hold);applyWoodLand();checkCold();
   const away=S.lastSeen?Date.now()-S.lastSeen:0;
   const ripe=S.plots.filter(p=>p&&stageOf(p)==="ripe").length,eggs=eggsReady(),w=weather.kind;
@@ -85,6 +87,7 @@ const start=()=>{if(me)return;makePeople();setHold(S.hold);applyWoodLand();check
     if(w==="비"||w==="눈")h+=`<div class="item"><div>오늘은 ${w==="비"?"비가":"눈이"}와요<small>${WX_NOTE[w]}</small></div></div>`;
     openSheet(h+helpH);bindThanks();
   }else toast(away?"다시 오셨네요. "+termNow(new Date())+" 무렵이에요":"시골살이에 오신 걸 환영해요. 텃밭부터 가볼까요? · 궁금한 건 날씨 칸 ▾ → 안내서");
+  setTimeout(trimShadows,1500);
   save();setInterval(save,15000);
   document.addEventListener("visibilitychange",()=>{if(document.hidden)save()});
 };

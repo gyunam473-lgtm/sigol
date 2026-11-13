@@ -355,3 +355,7 @@ body{margin:0}
 
 .sit{flex-direction:column;justify-content:flex-end;align-items:center}
 .sit.folded .sitfold{margin-bottom:max(18px,env(safe-area-inset-bottom,0px))}
+
+.roastrow{grid-template-columns:repeat(4,minmax(0,1fr))}
+.manure{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px dashed #8a6a48;border-radius:10px;font-size:14px}
+.manure input{width:20px;height:20px}.manure small{color:var(--muted);font-size:11px}

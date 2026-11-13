@@ -3,7 +3,7 @@
 /* ---------- 3D 장면 ---------- */
 const canvas=$("c");
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
-renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,Math.min(screen.width,screen.height)<700?1.6:2)); // 폰은 1.6배까지만 (가볍게)
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 const scene=new THREE.Scene();
 scene.background=new THREE.Color(0xcfe6ee);scene.fog=new THREE.Fog(0xcfe6ee,32,75);

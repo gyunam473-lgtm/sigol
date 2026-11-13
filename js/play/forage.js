@@ -51,8 +51,10 @@ function useForage(i){
     onTap(s,t){sfx("pluck");const c=sp(t.p);wPop(c.x,c.y-30,s==="dig"?"살살":"똑")},
     frame(dt){this.g.children.forEach(b=>{if(b.userData.v){b.position.y+=dt*0.6;if(b.position.y>H+0.4)b.userData.v=0}})},
     finish(){
-      const good=Math.random()<0.2+0.08*lv+avg(this.scores)*0.15,n=k==="sansam"?1:(dig?1:2)+(good?1:0)+(lv>=3&&!dig?1:0);
-      S.inv[k]=(S.inv[k]||0)+n;const d=S.forageDex[k]||{n:0};const first=!d.n;d.n+=n;S.forageDex[k]=d;S.forageDone.push(i);S.forageAt=S.forageAt||{};S.forageAt[i]=Date.now()+FORAGE_REGROW*1000;
+      const sc=avg(this.scores),fail=k!=="sansam"&&Math.random()<Math.max(0,Math.min(0.6,(0.86-sc)*2.5-0.05*lv));
+      const good=!fail&&Math.random()<0.2+0.08*lv+sc*0.15;let n=k==="sansam"?1:(dig?1:2)+(good?1:0)+(lv>=3&&!dig?1:0);if(fail)n=Math.max(dig?0:1,n-(dig?1:1));
+      if(fail)setTimeout(()=>toast(dig?"앗, 뿌리가 뚝 끊어졌어요… 살살 캐야 해요":"잎이 짓이겨졌어요. 조금만 건졌어요"),900);
+      S.inv[k]=(S.inv[k]||0)+n;const d=S.forageDex[k]||{n:0};const first=!d.n&&n>0;d.n+=n;if(d.n)S.forageDex[k]=d;S.forageDone.push(i);S.forageAt=S.forageAt||{};S.forageAt[i]=Date.now()+FORAGE_REGROW*1000;
       const lv0=forageLv(),xp=k==="sansam"?40:f.w>=25?1:f.w>=12?2:4;S.skill.forage=forageXp()+xp;const lv1=forageLv();
       applyForage();
       if(k==="sansam"){endChore("");sfx("level");buzz([60,40,60,40,120]);
