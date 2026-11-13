@@ -93,7 +93,7 @@ function startKimjangWork(){const st=pickOne(KJ_STATIONS),C=new THREE.Vector3(KJ
   const O={cab:C.clone(),salt:C.clone().add(new THREE.Vector3(-0.75,0,-0.1)),wash:C.clone().add(new THREE.Vector3(0.75,0,-0.1)),bowl:C.clone().add(new THREE.Vector3(0,0,-0.6)),board:C.clone().add(new THREE.Vector3(-0.15,0,0.45)),tong:C.clone().add(new THREE.Vector3(0.75,0,0.45))};
   let whole,halves=[],withered=[],mu,muchae=[],mix,leaves=[],tong,sokN=0;
   const tub=(p,c,w)=>{const g=new THREE.Group(),side=new THREE.Mesh(new THREE.CylinderGeometry(0.34,0.28,0.2,16,1,true),new THREE.MeshLambertMaterial({color:c,side:THREE.DoubleSide}));side.position.y=0.1;g.add(side);g.add(cyl(0.28,0.28,0.01,c,0,0.005,0,16));g.add(cyl(0.31,0.31,0.01,w,0,0.12,0,16));g.position.copy(p);return g}; // 위가 열린 고무 대야
-  startChore({steps:KJ_STEPS.slice(),chops:1,focus:C.clone(),cam:C.clone().add(new THREE.Vector3(0.1,1.35,1.35)),look:C.clone().add(new THREE.Vector3(0,-0.05,-0.12)),
+  startChore({steps:KJ_STEPS.slice(),chops:1,tool:"knife",focus:C.clone(),cam:C.clone().add(new THREE.Vector3(0.1,1.35,1.35)),look:C.clone().add(new THREE.Vector3(0,-0.05,-0.12)),
     chopAt:()=>C.clone().add(new THREE.Vector3(0,0.22,0)),
     setup(){const g=this.g;g.add(tub(O.salt,0xc8322a,0xd8e8e8));g.add(tub(O.wash,0x3f6fa8,0x8fc8e0));g.add(tub(O.bowl,0xc8322a,0xd8d0c0));
       const bd=box(0.42,0.04,0.26,0xc8a070,O.board.x,0.14,O.board.z);g.add(bd);

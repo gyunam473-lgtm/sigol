@@ -10,14 +10,15 @@ FIRE_FOOD.push({id:"bangeonsi",name:"반건시",fill:15,desc:"말랑말랑 쫀�
 const gamSeason=()=>{const m=new Date().getMonth()+1;return m===10||m===11};
 const gamTree=TREES.find(t=>t.parent===land&&Math.abs(t.position.x+15.2)<0.1); // 감나무 (scene.js 에서 만든 것을 앞마당으로 옮겨요)
 // 앞마당(들어오는 길 왼쪽)에 감나무와 덕장: 집에 돌아오면 바로 보이는 자리 (2026-11-13 옮김)
-const GRACK={x:-3.2,z:7.6},GTREE={x:-4.4,z:5.6}; // 덕장이 앞, 감나무는 그 뒤 (카메라에서 덕장이 안 가려지게)
+// 밭 오른쪽 넓은 빈 땅 (우물·닭장과 떨어뜨려 넉넉하게). 덕장이 앞, 감나무는 그 뒤 (2026-11-13)
+const GRACK={x:12.4,z:2.6},GTREE={x:15.4,z:0.4};
 if(gamTree)gamTree.position.set(GTREE.x,0,GTREE.z);
 const gRack=new THREE.Group();
 (function(){[-0.9,0.9].forEach(x=>gRack.add(cyl(0.06,0.07,2.4,0x7a5a3a,x,1.2,0,6)));gRack.add(box(2.2,0.08,0.08,0x6b4a2e,0,2.2,0));
   const rf=box(2.6,0.06,1.0,0xd9c27a,0,2.5,0);rf.rotation.x=0.18;gRack.add(rf); // 짚 지붕
   gRack.add(hitBox(2.4,2.6,0.8,0,1.3,0));gRack.position.set(GRACK.x,0,GRACK.z);land.add(gRack);
   poke(gRack,()=>useGotgamRack(),[GRACK.x+1.7,GRACK.z+0.4]);
-  if(gamTree){gamTree.userData={kind:"poke",poke:()=>pickGam(),at:[GTREE.x+1.6,GTREE.z]}}})();
+  if(gamTree){gamTree.userData={kind:"poke",poke:()=>pickGam(),at:[GTREE.x-1.4,GTREE.z+1.6]}}})();
 const strandG=new THREE.Group();gRack.add(strandG);
 const gStage=s=>{const e=Date.now()-s.t;return e>=GOTGAM.full?"full":e>=GOTGAM.half?"half":"raw"};
 function drawStrands(){while(strandG.children.length)strandG.remove(strandG.children[0]);(S.gotgam||[]).forEach((s,i)=>{const st=gStage(s),x=-0.6+i*0.6;
@@ -37,7 +38,7 @@ CH.jumuri={name:"주물러 주기",g:"rub",n:3,guide:n=>`반건시를 손으로 
 function pickGam(){if(!gamSeason()){toast("감나무예요. 감은 가을(10~11월)에 주렁주렁 열려요");return}
   const d=dayKey(new Date());if(S.gamDay!==d){S.gamDay=d;S.gamPicked=0}const left=GOTGAM.perDay-S.gamPicked;if(left<=0){toast("오늘 딸 감은 다 땄어요. 내일 또 익어요");return}
   const T=gamTree.position,F=new THREE.Vector3(T.x,2.0,T.z);let picked=0;
-  startChore({steps:["gamttagi"],focus:F,cam:new THREE.Vector3(T.x+3.4,2.9,T.z-3.4),look:new THREE.Vector3(T.x,2.0,T.z),
+  startChore({steps:["gamttagi"],focus:F,cam:new THREE.Vector3(T.x-2.6,2.9,T.z+3.8),look:new THREE.Vector3(T.x,2.0,T.z),
     targets:()=>gamFruits.filter(f=>f.visible).slice(0,left).map(f=>f.getWorldPosition(new THREE.Vector3())),
     onTap(s,t){sfx("pluck");picked++;const f=gamFruits.find(q=>q.visible&&q.getWorldPosition(new THREE.Vector3()).distanceTo(t.p)<0.05);if(f)f.visible=false},onRub:noop,onHold:noop,
     finish(){const n=picked;S.gamPicked+=n;S.inv.gam=(S.inv.gam||0)+n;save();applyGamTree();endChore(`잘 익은 감 ${n}개를 땄어요 · 감나무 옆 곶감 덕장에서 깎아 매달아요`)}})}
@@ -51,7 +52,7 @@ function useGotgamRack(){S.gotgam=S.gotgam||[];const L=S.gotgam,ready=L.filter(s
   h+=`</div><p class="hint">${S.inv.gam>0||L.length?"":"먼저 감나무에서 감을 따 와요 (가을 10~11월). "}걷은 곶감은 우리 평상에 앉아 꺼내 먹거나 채소가게 아줌마한테 팔아요</p>`;
   openSheet(h);
   if($("gNew"))$("gNew").onclick=()=>{closeSheet();hangGam()};
-  if($("gPick"))$("gPick").onclick=()=>{closeSheet();go(GTREE.x+1.4,GTREE.z,{type:"poke",fn:pickGam})};
+  if($("gPick"))$("gPick").onclick=()=>{closeSheet();go(GTREE.x-1.4,GTREE.z+1.6,{type:"poke",fn:pickGam})};
   sheet.querySelectorAll("[data-jm]").forEach(b=>b.onclick=()=>{closeSheet();kneadGam(+b.dataset.jm)});
   sheet.querySelectorAll("[data-gt]").forEach(b=>b.onclick=()=>{const s=L[+b.dataset.gt],st=gStage(s);L.splice(+b.dataset.gt,1);
     let k,msg;if(st==="full"){k=s.kneaded?"gotgam_top":"gotgam";msg=s.kneaded?`분 핀 상품 곶감 ${s.n}개! 하얀 분이 소복해요`:`곶감 ${s.n}개를 걷었어요`}else{k="bangeonsi";msg=`말랑한 반건시 ${s.n}개를 걷었어요`}

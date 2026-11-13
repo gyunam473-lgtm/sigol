@@ -12,7 +12,7 @@ function arriveAt(){if(mode==="dabang"){me.g.position.set(0,0,DB.z1-0.8);me.tx=0
   me.g.position.set(0,0,13);me.tx=0;me.tz=5;me.route=[];me.moving=true;pending=null;camera.position.set(0,12,25)}
 function applyMode(){
   if(SIT)standUp();if(SKYV)standSky(false);exitRoom();const n=visiting; // 앉아 있거나 집 안이면 먼저 일어나서 나가요
-  const P=PLACES[mode];land.visible=!P;ground.visible=mode!=="dwitsan"&&mode!=="dabang"; /* 뒷산·다방은 자기 땅이 있어요. 겹치면 번쩍거려서 원래 풀밭은 숨겨요 */Object.entries(PLACES).forEach(([k,p])=>p.g.visible=k===mode);BG_TREES.forEach(t=>t.visible=mode!=="plaza"&&mode!=="school"&&mode!=="hall");
+  const P=PLACES[mode];land.visible=!P;ground.visible=mode!=="dwitsan"&&mode!=="dabang"; /* 뒷산·다방은 자기 땅이 있어요. 겹치면 번쩍거려서 원래 풀밭은 숨겨요 */Object.entries(PLACES).forEach(([k,p])=>p.g.visible=k===mode);BG_TREES.forEach((t,i)=>t.visible=mode!=="plaza"&&mode!=="school"&&mode!=="hall"&&!(i===3&&(mode==="home"||mode==="visit")));
   applyHouse();ijang.visible=!!(n&&n.full);applyLand();
   npcs.forEach(p=>{
     if(P){const chief=p.name==="이장님"&&mode==="hall"; // 회관에선 이장님이 게시판 옆에 서 계셔요

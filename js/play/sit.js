@@ -14,6 +14,9 @@ const SEATS={
     cam:new THREE.Vector3(10.4,3.2,3.9),look:new THREE.Vector3(5.6,-0.7,3.6),table:()=>pavTable}};
 Object.assign(SEATS,TABLE_SEATS); // 장터 먹거리 천막·평상 자리 (world/places3.js)
 let SIT=null; // 지금 앉아 있는 곳 (없으면 null)
+// 아래 창 접기: 앉아서 경치·음식을 가리지 않고 보고 싶을 때 (접은 상태는 기억해요)
+function setSitFold(on){S.sitFold=on;$("sit").classList.toggle("folded",on);$("sitFold").textContent=on?"▴ 창 펴기"+(SIT?" · "+SIT.title:""):"▾ 창 접기 · 경치 보기";$("sitFold").setAttribute("aria-expanded",!on)}
+$("sitFold").onclick=()=>{setSitFold(!S.sitFold);save()};
 
 // 앉은 자세: 몸을 방석 높이로 내리고 다리를 앞으로 접어요 (양반다리)
 function sitPose(on){const legs=me.b.children[0];
@@ -40,7 +43,7 @@ function sitDown(place){
   // 우리 평상: 집 쪽으론 안 돌아가요
   const yard=place==="home"||place==="nbBench";
   if(s.free)orbitStart(s.cam,s.look,s.block,s.yaw);else orbitStart(s.cam,s.look,yard?[house,stove,myBarn]:s.block||[pav],yard?[-1.7,0.6]:null);
-  if(place==="nbBench")nbSitStart();sfx("pop");renderSit();
+  if(place==="nbBench")nbSitStart();sfx("pop");renderSit();setSitFold(!!S.sitFold);
 }
 function standUp(){
   if(!SIT)return;cancelEat();if(SIT.cupMesh){SIT.cupMesh.parent.remove(SIT.cupMesh);SIT.cupMesh=null}let msg="";if(SIT.sky)lookSky(false);unseatAll();

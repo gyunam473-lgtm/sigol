@@ -28,8 +28,14 @@ const _pv=new THREE.Vector3();
 function sp(v){_pv.copy(v).project(camera);return {x:(_pv.x+1)/2*wEl.clientWidth,y:(1-_pv.y)/2*wEl.clientHeight}}
 function spR(v,d=0.15){const a=sp(v),b=sp(v.clone().add(new THREE.Vector3(d,0,0)));return Math.max(20,Math.hypot(b.x-a.x,b.y-a.y))}
 
+// 도끼: 손잡이 끝(손)을 축으로 돌아요. 쉴 땐 통나무 위에 대고, 누르면 번쩍 치켜들고, 내리찍으면 휙
+function makeAxe(){const g=new THREE.Group(),h=cyl(0.018,0.022,0.62,0x8a6440,0,0,-0.31,6);h.rotation.x=Math.PI/2;g.add(h);
+  const head=box(0.03,0.14,0.11,0x6a6e72,0,0,-0.6);g.add(head);g.add(box(0.012,0.15,0.03,0xd8dce0,0,0,-0.665));return g}
+// 김장 칼: 짧은 손잡이에 긴 칼날
+function makeKnifeTool(){const g=new THREE.Group(),h=cyl(0.016,0.018,0.14,0x3a2a1a,0,0,-0.07,6);h.rotation.x=Math.PI/2;g.add(h);g.add(box(0.006,0.07,0.34,0xd8dce0,0,-0.02,-0.31));return g}
 function startChore(job){
   stashHold();PD=Object.assign({si:-1,scores:[],g:new THREE.Group(),busy:false},job);scene.add(PD.g);
+  if(PD.chopAt){const c=PD.chopAt();PD.axe=PD.tool==="knife"?makeKnifeTool():makeAxe();PD.axe.position.copy(c).add(PD.tool==="knife"?new THREE.Vector3(0.05,0.3,0.42):new THREE.Vector3(0.12,0.42,0.58));PD.axe.rotation.x=-0.6;PD.g.add(PD.axe);PD.axeA=-0.6;PD.chips=[]}
   me.g.visible=false;document.querySelector(".top").hidden=true;document.querySelector(".bottom").hidden=true;wEl.hidden=false;
   $("wSteps").innerHTML=PD.steps.map(s=>`<li>${CH[s].name}</li>`).join("");$("wCare").textContent="";
   if(PD.setup)PD.setup();nextChore();
@@ -58,6 +64,7 @@ wEl.addEventListener("pointerdown",e=>{if(!PD||PD.busy||e.target.closest("button
   const p=wpt(e);PD.down=true;PD.path=[p];PD.last=p;const s=PD.steps[PD.si],d=CH[s],st=PD.st;
   if(d.g==="rub"){st.dir=0;st.run=0}
   if(d.g==="hold")st.hold=true;
+  if(d.g==="down"&&PD.axe){PD.axeUp=true;sfx("scrape")}
   if(d.g==="tap"){let best=null,bd=1e9;st.t.forEach(t=>{if(t.done)return;const q=sp(t.p),dd=Math.hypot(p.x-q.x,p.y-q.y);if(dd<bd){bd=dd;best=t}});
     const R=best?spR(best.p):0;if(!best||bd>R*1.6){wPop(p.x,p.y-30,"동그라미를 눌러요");return}
     best.done=true;best.el.remove();PD.hint=false;buzz(12);workT=0.5;PD.onTap(s,best,st.t.filter(t=>t.done).length);
@@ -67,15 +74,20 @@ wEl.addEventListener("pointermove",e=>{if(!PD||!PD.down||PD.busy)return;const p=
     st.run+=Math.abs(dv);if(!st.counted&&st.run>=45){st.counted=true;st.n++;PD.hint=false;buzz(10);sfx(d.sfx);wPop(p.x,p.y-30,d.pop);PD.onRub(s,st.n,st.need);choreGuide();if(st.n>=st.need)choreDone(1)}}});
 const chUp=e=>{if(!PD||!PD.down)return;PD.down=false;if(PD.busy)return;const p=wpt(e),s=PD.steps[PD.si],d=CH[s],st=PD.st;
   if(d.g==="hold"){st.hold=false;if(st.g<0.2)return;const ok=st.g>=st.z[0]&&st.g<=st.z[1];sfx("water");PD.onHold(st.g);const ms=d.msgs||["물이 알맞아요!","조금 얕지만 괜찮아요","물이 조금 많아요"];choreDone(ok?1:(d.miss??0.6),ok?ms[0]:st.g<st.z[0]?ms[1]:ms[2])}
-  if(d.g==="down"){const a=PD.path[0],dy=p.y-a.y;if(dy<60){wPop(p.x,p.y-30,"위에서 아래로 내리찍어요");return}
+  if(d.g==="down"){PD.axeUp=false;const a=PD.path[0],dy=p.y-a.y;if(dy<60){wPop(p.x,p.y-30,"위에서 아래로 내리찍어요");return}PD.swing=0.16;
     const c=sp(PD.chopAt()),mid=PD.path.reduce((q,v)=>Math.abs(v.y-c.y)<Math.abs(q.y-c.y)?v:q,a),off=Math.abs(mid.x-c.x),R=spR(PD.chopAt(),0.25);
     if(off>R){sfx("scrape");wPop(p.x,p.y-30,"빗맞았어요! 가운데를 노려요");buzz(8);return}
-    st.n++;PD.hint=false;buzz(25);PD.scores.push(Math.max(0.5,1-off/R*0.5));PD.onChop(st.n);choreGuide();workT=0.5;
+    st.n++;PD.hint=false;buzz(25);PD.scores.push(Math.max(0.5,1-off/R*0.5));chopChips();PD.onChop(st.n);choreGuide();workT=0.5;
     if(st.n>=st.need){PD.busy=true;sweat(3);setTimeout(()=>{if(PD)nextChore()},700)}}};
 wEl.addEventListener("pointerup",chUp);wEl.addEventListener("pointercancel",chUp);
 
+// 쩍! 나뭇조각 튀기
+function chopChips(){if(!PD)return;const c=PD.chopAt();for(let i=0;i<10;i++){const m=box(0.05,0.012,0.025,PD.tool==="knife"?(i%2?0xe6f2c6:0x8ac060):i%3?0xd8b07a:0xb08a5a,c.x,c.y+0.05,c.z);m.userData.v=new THREE.Vector3(fr(-1.4,1.4),fr(1,2.4),fr(-0.6,1.2));m.userData.t=0;PD.g.add(m);PD.chips.push(m)}}
+function axeFrame(dt){if(!PD||!PD.axe)return;let tgt=PD.axeUp?1.35:-0.6;if(PD.swing>0){PD.swing-=dt;tgt=-0.85}
+  PD.axeA+=(tgt-PD.axeA)*Math.min(1,dt*(PD.swing>0?40:PD.axeUp?10:8));PD.axe.rotation.x=PD.axeA;
+  PD.chips=PD.chips.filter(m=>{const v=m.userData.v;v.y-=dt*7;m.position.addScaledVector(v,dt);m.rotation.x+=dt*9;m.rotation.z+=dt*7;m.userData.t+=dt;if(m.position.y<0.03){m.position.y=0.03;v.set(0,0,0)}if(m.userData.t>1.6){PD.g.remove(m);return false}return true})}
 function choreFrame(dt,now){
-  if(!PD)return;const s=PD.steps[PD.si];if(PD.frame)PD.frame(dt,now);if(!s)return;const d=CH[s],st=PD.st;let f=null;
+  if(!PD)return;axeFrame(dt);const s=PD.steps[PD.si];if(PD.frame)PD.frame(dt,now);if(!s)return;const d=CH[s],st=PD.st;let f=null;
   if(d.g==="tap")st.t.forEach(t=>{if(t.done)return;const q=sp(t.p),R=spR(t.p);t.el.setAttribute("cx",q.x);t.el.setAttribute("cy",q.y);t.el.setAttribute("r",R);if(!f)f=q});
   if(d.g==="rub"||d.g==="hold")f=sp(PD.focus);
   if(d.g==="down"){const c=sp(PD.chopAt());f={x:c.x,y:c.y-60}}

@@ -346,3 +346,12 @@ body{margin:0}
 .guide ul{margin:0;padding-left:18px}.guide li{margin:3px 0}
 .gtable{width:100%;border-collapse:collapse;font-size:13px}.gtable th,.gtable td{border-bottom:1px solid var(--line);padding:5px 4px;text-align:left;vertical-align:top}
 .gtable td:first-child{white-space:nowrap;font-weight:700}
+
+/* 앉았을 때 아래 창 접기 */
+.sitfold{pointer-events:auto;align-self:center;margin-bottom:6px;padding:7px 16px;border-radius:99px;border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 92%,transparent);color:var(--ink);font:inherit;font-size:13px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.sit.folded .sitpanel{display:none}
+.sitpanel{max-height:38%}
+@media (max-height:520px){.sitpanel{max-height:55%}}
+
+.sit{flex-direction:column;justify-content:flex-end;align-items:center}
+.sit.folded .sitfold{margin-bottom:max(18px,env(safe-area-inset-bottom,0px))}
