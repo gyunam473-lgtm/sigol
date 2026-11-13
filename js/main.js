@@ -44,7 +44,7 @@ function loop(now){
     else if(mode==="dabang")dabangCam(); // 다방 안
     else{const p=me.g.position;camPos.set(p.x,p.y+10,p.z+11);lookT.set(p.x,1,p.z-1)}
     camera.position.lerp(camPos,0.07);look.lerp(lookT,0.12);camera.lookAt(look);
-    workFrame(dt);cookFrame(dt,now);choreFrame(dt,now);fishFrame(dt,now);eatFrame(dt);placesFrame(dt,now);grindFrame(dt,now);village2Frame(dt,now);gotgamFrame(dt);decoFrame();armsFrame(dt,now);sitChoreUi();
+    workFrame(dt);cookFrame(dt,now);choreFrame(dt,now);fishFrame(dt,now);eatFrame(dt);placesFrame(dt,now);grindFrame(dt,now);village2Frame(dt,now);gotgamFrame(dt);decoFrame();armsFrame(dt,now);sitChoreUi();village4Frame(dt,now);
   }
   if(rainG.visible||snowG.visible){const G=rainG.visible?rainG:snowG,sp=rainG.visible?14:1.6,mp=me?me.g.position:{x:0,z:0};
     G.children.forEach((m,i)=>{m.position.y-=sp*dt;if(!rainG.visible)m.position.x+=Math.sin(now/600+i)*0.004;
