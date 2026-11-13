@@ -56,3 +56,53 @@ function scatterAll(){const jobs=[["home",land,650]];
 // 그 장소가 보일 때만, 집 안에선 안 보여요
 function decoFrame(){if(typeof ywG!=="undefined")ywG.visible=mode==="home"&&!PD; // 마당 잡초: 우리 땅에서만, 뽑는 동안엔 숨겨요
   for(const k in DECO){const g=DECO[k];g.visible=g.userData.src.visible&&ground.visible&&!(typeof inHouse!=="undefined"&&inHouse)}}
+
+/* ================= 멀리 보이는 이웃 마을 (2026-11-13) =================
+   카메라를 돌리면 저 멀리 다른 집들이 모인 마을이 보여요(놀이 공간 밖 30~40m, 안개 속에 아련하게).
+   기와집·초가·함석지붕 집, 굴뚝 연기, 감나무, 논배미, 비닐하우스, 전봇대. 밤엔 창에 불이 켜져요(weather.js 의 winMat).
+   집 수십 채를 "한 덩어리"로 합쳐 그려서 휴대폰에서도 가벼워요(그리기 두세 번). 걸어갈 순 없어요(누르기 목록에 없음) */
+const FARV=new THREE.Group();scene.add(FARV);
+// 넓은 바탕 땅: 원래 땅(90m) 밖까지 안개 끝보다 멀리 이어지게 (누르면 안 걸어가요)
+const farGround=new THREE.Mesh(new THREE.PlaneGeometry(260,260),groundMat);farGround.rotation.x=-Math.PI/2;farGround.position.y=-0.06;farGround.receiveShadow=false;scene.add(farGround);
+function mergeParts(parts){const P=[],N=[],C=[];
+  parts.forEach(({g,m,c})=>{const q=(g.index?g.toNonIndexed():g.clone());q.applyMatrix4(m);const p=q.attributes.position.array,n=q.attributes.normal.array;
+    for(let i=0;i<p.length;i++){P.push(p[i]);N.push(n[i])}for(let i=0;i<p.length/3;i++)C.push(c.r,c.g,c.b)});
+  const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.Float32BufferAttribute(P,3));g.setAttribute("normal",new THREE.Float32BufferAttribute(N,3));g.setAttribute("color",new THREE.Float32BufferAttribute(C,3));return g}
+const FARV_SMOKE=[];
+(function(){const parts=[],wins=[],_m=new THREE.Matrix4(),q=new THREE.Quaternion(),e=new THREE.Euler(),R=Math.random;
+  const col=h=>new THREE.Color(h),add=(geo,x,y,z,ry,sx=1,sy=1,sz=1,c,rx=0)=>parts.push({g:geo,m:new THREE.Matrix4().compose(new THREE.Vector3(x,y,z),q.clone().setFromEuler(e.set(rx,ry,0)),new THREE.Vector3(sx,sy,sz)),c:col(c)});
+  const BOX=new THREE.BoxGeometry(1,1,1),PRISM=(()=>{const g=new THREE.CylinderGeometry(1,1,1,3,1);g.rotateX(-Math.PI/2);g.rotateY(Math.PI/2);return g})(),CYL=new THREE.CylinderGeometry(1,1,1,7),SPH=new THREE.SphereGeometry(1,8,6),HALF=new THREE.CylinderGeometry(1,1,1,10,1,false,0,Math.PI);
+  const WALLS=[0xeee6d2,0xe8dcc0,0xf2eee4,0xd8cdb4],ROOFS={giwa:0x4a5058,cho:0xb8995a,tin1:0x3f6f9a,tin2:0xa84a3a,tin3:0x5a8a6a};
+  const MT=[[-22,-34,16],[0,-40,20],[24,-34,15],[-40,-20,12],[40,-18,13]],inMt=(x,z)=>MT.some(([a,b,r])=>Math.hypot(x-a,z-b)<r*0.95);
+  // 집 한 채: 몸채 + 지붕(기와·초가·함석) + 창 둘 + 가끔 굴뚝
+  function house(x,z,ry){const w=3+R()*1.6,d=2.2+R()*0.6,h=1.7+R()*0.3,style=pickOne(["giwa","giwa","cho","tin1","tin2","tin3"]),wall=pickOne(WALLS);
+    const s=Math.sin(ry),c=Math.cos(ry),loc=(lx,lz)=>[x+lx*c+lz*s,z-lx*s+lz*c];
+    add(BOX,x,h/2,z,ry,w,h,d,wall);add(BOX,x,0.12,z,ry,w+0.3,0.24,d+0.3,0xb0a890);
+    const rh=style==="cho"?1.0:style==="giwa"?0.95:0.6,ov=style==="tin1"||style==="tin2"||style==="tin3"?0.25:0.45;
+    if(style==="cho"){add(SPH,x,h+0.15,z,ry,w*0.62,rh,d*0.75,ROOFS.cho)}
+    // 맞배지붕: 세모 기둥(용마루가 몸채 긴 쪽을 따라). 아래가 몸채 위에 얹혀요
+    else add(PRISM,x,h+rh*0.5,z,ry,w+ov*2,rh,(d/2+ov)/0.866,ROOFS[style]);
+    // 창 (앞면 +z 쪽 두 개): 밤엔 불빛
+    [-w*0.25,w*0.25].forEach(lx=>{const [wx,wz]=loc(lx,d/2+0.01);wins.push({g:BOX,m:new THREE.Matrix4().compose(new THREE.Vector3(wx,h*0.55,wz),q.clone().setFromEuler(e.set(0,ry,0)),new THREE.Vector3(0.6,0.5,0.04)),c:col(0xffffff)})});
+    {const [dx,dz]=loc(0,d/2+0.01);add(BOX,dx,0.75,dz,ry,0.7,1.3,0.05,0x6a4e34)} // 문
+    if(R()<0.5){const [cx,cz]=loc(w*0.32,-d*0.2);add(BOX,cx,h+rh+0.3,cz,ry,0.3,0.8,0.3,0x8a7a6a);FARV_SMOKE.push([cx,h+rh+0.75,cz])}}
+  function treeAt(x,z,s,fruit){add(CYL,x,0.9*s,z,0,0.18*s,1.8*s,0.18*s,0x6a5038);add(SPH,x,2.2*s,z,0,1.2*s,1.0*s,1.2*s,pickOne([0x5f8d4a,0x6f9a52,0x587f44]));
+    if(fruit)for(let i=0;i<6;i++)add(SPH,x+Math.cos(i)*0.9*s,2.0*s+(i%2)*0.4,z+Math.sin(i)*0.9*s,0,0.12,0.12,0.12,0xe8782a)}
+  // 마을 덩어리: [가운데 x, z, 집 수]
+  [[6,38,4],[-16,36,3],[26,32,3],[36,8,4],[34,22,2],[-36,9,4],[-34,23,3],[-27,34,2]].forEach(([cx,cz,n])=>{
+    const face=Math.atan2(-cx,-cz); // 대충 우리 마을 쪽을 봐요
+    for(let i=0;i<n;i++){const a=i/n*Math.PI*2+R(),r=3+R()*3,x=cx+Math.cos(a)*r,z=cz+Math.sin(a)*r;if(inMt(x,z))continue;house(x,z,face+(R()-0.5)*0.8)}
+    for(let i=0;i<3;i++)treeAt(cx+(R()-0.5)*12,cz+(R()-0.5)*10,0.9+R()*0.5,i===0);
+    // 논배미와 비닐하우스
+    const px=cx+(cx>0?-7:7),pz=cz+(cz>0?-6:6);for(let i=0;i<3;i++)add(BOX,px+(i-1)*4.3,0.03,pz,face,4,0.06,3,pickOne([0x9ab860,0xa8b868,0xc8b870]));
+    if(R()<0.6)add(HALF,px,0,pz+4,face+Math.PI/2,1.4,7,1.4,0xe8eeea,Math.PI/2)});
+  // 전봇대 한 줄 (마을과 마을을 잇는 길 따라)
+  for(let i=0;i<9;i++){const a=-0.4+i*0.45,x=Math.sin(a)*34,z=Math.cos(a)*34;if(inMt(x,z)||Math.abs(z+4)<4)continue;add(CYL,x,3,z,0,0.08,6,0.08,0x7a6a58);add(BOX,x,5.6,z,a,1.2,0.08,0.08,0x6a5a48)}
+  const mat=new THREE.MeshLambertMaterial({vertexColors:true});const m=new THREE.Mesh(mergeParts(parts),mat);m.castShadow=m.receiveShadow=false;FARV.add(m);
+  const wm=new THREE.Mesh(mergeParts(wins),winMat);FARV.add(wm);
+  // 굴뚝 연기 (뭉게뭉게 올라가며 흩어져요)
+  const sm=new THREE.InstancedMesh(new THREE.SphereGeometry(0.35,6,5),new THREE.MeshLambertMaterial({color:0xe8e8e4,transparent:true,opacity:0.45,depthWrite:false}),FARV_SMOKE.length*4);sm.frustumCulled=false;FARV.add(sm);FARV.userData.smoke=sm})();
+function farvFrame(now){const on=ground.visible&&!(typeof inHouse!=="undefined"&&inHouse);FARV.visible=on;farGround.visible=on;if(!on)return;
+  const sm=FARV.userData.smoke,M4=new THREE.Matrix4(),t=now/1000;let k=0;
+  FARV_SMOKE.forEach(([x,y,z],i)=>{for(let j=0;j<4;j++){const u=(t*0.12+j/4+i*0.37)%1,s=0.5+u*1.6;M4.makeScale(s,s,s);M4.setPosition(x+u*1.2+Math.sin(t+i+j)*0.2,y+u*3.5,z+u*0.4);sm.setMatrixAt(k++,M4)}});sm.instanceMatrix.needsUpdate=true}
+{const df=decoFrame;decoFrame=function(){df();farvFrame(performance.now())}}

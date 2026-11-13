@@ -11,7 +11,14 @@ const fcOn=()=>me&&!SIT&&!W&&!PD&&!CK&&!FS&&!SKYV&&!LIE&&!inHouse&&mode!=="daban
 // main.js 가 걸어 다닐 때 부르는 카메라 자리
 function freeCam(p,camPos,lookT){if(FC.mode!==mode){FC.mode=mode;FC.yaw=0;fcChanged()}
   const z=FC.zoom,h=10*z*FC.tilt,d=11*z*(1.25-0.25*FC.tilt),s=Math.sin(FC.yaw),c=Math.cos(FC.yaw);
-  camPos.set(p.x+s*d,p.y+h,p.z+c*d);lookT.set(p.x-s*1,1,p.z-c*1)}
+  camPos.set(p.x+s*d,p.y+h,p.z+c*d);lookT.set(p.x-s*1,1,p.z-c*1);
+  // 돌려 본 카메라가 집·지붕 속으로 들어가면 가리는 것 앞으로 다가와요 (세 장면에 한 번 재요)
+  if(!FC.changed){FC.near=1;return}
+  if(((FC.tick=(FC.tick||0)+1)%3)===0){const g=PLACES[mode]?PLACES[mode].g:land,o=_fcO.set(p.x,p.y+1.2,p.z),dir=_fcD.copy(camPos).sub(o),dist=dir.length();dir.normalize();
+    _fcRay.set(o,dir);_fcRay.far=dist;_fcRay.camera=camera;const hit=_fcRay.intersectObject(g,true).find(x=>x.object.visible&&!x.object.isSprite&&x.distance>1&&!(x.object.material&&x.object.material.transparent&&x.object.material.opacity<0.2));
+    FC.nearT=hit?Math.max(0.15,(hit.distance-0.6)/dist):1}
+  FC.near=(FC.near||1)+((FC.nearT||1)-(FC.near||1))*0.25;if(FC.near<0.999)camPos.sub(_fcO.set(p.x,p.y+1.2,p.z)).multiplyScalar(FC.near).add(_fcO)}
+const _fcRay=new THREE.Raycaster(),_fcO=new THREE.Vector3(),_fcD=new THREE.Vector3();
 // 단추는 위 정보칸 바로 아래 (폰마다 정보칸 높이가 달라서 그때그때 재요)
 function fcChanged(){FC.changed=Math.abs(FC.yaw)>0.02||Math.abs(FC.tilt-1)>0.02||Math.abs(FC.zoom-1)>0.02;const on=FC.changed&&fcOn(),el=$("fcctl");el.hidden=!on;
   if(on){const c=document.querySelector(".cols");if(c){const b=[...c.children].filter(x=>x.offsetParent).reduce((m,x)=>Math.max(m,x.getBoundingClientRect().bottom),0);if(b)el.style.top=(b+8)+"px"}}}
