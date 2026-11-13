@@ -26,6 +26,14 @@ const flames=[],fireSparks=[];let fireLight;
   fireG.add(hitBox(4.2,3,4.2,0,1.5,0));poke(fireG,()=>addFireWood(),[FIRE.x+2.4,FIRE.z+2.6]);
 })();
 // 통나무 의자 두 겹: 안쪽 12개(반지름 4.2), 바깥 16개(6.2). 앞쪽(+z, 들어오는 쪽)은 비워요
+// 불길 소리: 화르르 낮게 깔리는 소리를 계속 틀어 두고, 가까이·불이 셀수록 크게 (분교 밖에선 꺼요)
+let roarSrc=null,roarGain=null;
+function fireRoar(lv){if(!soundOn||!AC){if(roarGain)roarGain.gain.value=0;return}
+  if(!roarSrc){roarSrc=AC.createBufferSource();roarSrc.buffer=noiseBuf();roarSrc.loop=true;const f=AC.createBiquadFilter();f.type="lowpass";f.frequency.value=380;
+    roarGain=AC.createGain();roarGain.gain.value=0;roarSrc.connect(f);f.connect(roarGain);roarGain.connect(out());roarSrc.start()}
+  const d=me?Math.hypot(me.g.position.x-FIRE.x,me.g.position.z-FIRE.z):99,near=Math.max(0,1-d/18),
+    tgt=mode==="school"&&!inHouse&&lv>0.05?0.2*lv*near*near*(0.85+0.15*Math.sin(performance.now()/300)):0;
+  roarGain.gain.value+=(tgt-roarGain.gain.value)*0.08}
 const FIRE_LOGS=[];
 [[4.2,12],[6.2,16]].forEach(([R,n],ring)=>{for(let k=0;k<n;k++){const a=k/n*TAU+(ring?0.1:0),x=FIRE.x+Math.cos(a)*R,z=FIRE.z+Math.sin(a)*R;
   if(Math.abs(x-FIRE.x)<1.6&&z>FIRE.z)continue;FIRE_LOGS.push({i:FIRE_LOGS.length,x,z,R,ring,face:Math.atan2(FIRE.x-x,FIRE.z-z)})}});
@@ -62,8 +70,11 @@ function fireFrame(dt,now){const lv=fireLv(),n=skyNow.night||0;
   flames.forEach((m,i)=>{const s=lv*(1.15+0.2*Math.sin(now/90+i*2)+0.1*Math.sin(now/37+i));m.visible=lv>0.02;m.scale.set(Math.max(0.01,lv*(0.95+0.12*Math.sin(now/70+i))),Math.max(0.01,s),Math.max(0.01,lv))});
   fireSparks.forEach(s=>{const u=(now/1800+s.userData.ph)%1;s.visible=lv>0.25;s.position.set(Math.sin(s.userData.ph*40+u*6)*0.35,0.4+u*3.0*lv,Math.cos(s.userData.ph*30+u*5)*0.35);s.scale.setScalar(1-u)});
   fireLight.intensity=lv*(1.0+2.4*n)*(0.9+0.1*Math.sin(now/60));
-  if(mode!=="school")return;
-  const d=me?Math.hypot(me.g.position.x-FIRE.x,me.g.position.z-FIRE.z):99;if(lv>0.1&&d<16&&Math.random()<dt*1.8)burst(0.05,2400,0.07*lv*(1-d/16)); // 타닥타닥
+  fireRoar(lv);if(mode!=="school")return;
+  // 타닥타닥: 가까울수록 크고 자주 (2026-11-13 더 크게), 가끔 두세 번 연달아 탁 탁
+  const d=me?Math.hypot(me.g.position.x-FIRE.x,me.g.position.z-FIRE.z):99,near=Math.max(0,1-d/18);
+  if(lv>0.1&&near>0&&Math.random()<dt*(2.2+3*lv)){const v=0.24*Math.max(0.35,lv)*near,k=Math.random()<0.3?3:1;for(let i=0;i<k;i++)burst(0.04+Math.random()*0.05,1800+Math.random()*2200,v*(0.6+Math.random()*0.6),i*0.07)}
+  if(lv>0.3&&near>0.5&&Math.random()<dt*0.12)burst(0.18,700,0.22*lv*near); // 장작이 툭 내려앉는 소리
   if(SIT&&SIT.id&&SIT.id.startsWith("fireLog")&&lv>=0.2){if(!(S.warmUntil>Date.now()+60000))toast("불 곁에 앉으니 몸이 녹아요 · 10분 동안 덜 지쳐요");S.warmUntil=Date.now()+600000}
   fireNpcT+=dt;if(n>0.35&&fireNpcT>150){fireNpcT=0;if(fireOwn()<0.6)addFireWood(pickOne(["옆집 할머니","이장님","귀농 2년차","분교 선생님","동네 할아버지","윗마을 청년"]))}
   if(Math.random()<dt)fireCrowdApply()}
