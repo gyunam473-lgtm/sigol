@@ -35,7 +35,7 @@
         <div class="clockrow"><button class="clock" id="clock" title="눌러서 날씨 미리보기"></button><button class="more" id="sideMore" aria-label="날씨와 단추 더 보기" aria-expanded="false">▾</button></div>
         <p class="hint" id="wxNote"></p>
         <p class="hint warn" id="wxWarn" hidden></p>
-        <div class="sidebtns"><button class="snd" id="skyHud">하늘 보기</button><button class="snd" id="sndBtn">소리 켜기</button><button class="snd" id="resetBtn" title="시험 서버용: 기록을 지우고 처음부터">처음부터</button></div>
+        <div class="sidebtns"><button class="snd" id="skyHud">하늘 보기</button><button class="snd" id="sndBtn">소리 켜기</button><button class="snd" id="timeBtn">시간 보기</button><button class="snd" id="resetBtn" title="시험 서버용: 기록을 지우고 처음부터">처음부터</button></div>
       </div>
     </div>
   </div>
@@ -44,7 +44,7 @@
 
   <div class="bottom">
     <!-- 오른쪽 아래: 창고, 돌아가기 -->
-    <div class="br"><button class="chip big go" id="fishBtn" hidden>낚시하기</button><button class="chip big mapbtn" id="mapBtn" aria-label="마을 지도 열기"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z M9 4v14 M15 6v14" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>마을 지도</button><button class="chip big" id="invBtn">창고</button><button class="chip big go" id="homeBtn" hidden>우리 땅으로</button></div>
+    <div class="br"><button class="chip big" id="timeChip" hidden></button><button class="chip big go" id="fishBtn" hidden>낚시하기</button><button class="chip big mapbtn" id="mapBtn" aria-label="마을 지도 열기"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z M9 4v14 M15 6v14" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>마을 지도</button><button class="chip big" id="invBtn">창고</button><button class="chip big go" id="homeBtn" hidden>우리 땅으로</button></div>
   </div>
 
   <!-- 작업 화면: 밭 한 칸을 가까이 보며 손동작으로 일해요 (js/play/work.js) -->

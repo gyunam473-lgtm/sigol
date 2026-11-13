@@ -313,3 +313,10 @@ body{margin:0}
 .kjbar{position:relative;height:22px;border-radius:99px;background:var(--line);overflow:hidden}
 .kjbar i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,#8ac060,#c0392b)}
 .kjbar span{position:relative;display:block;text-align:center;font-size:12px;line-height:22px;color:var(--ink);font-weight:700}
+
+/* 시간 바꿔 보기 */
+.tpbig{font-family:var(--display);font-size:22px;text-align:center;margin:6px 0}
+#tpRange{width:100%;height:36px;accent-color:#c8572f}
+.tpquick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.tpquick button{display:flex;flex-direction:column;align-items:center;padding:8px 4px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font:inherit;font-size:14px}
+.tpquick small{color:var(--muted);font-size:11px}

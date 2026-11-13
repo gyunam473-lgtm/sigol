@@ -81,11 +81,12 @@ function skyFollow(){skyG.position.copy(camera.position)} // main.js 에서 매 
 
 /* ---------- 지금 시간 (체험용 '하루 빨리 보기' 중이면 빠르게 흘러요) ---------- */
 let timelapse=null; // {t0, h0}
-function hourNow(){
+let timePick=null; // 시간 미리보기: 고른 시각(0~24)에 멈춰 둬요. 하늘·빛·소리만 바뀌고 작물·가게는 실제 시간대로
+function hourNow(){if(timePick!=null)return timePick;
   if(timelapse){const e=(performance.now()-timelapse.t0)/1000,h=timelapse.h0+e*0.4; // 1초에 24분
     if(e*0.4>=24){timelapse=null;toast("실제 시간으로 돌아왔어요")}else return h%24}
   const d=new Date();return d.getHours()+d.getMinutes()/60+d.getSeconds()/3600}
-function startTimelapse(){timelapse={t0:performance.now(),h0:hourNow()};toast("하루를 1분 만에 보여 드려요")}
+function startTimelapse(){timePick=null;refreshTimeChip();timelapse={t0:performance.now(),h0:hourNow()};toast("하루를 1분 만에 보여 드려요")}
 
 let skyNow={night:0};
 const _dir=new THREE.Vector3(),_sunE=new THREE.Vector3();
@@ -113,9 +114,25 @@ function applyTime(){
   ground.material=M(w==="눈"?0xe4e8e2:0xa9c97f);
   rainG.visible=w==="비";snowG.visible=w==="눈";
   const hh=Math.floor(h);
-  $("clock").textContent=(d.getMonth()+1)+"월 "+d.getDate()+"일 · "+termNow(d)+" 무렵 · "+timeLabel(h)+(timelapse?" "+hh+"시":"")+" · "+w+(weather.preview?" (미리보기)":"");
+  $("clock").textContent=(d.getMonth()+1)+"월 "+d.getDate()+"일 · "+termNow(d)+" 무렵 · "+timeLabel(h)+(timelapse?" "+hh+"시":"")+(timePick!=null?" "+fmt12(timePick)+" (시간 미리보기)":"")+" · "+w+(weather.preview?" (미리보기)":"");
   $("clock").title="해 뜨는 시간 "+fmtH(t.rise)+" · 해 지는 시간 "+fmtH(t.set)+" · 눌러서 날씨 미리보기";
   $("wxNote").textContent=WX_NOTE[w];
 }
 $("clock").onclick=()=>{const i=WX_CYCLE.indexOf(weather.kind);weather.preview=true;weather.kind=WX_CYCLE[(i+1)%4];
   if(weather.kind===dayWeather(new Date()))weather.preview=null;applyTime();wetFromWeather();setAmbience();toast("날씨 미리보기: "+weather.kind)};
+
+/* ---------- 시간 바꿔 보기 (원하는 시간의 하늘을 봐요) ---------- */
+const fmt12=h=>{h=((h%24)+24)%24;const H=Math.floor(h),m=Math.round(h%1*60)%60;return (H<12?"오전 ":"오후 ")+((H%12)||12)+":"+String(m).padStart(2,"0")};
+function setTimePick(h){timePick=h==null?null:((h%24)+24)%24;timelapse=null;applyTime();if(typeof setAmbience==="function")setAmbience();if(typeof dabangLighting==="function"&&mode==="dabang")dabangLighting();refreshTimeChip()}
+function refreshTimeChip(){const c=$("timeChip");if(!c)return;c.hidden=timePick==null;if(timePick!=null)c.textContent="🕒 "+fmt12(timePick)+" 보는 중 · 지금으로"}
+function openTimePick(){const t=sunTimes(new Date()),cur=hourNow();
+  const Q=[["새벽",t.rise-0.7],["해 뜰 녘",t.rise+0.1],["한낮",12.5],["노을",t.set-0.15],["저녁",t.set+0.8],["한밤",0.5]];
+  openSheet(`<h2>시간 바꿔 보기</h2><p class="hint">고른 시간의 하늘·빛·소리를 보여 줘요. 밭 작물·가게·이웃은 실제 시간대로 흘러가요.</p>
+    <p class="tpbig" id="tpLabel">${fmt12(cur)} · ${timeLabel(cur)}</p>
+    <input type="range" id="tpRange" min="0" max="23.75" step="0.25" value="${Math.round(cur*4)/4}" aria-label="시간 고르기">
+    <div class="tpquick">${Q.map(([n,h])=>`<button data-tp="${h}">${n}<small>${fmt12(h)}</small></button>`).join("")}</div>
+    <button class="close go" id="tpNow">지금 시간으로 돌아가기</button>`);
+  const upd=h=>{setTimePick(h);$("tpLabel").textContent=fmt12(h)+" · "+timeLabel(h)};
+  $("tpRange").oninput=e=>upd(+e.target.value);
+  sheet.querySelectorAll("[data-tp]").forEach(b=>b.onclick=()=>{const h=+b.dataset.tp;$("tpRange").value=h;upd(h)});
+  $("tpNow").onclick=()=>{setTimePick(null);closeSheet();toast("실제 시간으로 돌아왔어요")}}

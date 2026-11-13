@@ -126,9 +126,10 @@ let flowerT=0;
 const sunsetNow=()=>{const h=hourNow();return skyNow.set&&h>=skyNow.set-0.75&&h<=skyNow.set+0.35};
 const NOEUL_SEATS=["plaza","sanJeongja"];
 function noeulBtnHtml(){if(!SIT||!NOEUL_SEATS.includes(SIT.place||SIT.id))return "";
-  return sunsetNow()?`<button class="close go" id="noeulBtn">노을 보기</button>`:`<p class="hint">해 질 녘(${fmtH(skyNow.set)}쯤) 여기 앉으면 노을을 볼 수 있어요</p>`}
+  return sunsetNow()?`<button class="close go" id="noeulBtn">노을 보기</button>`:`<div class="item"><div>노을은 ${fmt12(skyNow.set)}쯤<small>그때 오거나, 시간을 노을 무렵으로 바꿔 미리 볼 수 있어요</small></div><button class="go" onclick="setTimePick(skyNow.set-0.15);SIT.free?renderFreeSit():renderSit()">노을 시간으로</button></div>`}
+// 노을 보기: 기둥 밖, 지붕들보다 높이서 해 지는 쪽을 봐요
 function watchNoeul(){if(!SIT)return;const d=sun.position.clone().setY(0).normalize();SIT.noeul=true;lookSky(true);
-  SIT.skyCam=SIT.seat.clone().add(d.clone().multiplyScalar(2.4)).add(new THREE.Vector3(0,2.8,0)); // 기둥 밖, 지붕들보다 높이서 봐요SIT.skyLook=SIT.skyCam.clone().add(d.multiplyScalar(20)).add(new THREE.Vector3(0,0.4,0));
+  SIT.skyCam=SIT.seat.clone().add(d.clone().multiplyScalar(2.4)).add(new THREE.Vector3(0,4.2,0));SIT.skyLook=SIT.skyCam.clone().add(d.multiplyScalar(20)).add(new THREE.Vector3(0,-1.6,0));
   const k=new Date().toDateString();if(S.noeulDay!==k){S.noeulDay=k;S.noeulN=(S.noeulN||0)+1;save();setTimeout(()=>toast(`오늘의 노을을 봤어요 · 지금까지 노을 ${S.noeulN}번`),1500)}renderSit()}
 const noeulNote=()=>pickOne(["하늘이 복숭앗빛에서 보랏빛으로 물들어요","해가 산 너머로 천천히 넘어가요. 오늘도 수고했어요","구름 가장자리가 금빛으로 빛나요","저녁 바람이 선선해요. 어디선가 밥 짓는 냄새"]);
 
