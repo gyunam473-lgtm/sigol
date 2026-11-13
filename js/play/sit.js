@@ -55,7 +55,7 @@ function standUp(){
 }
 
 function renderSit(){
-  if(SIT.sky){$("sitPanel").innerHTML=`<div class="sithead"><h2>하늘 보는 중</h2><small>${weather.kind} · ${timeLabel(hourNow())}</small></div><p class="hint">${skyNote()}</p><button class="close" id="skyOff">그만 보기</button>`;$("skyOff").onclick=()=>lookSky(false);return}
+  if(SIT.sky){$("sitPanel").innerHTML=`<div class="sithead"><h2>${SIT.noeul?"노을 보는 중":"하늘 보는 중"}</h2><small>${weather.kind} · ${timeLabel(hourNow())}</small></div><p class="hint">${SIT.noeul?noeulNote():skyNote()}</p><button class="close" id="skyOff">그만 보기</button>`;$("skyOff").onclick=()=>lookSky(false);return}
   if(SIT.free)return renderFreeSit();
   const s=SIT,home=s.place==="home",nb=s.place==="nbBench",dishes=home?S.dishes:s.order,tm=timeLabel(hourNow());
   if(s.focus){const k=s.focus.k,id=dishes[k];
@@ -73,11 +73,12 @@ function renderSit(){
   dishes.forEach((id,k)=>{h+=`<div class="item"><div ${k<4?`class="look" data-look="${k}"`:""}>${dishName(id)}${k<4?"<small>눌러서 가까이 보기</small>":""}</div><button class="go" data-eat="${k}">먹기</button></div>`});
   if(home&&dishes.length>4)h+=`<p class="hint">소반엔 네 접시까지 보여요. 나머지 ${dishes.length-4}접시는 찬장에 있어요.</p>`;
   if(home&&S.inv.makgeolli>0)h+=`<div class="item"><div>막걸리 한 병<small>${S.inv.makgeolli}병 있어요 · 사발에 따라 소반에 올려요</small></div><button id="pourBtn">따르기</button></div>`;
+  h+=noeulBtnHtml();
   h+=`<div class="sitbtns">${home?`<button class="close" id="invBtn2">이웃 부르기${s.guests.length?" ("+s.guests.length+")":""}</button>`:""}<button class="close" id="skyBtn">하늘 보기</button><button class="close" id="standBtn">일어나기</button></div>`;
   const p=$("sitPanel");p.innerHTML=h;
   p.querySelectorAll("[data-order]").forEach(b=>b.onclick=()=>order(b.dataset.order));
   p.querySelectorAll("[data-bottle]").forEach(b=>b.onclick=()=>{const f=MARKET_FOOD.find(x=>x.id===b.dataset.bottle);if(S.money<f.price)return;S.money-=f.price;S.inv.makgeolli=(S.inv.makgeolli||0)+1;sfx("coin");save();refresh();toast("막걸리 한 병 샀어요. 집 평상에서 이웃이랑 나눠 마셔요");renderSit()});
-  if($("invBtn2"))$("invBtn2").onclick=renderInvite;if($("pourBtn"))$("pourBtn").onclick=pourMakgeolli;
+  if($("invBtn2"))$("invBtn2").onclick=renderInvite;if($("noeulBtn"))$("noeulBtn").onclick=watchNoeul;if($("pourBtn"))$("pourBtn").onclick=pourMakgeolli;
   p.querySelectorAll("[data-eat]").forEach(b=>b.onclick=()=>eat(+b.dataset.eat));
   p.querySelectorAll("[data-look]").forEach(b=>b.onclick=()=>focusDish(+b.dataset.look));
   $("standBtn").onclick=standUp;$("skyBtn").onclick=()=>lookSky(true);
@@ -98,7 +99,7 @@ canvas.addEventListener("click",e=>{ // 앉아 있을 때 상 위 음식 누르�
   let o=hit&&hit.object;while(o&&o.userData.dishK===undefined)o=o.parent;
   if(o)focusDish(o.userData.dishK);else if(SIT.focus)focusDish(null)});
 // 하늘 보기: 평상·정자에 앉아서 고개를 들어요. 밤엔 달과 별, 낮엔 하늘색
-function lookSky(on){if(!SIT)return;SIT.sky=on;$("camctl").hidden=on;
+function lookSky(on){if(!SIT)return;SIT.sky=on;if(!on)SIT.noeul=false;$("camctl").hidden=on;
   if(on){const c=SIT.seat.clone().add(new THREE.Vector3(0,1.3,0.9));SIT.skyCam=c;SIT.skyLook=c.clone().add(MOON_DIR.clone().multiplyScalar(20));
     SIT.skyHid=[];scene.traverse(o=>{if(o.isSprite&&o.visible&&o.parent!==skyG){o.visible=false;SIT.skyHid.push(o)}})} // 하늘 볼 땐 이름표 숨기기
   else if(SIT.skyHid){SIT.skyHid.forEach(o=>o.visible=true);SIT.skyHid=null}
@@ -115,6 +116,8 @@ function renderFreeSit(){
   if(s.dabang){if(s.cup)h+=`<div class="item"><div>${dishName(s.cup)}<small>사장님이 갖다주셨어요 · 김이 모락모락</small></div><button class="go" id="drinkCup">마시기</button></div>`;
     else{h+='<h3>차림표 · 시키면 갖다드려요</h3>';DABANG_MENU.forEach(f=>{h+=`<div class="item"><div>${f.name}<small>${f.price}원 · ${f.desc}</small></div><button class="go" data-tea="${f.id}" ${S.money>=f.price?"":"disabled"}>시키기</button></div>`})}}
   if(S.hold)h+=`<div class="item"><div>${dishName(S.hold)}<small>들고 온 음식 · 여기서 먹어도 돼요</small></div><button class="go" id="eatHold">먹기</button></div>`;
+  if(s.panel)h+=s.panel();
+  h+=noeulBtnHtml();
   if(s.id==="maru")h+=`<div class="item"><div>짚공예<small>볏짚 ${S.inv.jip||0}단 · 새끼줄·짚신·소쿠리·멍석</small></div><button class="go" id="jipBtn">하기</button></div>`;
   h+=`<div class="sitbtns">${s.ledger?'<button class="close" id="ledgerBtn">살림 장부 펴기</button>':""}${outdoor?'<button class="close" id="skyBtn">하늘 보기</button>':""}<button class="close go" id="upBtn2">일어나기</button></div>`;
   $("sitPanel").innerHTML=h;
@@ -125,6 +128,7 @@ function renderFreeSit(){
     const extra=nourish(id);setHold(null);sfx("pop");buzz(15);toast(josa(name,"을","를")+" 맛있게 먹었어요"+(extra?" · "+extra:""));save();refresh();renderFreeSit()}
   if($("ledgerBtn"))$("ledgerBtn").onclick=openKitchen;
   if($("jipBtn"))$("jipBtn").onclick=openJipCraft;
+  if(s.bind)s.bind();if($("noeulBtn"))$("noeulBtn").onclick=watchNoeul;
   $("sitPanel").querySelectorAll("[data-tea]").forEach(b=>b.onclick=()=>{const f=DABANG_MENU.find(x=>x.id===b.dataset.tea);if(S.money<f.price)return;S.money-=f.price;s.cup=f.id;sfx("coin");save();refresh();
     const m=dish3D(f.id);m.position.set(...s.cupAt);dabang.add(m);s.cupMesh=m;toast("다방 사장님: \""+pickOne(["뜨거우니까 조심해요","설탕 하나 더 넣었어","오늘 날씨 좋지? 천천히 마시고 가"])+"\"");renderFreeSit()});
   if($("drinkCup"))$("drinkCup").onclick=()=>{if(EA)return;playEat({dish:s.cupMesh,id:s.cup,onDone:drinkNow})};

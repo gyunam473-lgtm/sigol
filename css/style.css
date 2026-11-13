@@ -302,3 +302,14 @@ body{margin:0}
 }
 
 .danger{background:#b8432f!important;color:#fff!important;border-color:#b8432f!important}
+
+/* 소원 매듭 */
+.wishes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;max-height:42vh;overflow-y:auto}
+.wish{background:var(--panel);border:1px solid var(--line);border-left:6px solid #c8572f;border-radius:8px;padding:6px 8px}
+.wish p{margin:0;font-size:13px;line-height:1.35}.wish small{color:var(--muted);font-size:11px}
+#wishText{width:100%;box-sizing:border-box;font:inherit;font-size:16px;padding:8px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
+.wishcols{display:flex;gap:8px;margin:4px 0}.wc{width:34px;height:34px;border-radius:50%;border:2px solid var(--line)}.wc.on{outline:3px solid var(--ink);outline-offset:1px}
+/* 공동 김장 */
+.kjbar{position:relative;height:22px;border-radius:99px;background:var(--line);overflow:hidden}
+.kjbar i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,#8ac060,#c0392b)}
+.kjbar span{position:relative;display:block;text-align:center;font-size:12px;line-height:22px;color:var(--ink);font-weight:700}

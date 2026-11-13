@@ -21,7 +21,7 @@ const boosted=()=>(S.boost||0)>Date.now();
 const fillOf=id=>(anyFood(id)||{fill:20}).fill||20;
 
 // 일하면 든든함이 줄어요 (level.js 의 sweat 에서 불러요)
-function tire(n){
+function tire(n){if(S.warmUntil>Date.now())n*=0.5; // 모닥불 곁에 있었으면 덜 지쳐요 (play/village2.js)
   const before=fullNow(),wb=waterNow();S.full=Math.max(0,before-n*FULL_PER_SWEAT);S.water=Math.max(0,wb-n*WATER_PER_SWEAT*thirstRate());S.lastWork=Date.now();
   if(wb>=HUNGRY&&S.water<HUNGRY)setTimeout(()=>toast("목이 말라요. 손이 조금 느려졌어요 · 마당 우물에서 물 한 바가지 어때요?"),900);
   else if(before>=HUNGRY&&S.full<HUNGRY)setTimeout(()=>toast("배가 출출해요. 손이 조금 느려졌어요 · 평상에서 새참 먹을까요?"),900);

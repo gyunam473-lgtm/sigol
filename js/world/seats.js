@@ -40,7 +40,7 @@ const FREE_SEATS={
 // 앉을 자리 하나를 sit.js 가 쓰는 모양으로
 function freeSeat(id){const d=FREE_SEATS[id],g=d.get(),f=g.face,fw=[Math.sin(f),Math.cos(f)],sd=[Math.cos(f),-Math.sin(f)];
   const at=([a,b,c])=>new THREE.Vector3(g.pos[0]+sd[0]*a+fw[0]*c,g.pos[1]+b,g.pos[2]+sd[1]*a+fw[1]*c);
-  return {free:true,id,title:d.title,note:d.note,ledger:d.ledger,where:d.where,dabang:d.dabang,cupAt:g.cupAt,seat:new THREE.Vector3(...g.pos),face:f,stand:g.stand,cam:at(g.cam),look:at(g.look),block:g.block||[],yaw:g.yaw||null}}
+  return {free:true,id,title:d.title,note:d.note,panel:d.panel,bind:d.bind,ledger:d.ledger,where:d.where,dabang:d.dabang,cupAt:g.cupAt,seat:new THREE.Vector3(...g.pos),face:f,stand:g.stand,cam:at(g.cam),look:at(g.look),block:g.block||[],yaw:g.yaw||null}}
 function placeSeats(){maruCushion.position.set(HF.x-1.3,0.675,HF.z-2.15);maruCushion.visible=mode==="home"}
 
 // 공용 장소에서 누를 수 있는 것, 길막기에 의자 더하기
