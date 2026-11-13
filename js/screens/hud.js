@@ -15,7 +15,7 @@ function refresh(){
   if(S.hold)$("hint").textContent=dishName(S.hold)+(mode==="plaza"?" 들고 왔어요 · 정자·먹거리 천막·평상에 앉으면 상에 올려 먹어요":PLACES[mode]?" 들고 왔어요":visiting?" 들고 왔어요 · 집을 누르면 갖다드릴 수 있어요":" 들고 있어요 · 평상을 누르면 소반에 내려놓아요. 이웃집에 갖다드려도 돼요");
   if(me)me.speed=hungry()||thirsty()?3.5:4.2; // 출출하거나 목마르면 걸음이 조금 느려요
   if(typeof seaTruck!=="undefined")seaTruck.visible=jangToday(); // 장날에만 생선 트럭
-  refreshMeal();if(typeof refreshStorm==="function")refreshStorm();
+  if(typeof updateMyTitle==="function")updateMyTitle();refreshMeal();if(typeof refreshStorm==="function")refreshStorm();
   const lv=myLv(),xp=S.xp||0,L=LEVELS[lv],N=LEVELS[lv+1];
   $("lvName").textContent=L.name;$("xpFill").style.width=(N?(xp-L.xp)/(N.xp-L.xp)*100:100)+"%";
   $("xpNum").textContent=N?`땀방울 ${xp}/${N.xp}`:`땀방울 ${xp}`;

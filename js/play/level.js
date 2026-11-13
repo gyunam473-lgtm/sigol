@@ -3,6 +3,10 @@
 
 function lvOf(xp){let l=0;LEVELS.forEach((L,i)=>{if(xp>=L.xp)l=i});return l}
 const myLv=()=>lvOf(S.xp||0);
+// 내 머리 위 칭호 ("나" 이름표 위 금빛 이름표). 레벨이 바뀌면 새로 달아요
+let titleLv=-1;
+function updateMyTitle(){if(!me)return;const lv=myLv();if(lv===titleLv&&me.title)return;titleLv=lv;
+  if(me.title)me.g.remove(me.title);const t=label(LEVELS[lv].name,0.85,"title");t.position.y=3.08;t.userData.title=1;me.g.add(t);me.title=t}
 let lvQueue=null; // 작업 중에 레벨이 오르면, 작업이 끝난 뒤에 알려 줘요
 
 function sweat(n){

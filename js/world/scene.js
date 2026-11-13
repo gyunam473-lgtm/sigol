@@ -46,7 +46,7 @@ const BG_TREES=[[-16,-11],[-18,7],[14,-12],[16,2],[-3,-14],[11,14],[-14,14],[3,1
 tree(-15.2,-7.5,1.05,true,land); // 감나무
 
 // 이름표. style: 장소(기본, 크림색) · me(나, 파랑) · nb(이웃, 초록) · shop(가게 주인, 주황)
-const LABEL_STYLE={place:["rgba(251,248,240,.92)","#2b2a24"],me:["rgba(58,104,160,.95)","#ffffff"],nb:["rgba(79,122,58,.95)","#ffffff"],shop:["rgba(200,87,47,.96)","#ffffff"]};
+const LABEL_STYLE={place:["rgba(251,248,240,.92)","#2b2a24"],me:["rgba(58,104,160,.95)","#ffffff"],nb:["rgba(79,122,58,.95)","#ffffff"],shop:["rgba(200,87,47,.96)","#ffffff"],title:["rgba(236,196,92,.96)","#3a2a10"]};
 function label(text,scale=1,style="place"){const [bg,fg]=LABEL_STYLE[style]||LABEL_STYLE.place;
   const c=document.createElement("canvas"),ctx=c.getContext("2d"),f=40;
   ctx.font=`${f}px "Gowun Dodum", sans-serif`;const w=Math.ceil(ctx.measureText(text).width)+40;c.width=w;c.height=64;

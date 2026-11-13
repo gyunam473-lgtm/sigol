@@ -30,6 +30,7 @@ function wPop(x,y,t){const e=document.createElement("span");e.className="wpop";e
 const avg=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:0.5;
 const careDots=v=>{const n=Math.round(v*5);return "●".repeat(n)+"○".repeat(5-n)};
 const meLabel=()=>me.g.children.find(c=>c.isSprite);
+const meTags=on=>me.g.children.forEach(c=>{if(c.isSprite)c.visible=on}); // 나 이름표 + 칭호
 
 /* ---------- 시작과 끝 ---------- */
 function startWork(i,kind){ // kind: plant(빈 칸 심기) · water(심어 둔 칸 물 주기) · harvest(거두기) · prep(궂은 날씨 대비)
@@ -39,7 +40,7 @@ function startWork(i,kind){ // kind: plant(빈 칸 심기) · water(심어 둔 �
      mat:new THREE.MeshLambertMaterial({color:kind==="plant"?SOIL_HARD:SOIL_SOFT})};
   W.ev=ev;P.g.add(W.g);P.soil.material=W.mat;P.crop.visible=kind==="water"||kind==="prep"||kind==="tend";if(kind==="tend")P.crop.children.forEach(c=>{if(c.isSprite||c.userData.iss)c.visible=false});
   if(kind==="plant")for(let k=0;k<7;k++){const c=box(0.24,0.1,0.18,0x8a5e3c,(Math.random()-.5)*1.4,0.28,(Math.random()-.5)*1.4);c.rotation.y=Math.random()*3;c.userData.clod=true;W.g.add(c)} // 굳은 흙덩이
-  const lab=meLabel();if(lab)lab.visible=false;
+  meTags(false);
   document.querySelector(".bottom").hidden=true;document.querySelector(".top").hidden=true;wEl.hidden=false;
   $("wSteps").innerHTML=steps.map(s=>`<li>${STEP_NAME[s]}</li>`).join("");
   $("wCare").textContent=kind==="harvest"||kind==="tend"?"정성 "+careDots(p.care==null?0.5:p.care)+" · 돌봄 "+careDots(tendScore(p)):"";
@@ -48,7 +49,7 @@ function startWork(i,kind){ // kind: plant(빈 칸 심기) · water(심어 둔 �
 function endWork(msg){
   if(!W)return;const i=W.i;W.P.g.remove(W.g);W.P.crop.visible=true;W=null;drawPlot(i,true);
   wEl.hidden=true;wSvg.innerHTML="";document.querySelector(".bottom").hidden=false;document.querySelector(".top").hidden=false;
-  const lab=meLabel();if(lab)lab.visible=true;
+  meTags(true);
   refresh();if(msg)toast(msg);
   if(lvQueue!=null)setTimeout(showLevelUp,700);
 }
