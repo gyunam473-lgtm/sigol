@@ -26,8 +26,8 @@ const tentRoof=new THREE.Group();
 const plazaClicks=[],plazaRects=[];
 let ppeong,jangPot;
 (function(){
-  plaza.add(box(40,0.02,26,0xd3c9b2,0,0.01,3)); // 넓어진 바닥 (가운데 옛 바닥보다 살짝 낮게)
-  for(let gx=-19;gx<=19;gx+=2)for(let gz=-9;gz<=15;gz+=2){const h=(gx*7+gz*13+400)%5;if(h>1||Math.abs(gx)<10&&gz<7.5)continue;const t=box(1.6,0.02,1.6,h?0xcac0a8:0xd8ceb6,gx,0.035,gz);t.castShadow=false;plaza.add(t)} // 바둑판 칸에만 (겹치면 번쩍거려요)
+  plaza.add(box(40,0.02,26,0xc4b597,0,0.01,3)); // 넓어진 바닥 (가운데 옛 바닥보다 살짝 낮게)
+  for(let gx=-19;gx<=19;gx+=2)for(let gz=-9;gz<=15;gz+=2){const h=(gx*7+gz*13+400)%5;if(h>1||Math.abs(gx)<10&&gz<7.5)continue;const t=box(1.6,0.02,1.6,h?0xb8ab90:0xc6b99c,gx,0.035,gz);t.castShadow=false;plaza.add(t)} // 바둑판 칸에만 (겹치면 번쩍거려요)
   // ---------- 먹거리 천막 ----------
   const T=PLAZA_X.tent,cx=(T.x0+T.x1)/2;
   [T.x0+0.2,cx,T.x1-0.2].forEach(x=>[T.z0+0.2,T.z1-0.2].forEach(z=>plaza.add(cyl(0.07,0.07,3.0,0x7a5a3a,x,1.5,z,6))));

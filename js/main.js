@@ -44,7 +44,7 @@ function loop(now){
     else if(mode==="dabang")dabangCam(); // 다방 안
     else{const p=me.g.position;camPos.set(p.x,p.y+10,p.z+11);lookT.set(p.x,1,p.z-1)}
     camera.position.lerp(camPos,0.07);look.lerp(lookT,0.12);camera.lookAt(look);
-    workFrame(dt);cookFrame(dt,now);choreFrame(dt,now);fishFrame(dt,now);eatFrame(dt);placesFrame(dt,now);grindFrame(dt,now);village2Frame(dt,now);gotgamFrame(dt);
+    workFrame(dt);cookFrame(dt,now);choreFrame(dt,now);fishFrame(dt,now);eatFrame(dt);placesFrame(dt,now);grindFrame(dt,now);village2Frame(dt,now);gotgamFrame(dt);decoFrame();armsFrame(dt,now);
   }
   if(rainG.visible||snowG.visible){const G=rainG.visible?rainG:snowG,sp=rainG.visible?14:1.6,mp=me?me.g.position:{x:0,z:0};
     G.children.forEach((m,i)=>{m.position.y-=sp*dt;if(!rainG.visible)m.position.x+=Math.sin(now/600+i)*0.004;
@@ -91,7 +91,7 @@ const start=()=>{if(me)return;makePeople();setHold(S.hold);applyWoodLand();check
     if(w==="비"||w==="눈")h+=`<div class="item"><div>오늘은 ${w==="비"?"비가":"눈이"}와요<small>${WX_NOTE[w]}</small></div></div>`;
     openSheet(h+helpH);bindThanks();
   }else toast(away?"다시 오셨네요. "+termNow(new Date())+" 무렵이에요":"시골살이에 오신 걸 환영해요. 텃밭부터 가볼까요? · 궁금한 건 날씨 칸 ▾ → 안내서");
-  texYards();setTimeout(trimShadows,1500);
+  texYards();scatterAll();setTimeout(trimShadows,1500);
   save();setInterval(save,15000);
   document.addEventListener("visibilitychange",()=>{if(document.hidden)save()});
 };

@@ -18,7 +18,11 @@ function person(shirt,name,o={}){
   const g=new THREE.Group(),b=new THREE.Group();g.add(b);
   b.add(box(0.5,0.55,0.32,o.pants||0x4a4a55,0,0.28,0));
   b.add(cyl(0.3,0.38,0.8,shirt,0,0.95,0));
-  b.add(sph(0.3,0xf0d2b0,0,1.6,0));
+  const head=new THREE.Mesh(new THREE.SphereGeometry(0.3,20,16),M(0xf0d2b0));head.position.y=1.6;head.castShadow=head.receiveShadow=true;b.add(head);
+  // 얼굴: 머리에 붙여서 고개를 움직이면 같이 움직여요 (몸 순서 0 바지 · 1 윗옷 · 2 머리는 그대로 둬요)
+  [-1,1].forEach(sd=>{head.add(sph(0.034,0x2a2420,sd*0.1,0.03,0.265));const ck=sph(0.05,0xf2a8a0,sd*0.17,-0.07,0.22);ck.scale.z=0.4;head.add(ck)});
+  head.add(sph(0.03,0xe8c4a0,0,-0.03,0.295));
+  {const mo=box(0.07,0.014,0.02,0x9a4a3a,0,-0.13,0.27);head.add(mo)}
   const hair=o.hair||0x3a332c;
   if(o.scarf){const sc=sph(0.33,o.scarf,0,1.7,-0.03);sc.scale.set(1,0.8,1.05);b.add(sc);b.add(sph(0.09,o.scarf,0,1.62,-0.33))} // 머릿수건과 매듭
   else if(o.cap){b.add(cyl(0.31,0.32,0.2,o.cap,0,1.84,0,14));b.add(box(0.36,0.04,0.3,o.cap,0,1.75,0.25))} // 모자와 챙
@@ -27,8 +31,11 @@ function person(shirt,name,o={}){
   if(o.hair&&(o.cap||o.hat!==false&&!o.scarf))b.add(sph(0.305,hair,0,1.62,-0.06)); // 모자 밑 머리
   if(o.apron){const a=box(0.5,0.62,0.04,o.apron,0,0.9,0.36);a.rotation.x=-0.1;b.add(a)}
   if(o.beard)b.add(sph(0.14,o.beard,0,1.42,0.22));
+  // 팔: 어깨를 축으로 돌아요 (소매는 윗옷 색, 손은 살색)
+  const arms=[-1,1].map(sd=>{const a=new THREE.Group();a.position.set(sd*0.33,1.27,0);a.rotation.z=sd*0.2;
+    a.add(cyl(0.075,0.07,0.5,shirt,0,-0.25,0,8));a.add(sph(0.075,0xf0d2b0,0,-0.53,0));b.add(a);return a});
   const l=label(name,0.9,o.style||"nb");l.position.y=2.55;g.add(l);
-  scene.add(g);return {g,b,tx:0,tz:0,speed:3.2,moving:false,wait:0,label:l}}
+  scene.add(g);return {g,b,arms,tx:0,tz:0,speed:3.2,moving:false,wait:0,label:l}}
 
 // 가게 주인 머리 위 말풍선: 말 걸 수 있는 사람이라는 표시 (살짝 위아래로 흔들려요)
 const markers=[];
@@ -70,3 +77,10 @@ function shopSpot(k){if(SHOPS[k].spot)return SHOPS[k].spot;
 function shopStand(k){if(SHOPS[k].stand)return SHOPS[k].stand;const [x,z]=shopSpot(k);return k==="fish"?[x+0.9,z-0.9]:[x+1.2,z+1.0]}
 const WAY=[[2,-1],[3,2],[-4,3],[-5,6],[4,5],[9,1],[-2,-2],[1,9],[-9,3],[10,4]];
 const WAYP=[[-5,-1.5],[5,-1.5],[-3,2],[2,3],[6,0.5],[-6,0],[0,1],[4,5],[-4,6],[3,-2]];
+
+// 팔 움직임: 걸을 땐 앞뒤로 흔들고, 음식을 들고 있으면 두 팔을 앞으로, 서 있을 땐 살짝 숨 쉬듯
+function armsFrame(dt,now){const t=now/1000;
+  [me,...npcs].forEach(p=>{if(!p||!p.arms||!p.g.visible)return;const hold=p===me&&typeof holdMesh!=="undefined"&&holdMesh&&holdMesh.visible&&holdMesh.parent===me.b;
+    p.arms.forEach((a,i)=>{const sd=i?1:-1;let tx;
+      if(hold)tx=-1.15;else if(p.moving)tx=Math.sin(now/110*0.5+(i?Math.PI:0))*0.6;else tx=Math.sin(t*1.6+i)*0.03;
+      a.rotation.x+=(tx-a.rotation.x)*Math.min(1,dt*12);a.rotation.z=sd*(hold?0.05:0.2)})})}

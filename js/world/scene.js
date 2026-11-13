@@ -85,8 +85,8 @@ function stall(x,z,awn,goods,shop){
   for(let i=0;i<6;i++)s.add(box(0.62,0.12,1.9,i%2?0xf3ead6:awn,-1.55+i*0.62,2.45,0));
   goods.forEach((c,i)=>{const gx=-1+i;s.add(cyl(0.38,0.3,0.3,0xc9a36a,gx,1.05,0));for(let k=0;k<4;k++)s.add(sph(0.14,c,gx+(k%2-0.5)*0.22,1.25,(k>1?0.1:-0.1)))});
   s.position.set(x,0,z);plaza.add(s);STALLS.push(s);return s}
-plaza.add(box(18,0.04,13,0xd8cfba,0,0.02,0));
-for(let i=0;i<40;i++){const x=-8.5+(i%10)*1.9,z=-6+Math.floor(i/10)*3.4;plaza.add(box(1.7,0.05,3.1,i%3?0xcfc5ad:0xc6bba0,x,0.03,z))}
+plaza.add(box(18,0.04,13,0xc9bc9e,0,0.02,0));
+for(let i=0;i<40;i++){const x=-8.5+(i%10)*1.9,z=-6+Math.floor(i/10)*3.4;plaza.add(box(1.7,0.05,3.1,i%3?0xbfb398:0xb3a68a,x,0.03,z))}
 stall(-6.6,-3.5,0xd9583f,[0x7cc36a,0xd9483b,0xc9a66b],"veg");   // 채소가게
 stall(-2.2,-4.5,0x3f6f8f,[0x8a6a48,0xc9a66b,0x6b4a2e],"seed");  // 씨앗가게 (씨앗 자루)
 stall(2.2,-4.5,0x6f8f3f,[0xf6f2ea,0xe9d9b8,0xf6f2ea],"egg");   // 닭집 (달걀 바구니)
