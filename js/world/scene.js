@@ -4,7 +4,7 @@
 const canvas=$("c");
 const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
 renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,Math.min(screen.width,screen.height)<700?1.6:2)); // 폰은 1.6배까지만 (가볍게)
-renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.shadowMap.autoUpdate=false; // main.js 가 두 장면에 한 번 새로 그려요
 const scene=new THREE.Scene();
 scene.background=new THREE.Color(0xcfe6ee);scene.fog=new THREE.Fog(0xcfe6ee,32,75);
 const camera=new THREE.PerspectiveCamera(48,1,0.1,200);
@@ -14,10 +14,12 @@ sun.shadow.mapSize.set(1024,1024);sun.shadow.bias=-0.0006;sun.shadow.normalBias=
 
 const mats={};const M=c=>mats[c]||(mats[c]=new THREE.MeshLambertMaterial({color:c}));
 function mesh(geo,c,x=0,y=0,z=0){const m=new THREE.Mesh(geo,M(c));m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;return m}
-const box=(w,h,d,c,x,y,z)=>mesh(new THREE.BoxGeometry(w,h,d),c,x,y,z);
-const cyl=(rt,rb,h,c,x,y,z,seg=12)=>mesh(new THREE.CylinderGeometry(rt,rb,h,seg),c,x,y,z);
-const sph=(r,c,x,y,z)=>mesh(new THREE.SphereGeometry(r,12,10),c,x,y,z);
-const cone=(r,h,c,x,y,z,seg=8)=>mesh(new THREE.ConeGeometry(r,h,seg),c,x,y,z);
+// 같은 크기 도형은 한 번만 만들어 같이 써요 (휴대폰 메모리·불러오기 가볍게, 2026-11-13). 이 도형들은 직접 고치지(translate 등) 말기
+const GEO={},geo=(k,f)=>GEO[k]||(GEO[k]=f());
+const box=(w,h,d,c,x,y,z)=>mesh(geo("b"+w+","+h+","+d,()=>new THREE.BoxGeometry(w,h,d)),c,x,y,z);
+const cyl=(rt,rb,h,c,x,y,z,seg=12)=>mesh(geo("c"+rt+","+rb+","+h+","+seg,()=>new THREE.CylinderGeometry(rt,rb,h,seg)),c,x,y,z);
+const sph=(r,c,x,y,z)=>mesh(geo("s"+r,()=>new THREE.SphereGeometry(r,12,10)),c,x,y,z);
+const cone=(r,h,c,x,y,z,seg=8)=>mesh(geo("o"+r+","+h+","+seg,()=>new THREE.ConeGeometry(r,h,seg)),c,x,y,z);
 // 처마 초롱: 해가 지면 불이 들어와요 (밝기는 play/weather.js 가 정해요)
 const lampMat=new THREE.MeshLambertMaterial({color:0xf3dcae,emissive:0x000000});
 const lampLights=[];

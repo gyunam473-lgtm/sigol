@@ -69,6 +69,7 @@ function loop(now){
   if(inHouse){rainG.visible=snowG.visible=false;if(tick===0&&!(LIE&&LIE.off))roomLighting()}
   if(mode==="dabang"){rainG.visible=snowG.visible=false;if(tick===0)dabangLighting()}
   markers.forEach((m,i)=>m.position.y=m.userData.y+Math.sin(now/320+i)*0.08); // 가게 주인 말풍선
+  loop.n=(loop.n||0)+1;if(loop.n%2===0)renderer.shadowMap.needsUpdate=true;
   renderer.render(scene,camera);
   if(me&&!loop.shown){loop.shown=true;$("loading").classList.add("done")}
   requestAnimationFrame(loop)}

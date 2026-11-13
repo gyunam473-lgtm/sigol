@@ -34,11 +34,11 @@ canvas.addEventListener("pointerdown",e=>{if(!ORB||(SIT&&SIT.sky))return;ptrs.se
   if(ptrs.size===1)orbDrag={x:e.clientX,y:e.clientY};
   if(ptrs.size===2){const [a,b]=[...ptrs.values()];pinch0=Math.hypot(a.x-b.x,a.y-b.y)}});
 canvas.addEventListener("pointermove",e=>{if(!ORB||!ptrs.has(e.pointerId))return;ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
-  if(ptrs.size===2){const [a,b]=[...ptrs.values()],d=Math.hypot(a.x-b.x,a.y-b.y);if(pinch0>0){orbitZoom(pinch0/d);pinch0=d;orbMoved=true}return}
+  if(ptrs.size===2){const [a,b]=[...ptrs.values()],d=Math.hypot(a.x-b.x,a.y-b.y);if(pinch0>0){orbitZoom(Math.pow(pinch0/d,0.6));pinch0=d;orbMoved=true}return}
   if(!orbDrag)return;const dx=e.clientX-orbDrag.x,dy=e.clientY-orbDrag.y;
-  if(!orbMoved&&Math.hypot(dx,dy)<6)return;
+  if(!orbMoved&&Math.hypot(dx,dy)<12)return;
   if(!orbMoved){orbMoved=true;unFocus()}
-  ORB.th-=dx*0.009;if(ORB.yaw)ORB.th=Math.max(ORB.th0+ORB.yaw[0],Math.min(ORB.th0+ORB.yaw[1],ORB.th));ORB.ph=Math.max(ORB_LIM.phMin,Math.min(ORB_LIM.phMax,ORB.ph-dy*0.006));orbDrag={x:e.clientX,y:e.clientY}});
+  const k=camSens();ORB.th-=dx*0.006*k;if(ORB.yaw)ORB.th=Math.max(ORB.th0+ORB.yaw[0],Math.min(ORB.th0+ORB.yaw[1],ORB.th));ORB.ph=Math.max(ORB_LIM.phMin,Math.min(ORB_LIM.phMax,ORB.ph-dy*0.004*k));orbDrag={x:e.clientX,y:e.clientY}});
 const orbUp=e=>{ptrs.delete(e.pointerId);if(ptrs.size<2)pinch0=0;if(!ptrs.size)orbDrag=null};
 canvas.addEventListener("pointerup",orbUp);canvas.addEventListener("pointercancel",orbUp);
 canvas.addEventListener("wheel",e=>{if(!ORB)return;e.preventDefault();orbitZoom(e.deltaY>0?1.1:0.9)},{passive:false});
