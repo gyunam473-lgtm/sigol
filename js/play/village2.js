@@ -112,7 +112,7 @@ function flowerMesh(k,bloom){const f=FLOWERS[k],g=new THREE.Group();
   return g}
 function drawFlowers(){["plaza","stream"].forEach(pl=>{const G=flowerG[pl];while(G.children.length)G.remove(G.children[0]);
   FLOWER_SLOTS.filter(s=>s.place===pl).forEach(sl=>{const f=flowerOf(sl),g=new THREE.Group();g.position.set(sl.x,0,sl.z);
-    const soil=cyl(0.38,0.4,0.04,f?0x6a4a2e:0x8a6a48,0,0.03,0,12);soil.receiveShadow=true;g.add(soil);
+    const soil=cyl(0.38,0.4,0.06,f?0x6a4a2e:0x8a6a48,0,0.04,0,12);soil.receiveShadow=true;g.add(soil);
     if(f){const bloom=Date.now()-f.t>=FLOWER_GROW;g.add(flowerMesh(f.k,bloom))}
     g.add(hitBox(0.9,0.9,0.9,0,0.45,0));poke(g,()=>useFlowerSlot(sl),[sl.x,sl.z+(pl==="plaza"?-0.9:0.9)]);G.add(g)})})}
 drawFlowers();
@@ -155,11 +155,12 @@ function kjBase(){const d=new Date(),s=new Date(d.getFullYear(),KJ.start[0]-1,KJ
 const kjMine=()=>((S.kj||{})[kjKey()]||{}).mine||0;
 const kjTotal=()=>Math.min(KJ.goal,kjBase()+kjMine());
 // 넓힌 회관 앞마당 동쪽에 커다란 김장판: 큰 깔개, 고무 대야 넷, 배추 산 둘, 고춧가루 양푼, 둘러앉은 마을 사람들
-hall.add(box(38,0.03,26,0xd5d0c4,4,0.015,3)); // 회관 앞마당 넓히기 (옛 마당보다 살짝 낮게)
+hall.add(box(38,0.02,26,0xd5d0c4,4,0.01,3)); // 회관 앞마당 넓히기 (옛 마당보다 살짝 낮게)
 const KJ_C={x:12,z:4.6,w:11,d:7};
 const kjSite=new THREE.Group();
 const KJ_STATIONS=[[-4,2.4],[-1.3,2.4],[1.3,2.4],[4,2.4],[-4,-0.6],[4,-0.6]]; // 내가 거드는 자리 (깔개 기준)
-(function(){const {w,d}=KJ_C;kjSite.add(box(w,0.02,d,0x3f6fa8,0,0.02,0));
+// 깔개는 바닥(0.04)보다 띄워요. 같은 높이면 번쩍거려요
+(function(){const {w,d}=KJ_C;kjSite.add(box(w,0.02,d,0x3f6fa8,0,0.065,0));
   [[-4,-1.6],[-1.3,-1.6],[1.3,-1.6],[4,-1.6]].forEach(([x,z])=>{kjSite.add(cyl(0.75,0.6,0.42,0xc8322a,x,0.23,z,18));kjSite.add(cyl(0.7,0.7,0.02,0x9ac078,x,0.44,z,18));
     for(let i=0;i<6;i++){const c=sph(0.15,i%2?0xe6f2c6:0x8ac060,x+((i%3)-1)*0.3,0.5,z+(Math.floor(i/3)-0.5)*0.3);c.scale.set(1,0.6,1.3);kjSite.add(c)}});
   [[-4.6,1.4],[4.6,1.4]].forEach(([x,z])=>{for(let i=0;i<20;i++){const c=sph(0.17,0x9ac078,x+((i%4)-1.5)*0.32,0.15+Math.floor(i/8)*0.24,z+((Math.floor(i/4)%2)-0.5)*0.34);c.scale.set(1,0.85,1.2);kjSite.add(c)}}); // 배추 산
