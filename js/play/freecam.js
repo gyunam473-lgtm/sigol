@@ -33,8 +33,9 @@ canvas.addEventListener("pointermove",e=>{if(!fcOn()||!fcPtrs.has(e.pointerId))r
   if(!fcDrag)return;const dx=e.clientX-fcDrag.x,dy=e.clientY-fcDrag.y;
   if(!fcMoved&&Math.hypot(dx,dy)<14)return;
   if(!fcMoved){fcMoved=true;if(!S.freeCamTip){S.freeCamTip=1;save();toast("화면을 끌면 둘러보고, 두 손가락으로 크게·작게 · 오른쪽 위 \"처음 시점\"으로 되돌려요")}}
+  // 2026-11-14 상하좌우 반대로 (끄는 쪽으로 화면이 따라와요)
   // 끌기 시작 지점의 흔들림은 빼고, 천천히 따라 돌아요 (너무 민감하지 않게)
-  const k=camSens();FC.yaw-=dx*0.0045*k;FC.tilt=Math.max(FC_LIM.tilt[0],Math.min(FC_LIM.tilt[1],FC.tilt-dy*0.0022*k));fcDrag={x:e.clientX,y:e.clientY};fcChanged()});
+  const k=camSens();FC.yaw+=dx*0.0045*k;FC.tilt=Math.max(FC_LIM.tilt[0],Math.min(FC_LIM.tilt[1],FC.tilt+dy*0.0022*k));fcDrag={x:e.clientX,y:e.clientY};fcChanged()});
 const fcUp=e=>{fcPtrs.delete(e.pointerId);if(fcPtrs.size<2)fcPinch=0;if(!fcPtrs.size)fcDrag=null};
 canvas.addEventListener("pointerup",fcUp);canvas.addEventListener("pointercancel",fcUp);
 canvas.addEventListener("wheel",e=>{if(!fcOn())return;e.preventDefault();fcZoom(e.deltaY>0?1.1:0.9)},{passive:false});
