@@ -1,8 +1,8 @@
 /* 이웃 땅 놀러 가기: 이웃 고르기, 오가기, 품앗이(물 주기), 선물 두고 오기 */
 
 function openNeighbors(){
-  let h='<h2>이웃</h2><h3>놀러 갈 땅을 골라요 (예시 이웃)</h3>';
-  NB.forEach((n,i)=>{const done=S.helped&&S.helped[n.name]===today;h+=`<div class="item"><div>${n.name}네 땅<small>${n.sub?n.sub:done?"오늘 품앗이 했어요":"밭에 물을 주면 고마워해요"}</small></div><button class="go" data-nb="${i}" ${visiting===n?"disabled":""}>놀러가기</button></div>`});
+  let h='<h2>이웃</h2><p class="hint">품앗이: 이웃 밭일(물·김매기·벌레)을 거들면 그 이웃한테 "품"이 쌓여요. 내가 자리를 비웠을 때 품만큼 내 밭을 대신 돌봐 줘요.</p><h3>놀러 갈 땅을 골라요 (예시 이웃)</h3>';
+  NB.forEach((n,i)=>{const done=S.helped&&S.helped[n.name]===today;h+=`<div class="item"><div>${n.name}네 땅<small>${n.sub?n.sub+" · ":""}${pumasiLine(n.name)} · ${done?"오늘 품앗이 했어요":"밭일을 거들면 품이 쌓여요"}</small></div><button class="go" data-nb="${i}" ${visiting===n?"disabled":""}>놀러가기</button></div>`});
   if(mode!=="home")h+=`<div class="item"><div>우리 땅<small>내 집과 텃밭</small></div><button data-home="1">돌아가기</button></div>`;
   openSheet(h);
   sheet.querySelectorAll("[data-nb]").forEach(b=>b.onclick=()=>{closeSheet();visit(NB[+b.dataset.nb])});
@@ -24,16 +24,19 @@ function applyMode(){
     else{p.g.visible=false;p.stay=!!p.shop}}); // 우리 땅엔 나 혼자
   arriveAt();for(let i=0;i<15;i++)drawPlot(i,true);refresh();setAmbience();
 }
-function visit(n){visiting=n;nbPlots=n.plots();mode="visit";applyMode();setTimeout(()=>toast(n.name+": "+n.greet),900)}
-function goHome(){visiting=null;mode="home";applyMode();toast("우리 땅으로 돌아왔어요")}
+function visit(n){visiting=n;nbPlots=n.plots();addNbIssues(n);mode="visit";applyMode();const k=nbNeeds();
+  setTimeout(()=>toast(n.name+": "+n.greet+(k?" · 밭에 거들 일이 "+k+"가지 있어요. 거들면 품앗이 품이 쌓여요":"")),900)}
+function goHome(){visiting=null;mode="home";applyMode();pumasiTick();if(!showHelpLog())toast("우리 땅으로 돌아왔어요")}
 
 function useNbPlot(i){
   const p=nbPlots[i],n=visiting;workT=0.5;
   if(!p){toast(n.name+"네 빈 밭이에요");return}
+  if(helpNbPlot(i))return; // 목마름·잡초·벌레 거들기 (play/pumasi.js)
   if(!p.wat){p.wat=Date.now();const g=plots[i].g.position;splash(g.x,g.z);
     S.helped=S.helped||{};
-    if(S.helped[n.name]!==today){S.helped[n.name]=today;S.money+=30;sweat(1);toast("품앗이 했어요! "+n.name+"가 고맙다며 30원을 줬어요");save();refresh()}
-    else toast("물을 줬어요. "+n.name+"가 고마워해요")}
+    S.pum=S.pum||{};const got=pumOf(n.name)<PUMASI.max;if(got)S.pum[n.name]=pumOf(n.name)+1;
+    if(S.helped[n.name]!==today){S.helped[n.name]=today;S.money+=30;sweat(1);toast("품앗이 했어요! "+josa(n.name,"이","가")+" 고맙다며 30원을 줬어요"+(got?" · 품 +1":""));save();refresh()}
+    else{toast("물을 줬어요. "+josa(n.name,"이","가")+" 고마워해요"+(got?" · 품 +1":""));save()}}
   else if(stageOf(p)==="ripe")toast("잘 익었네요. 이웃 작물은 구경만 해요");
   else toast("이미 물을 줬어요. 잘 자라는 중이에요");
   drawPlot(i,true)}
@@ -45,5 +48,5 @@ function openGift(){
   openSheet(h);
   if(S.hold)$("giveHold").onclick=()=>giveHold(n);
   sheet.querySelectorAll("[data-gift]").forEach(b=>b.onclick=()=>{const k=b.dataset.gift;S.inv[k]--;const back=Object.keys(CROPS)[Math.floor(Math.random()*4)];S.seeds[back]++;
-    closeSheet();toast(n.name+"가 답례로 "+CROPS[back].name+" 씨앗을 줬어요");save();refresh()});
+    closeSheet();toast(josa(n.name,"이","가")+" 답례로 "+CROPS[back].name+" 씨앗을 줬어요");save();refresh()});
 }

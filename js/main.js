@@ -76,14 +76,14 @@ camera.position.set(0,12,24);camera.lookAt(0,0,4);
 const start=()=>{if(me)return;makePeople();setHold(S.hold);applyWoodLand();checkCold();
   const away=S.lastSeen?Date.now()-S.lastSeen:0;
   const ripe=S.plots.filter(p=>p&&stageOf(p)==="ripe").length,eggs=eggsReady(),w=weather.kind;
-  wetFromWeather(true);
-  if(away>20000&&(ripe||eggs||w==="비"||w==="눈")){
+  wetFromWeather(true);pumasiTick();const helpH=helpLogHtml();
+  if(away>20000&&(ripe||eggs||w==="비"||w==="눈"||helpH)){
     const mins=Math.round(away/60000),ago=mins<1?"잠깐":mins<60?mins+"분":Math.round(mins/60)+"시간";
     let h=`<h2>다녀오셨어요</h2><h3>${ago} 동안 시골에선</h3>`;
     if(ripe)h+=`<div class="item"><div>밭 ${ripe}칸이 다 자랐어요<small>밭에 가서 거둬 보세요</small></div></div>`;
     if(eggs)h+=`<div class="item"><div>닭들이 달걀 ${eggs}개를 낳았어요<small>닭장에서 꺼내 오세요</small></div></div>`;
     if(w==="비"||w==="눈")h+=`<div class="item"><div>오늘은 ${w==="비"?"비가":"눈이"}와요<small>${WX_NOTE[w]}</small></div></div>`;
-    openSheet(h);
+    openSheet(h+helpH);bindThanks();
   }else toast(away?"다시 오셨네요. "+termNow(new Date())+" 무렵이에요":"시골살이에 오신 걸 환영해요. 텃밭부터 가볼까요?");
   save();setInterval(save,15000);
   document.addEventListener("visibilitychange",()=>{if(document.hidden)save()});

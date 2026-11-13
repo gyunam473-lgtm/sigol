@@ -248,7 +248,7 @@ function openStore(line){let b='<div class="goods">';
 /* ---------- 매 순간: 천막 지붕 비치기, 국솥·떡 김, 그네, 버스 ---------- */
 let regrowT=0;
 function placesFrame(dt,now){
-  regrowT+=dt;if(regrowT>1){regrowT=0;if(!W)tendTick();
+  regrowT+=dt;if(regrowT>1){regrowT=0;if(!W)tendTick();if(!W&&!PD)pumasiTick();
     if(mode==="dwitsan"&&!PD&&forageRegrow()){applyForage();toast("반짝! 캔 자리에 새로 돋았어요")}
     if(mode==="home"&&!PD&&!inHouse&&woodRegrow()){applyWoodLand();toast("땔감 숲에 또 쓰러진 나무가 생겼어요")}}
   if(mode==="plaza"&&me){const T=PLAZA_X.tent,p=me.g.position,inT=!SIT&&p.x>T.x0-1&&p.x<T.x1+1&&p.z>T.z0-1&&p.z<T.z1+2.5,o=inT?0.22:1;

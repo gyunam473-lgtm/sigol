@@ -69,11 +69,11 @@ function catchBug(b){if(!BUGS.includes(b)){toast("날아가 버렸어요");retur
   faceTo(p);startChore(Object.assign(camAt(p.x,p.y,p.z,1.8,0.9),{steps:["net"],zone:[c-wd/2,Math.min(0.97,c+wd/2)],
     onHold(g){sfx("scrape")},onTap:noop,onRub:noop,
     finish(){const ok=this.scores[0]===1;b.hold=false;
-      if(!ok){b.state.until=Date.now()+15000;b.state.k=null;applyBugs();skillUp("bug",BUG_LV,1,"채집");endChore("휙… "+B.name+"가 날아가 버렸어요. 다시 해 봐요");return}
+      if(!ok){b.state.until=Date.now()+15000;b.state.k=null;applyBugs();skillUp("bug",BUG_LV,1,"채집");endChore("휙… "+josa(B.name,"이","가")+" 날아가 버렸어요. 다시 해 봐요");return}
       const [a,z]=B.cm,cm=Math.round((a+(z-a)*Math.pow(Math.random(),1.4-0.1*lv))*10)/10;
       S.inv["bug_"+b.k]=(S.inv["bug_"+b.k]||0)+1;S.bugDex=S.bugDex||{};const d=S.bugDex[b.k]=S.bugDex[b.k]||{n:0,best:0};const first=!d.n,rec=cm>d.best;d.n++;d.best=Math.max(d.best,cm);
       b.state.until=Date.now()+25000;b.state.k=null;applyBugs();skillUp("bug",BUG_LV,rare?6:B.w<20?3:1,"채집");sfx("level");buzz([30,30,60]);
-      endChore(`${B.name}를 잡았어요! ${cm}cm`+(first?" · 곤충 도감에 새로 담았어요":rec?" · 최고 기록!":"")+" · 분교 선생님이 사 줘요")}}))}
+      endChore(`${josa(B.name,"을","를")} 잡았어요! ${cm}cm`+(first?" · 곤충 도감에 새로 담았어요":rec?" · 최고 기록!":"")+" · 분교 선생님이 사 줘요")}}))}
 function bugDexHtml(){const L=Object.entries(INSECTS);let h=`<h3>곤충 도감 · ${L.filter(([k])=>(S.bugDex||{})[k]).length}/${L.length} · ${BUG_LV[bugLv()].name}</h3><div class="goods">`;
   L.forEach(([k,b])=>{const d=(S.bugDex||{})[k];h+=`<div class="good"><div class="gname">${d?b.name:"???"}<small>${d?`${d.n}마리 · 최고 ${d.best}cm`:["봄","여름","가을","겨울"].filter((_,i)=>b.season.includes(i)).join("·")+" "+(b.time==="night"?"밤":"낮")+" · "+b.where.map(w=>PLACES[w].name).join("·")}</small></div></div>`});
   return h+"</div>"}
