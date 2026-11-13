@@ -21,7 +21,7 @@ const leaves=new THREE.Group();FX.g.add(leaves);
 const frostDust=new THREE.Points(new THREE.BufferGeometry().setAttribute("position",new THREE.Float32BufferAttribute(Array.from({length:600},()=>(Math.random()-.5)*30),3)),
   new THREE.PointsMaterial({color:0xffffff,size:0.1,transparent:true,opacity:0.8}));FX.g.add(frostDust);
 // 땅 색: 젖은 땅, 언 땅
-const wetGround=new THREE.MeshLambertMaterial({color:0xa9c97f}),groundCols={wet:new THREE.Color(0x6f8a52),frost:new THREE.Color(0xdfe8e6)};
+const wetGround=new THREE.MeshLambertMaterial({color:GROUND_C,map:grassTex}),groundCols={wet:new THREE.Color(0x6f8a52),frost:new THREE.Color(0xdfe8e6)};
 // 웅덩이 (집 마당 곳곳)
 const puddles=new THREE.Group();land.add(puddles);
 {const pm=new THREE.MeshLambertMaterial({color:0x7f98a8,transparent:true,opacity:0});puddles.userData.mat=pm;
@@ -47,7 +47,7 @@ function stormFrame(dt,now){
   const kind=FX.kind,wet=kind==="heavy"||kind==="typhoon";
   FX.g.visible=k>0.01&&outside;
   if(k<0.01){if(FX.wasOn){FX.wasOn=false;applyTime()} // 걷히면 원래 하늘로
-    if(ground.material===wetGround){ground.material=M(weather.kind==="눈"?0xe4e8e2:0xa9c97f)}puddles.visible=false;TREES.forEach(t=>t.rotation.set(0,0,0));return}
+    if(ground.material===wetGround){ground.material=groundMat}puddles.visible=false;TREES.forEach(t=>t.rotation.set(0,0,0));return}
   FX.wasOn=true;
   // 하늘: 큰비·태풍은 시커멓게, 서리는 차갑고 푸르게
   const dark=wet?new THREE.Color(0x3c444a):new THREE.Color(0xc4d4e4);
@@ -55,7 +55,7 @@ function stormFrame(dt,now){
   scene.fog.near=SKY0.near+(wet?10-SKY0.near:0)*k;scene.fog.far=SKY0.far+(wet?38-SKY0.far:0)*k;
   hemi.intensity=SKY0.hemi*(1-(wet?0.45:0.1)*k);sun.intensity=SKY0.sun*(1-(wet?0.8:0.3)*k);
   // 땅
-  if(ground.material!==wetGround)ground.material=wetGround;wetGround.color.setHex(0xa9c97f).lerp(wet?groundCols.wet:groundCols.frost,k);
+  if(ground.material!==wetGround)ground.material=wetGround;wetGround.color.setHex(GROUND_C).lerp(wet?groundCols.wet:groundCols.frost,k);
   wetGround.emissive.setRGB(0.22,0.25,0.28).multiplyScalar(wet?0:k); // 서리: 어스름에도 하얗게 보이게
   puddles.visible=wet&&land.visible;puddles.userData.mat.opacity=0.75*k;
   const mp=me?me.g.position:{x:0,z:0};

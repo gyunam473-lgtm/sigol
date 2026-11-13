@@ -10,7 +10,7 @@ scene.background=new THREE.Color(0xcfe6ee);scene.fog=new THREE.Fog(0xcfe6ee,32,7
 const camera=new THREE.PerspectiveCamera(48,1,0.1,200);
 const hemi=new THREE.HemisphereLight(0xffffff,0x8aa070,0.8);scene.add(hemi);
 const sun=new THREE.DirectionalLight(0xfff1d6,0.8);sun.position.set(12,22,10);sun.castShadow=true;
-sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-26,right:26,top:26,bottom:-26});scene.add(sun);
+sun.shadow.mapSize.set(1024,1024);sun.shadow.bias=-0.0006;sun.shadow.normalBias=0.03;Object.assign(sun.shadow.camera,{left:-26,right:26,top:26,bottom:-26});scene.add(sun);
 
 const mats={};const M=c=>mats[c]||(mats[c]=new THREE.MeshLambertMaterial({color:c}));
 function mesh(geo,c,x=0,y=0,z=0){const m=new THREE.Mesh(geo,M(c));m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;return m}
@@ -30,9 +30,23 @@ function lampLight(parent,x,y,z){const l=new THREE.PointLight(0xffb066,0,9,2);l.
 
 const clickables=[];
 // 땅
-const ground=new THREE.Mesh(new THREE.PlaneGeometry(90,90),M(0xa9c97f));ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;ground.userData.kind="ground";scene.add(ground);clickables.push(ground);
+// 땅 질감: 회색빛 얼룩·풀잎 결을 그려 두고, 색은 GROUND_C 로 입혀요 (눈 오면 흰색, 젖으면 짙은 초록)
+function noiseTex(kind){const c=document.createElement("canvas");c.width=c.height=256;const x=c.getContext("2d"),R=Math.random;
+  x.fillStyle=kind==="dirt"?"rgb(228,226,222)":"rgb(222,224,218)";x.fillRect(0,0,256,256);
+  const blot=(n,r0,r1,lo,hi,a)=>{for(let i=0;i<n;i++){const px=R()*256,py=R()*256,r=r0+R()*(r1-r0),v=lo+R()*(hi-lo)|0;
+    for(const [ox,oy] of [[0,0],[256,0],[-256,0],[0,256],[0,-256]]){const g=x.createRadialGradient(px+ox,py+oy,0,px+ox,py+oy,r);g.addColorStop(0,"rgba("+v+","+(v+(kind==="dirt"?-4:6))+","+(v-8)+","+a+")");g.addColorStop(1,"rgba("+v+","+v+","+v+",0)");x.fillStyle=g;x.fillRect(px+ox-r,py+oy-r,r*2,r*2)}}};
+  if(kind==="dirt"){blot(40,18,50,190,250,0.5);for(let i=0;i<260;i++){const v=150+R()*90|0;x.fillStyle="rgba("+v+","+(v-6)+","+(v-14)+",0.8)";x.beginPath();x.ellipse(R()*256,R()*256,0.8+R()*2.2,0.6+R()*1.6,R()*3,0,7);x.fill()}}
+  else{blot(46,20,60,175,255,0.55);x.lineWidth=1.2;for(let i=0;i<1600;i++){const px=R()*256,py=R()*256,v=150+R()*105|0,l=3+R()*6,a=-1.9+R()*0.8;
+    x.strokeStyle="rgba("+(v-10)+","+v+","+(v-30)+",0.55)";x.beginPath();x.moveTo(px,py);x.lineTo(px+Math.cos(a)*l*0.4,py+Math.sin(a)*l);x.stroke()}}
+  const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;t.anisotropy=4;return t}
+const GROUND_C=0xb4d08a,grassTex=noiseTex("grass");grassTex.repeat.set(18,18);
+const groundMat=new THREE.MeshLambertMaterial({color:GROUND_C,map:grassTex});
+const dirtTex=noiseTex("dirt");
+// 흙길: 길이에 맞춰 질감 반복 (2m 한 장)
+function dirtBox(w,h,d,c,x,y,z){const t=dirtTex.clone();t.needsUpdate=true;t.repeat.set(w/2,d/2);const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color:c,map:t}));m.position.set(x,y,z);m.receiveShadow=true;return m}
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(90,90),groundMat);ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;ground.userData.kind="ground";scene.add(ground);clickables.push(ground);
 // 흙길
-scene.add(box(2,0.02,26,0xd9c59b,0,0.01,1));scene.add(box(22,0.02,2,0xd9c59b,0,0.012,1.5));
+scene.add(dirtBox(2,0.02,26,0xdcc29a,0,0.01,1));scene.add(dirtBox(22,0.02,2,0xdcc29a,0,0.012,1.5));
 // 뒷산
 [[-22,-34,16,22,0x8fae86],[0,-40,20,28,0x9cb893],[24,-34,15,20,0x86a57d],[-40,-20,12,16,0x9cb893],[40,-18,13,18,0x8fae86]].forEach(([x,z,r,h,c])=>{const m=cone(r,h,c,x,h/2,z,7);m.castShadow=false;scene.add(m)});
 // 나무

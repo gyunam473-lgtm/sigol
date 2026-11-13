@@ -35,10 +35,10 @@ function wetFromWeather(silent){
 const SKY_KEYS=[
   {at:"rise",d:-1.3,sky:0x223058,hemi:0.42,sun:0.26,sc:0xa9c0f0,glow:1,lamp:1},    // 밤
   {at:"rise",d:-0.35,sky:0x8a86ad,hemi:0.42,sun:0.22,sc:0xd9a0b0,glow:0.7,lamp:0.7}, // 새벽 보랏빛
-  {at:"rise",d:0.45,sky:0xf2c8a2,hemi:0.62,sun:0.55,sc:0xffc690,glow:0.15,lamp:0},  // 해 뜰 녘 복숭앗빛
-  {at:"rise",d:2.0,sky:0xcfe6ee,hemi:0.80,sun:0.80,sc:0xfff1d6,glow:0,lamp:0},      // 낮
-  {at:"set",d:-2.0,sky:0xcfe6ee,hemi:0.80,sun:0.80,sc:0xfff1d6,glow:0,lamp:0},
-  {at:"set",d:-0.7,sky:0xf0d6a4,hemi:0.68,sun:0.68,sc:0xffc27a,glow:0.1,lamp:0.1},  // 노을 전 금빛
+  {at:"rise",d:0.45,sky:0xf2c8a2,hemi:0.55,sun:0.7,sc:0xffc690,glow:0.15,lamp:0},  // 해 뜰 녘 복숭앗빛
+  {at:"rise",d:2.0,sky:0xb6dcf0,hemi:0.64,sun:1.0,sc:0xffefd2,glow:0,lamp:0},      // 낮 (2026-11-13 그늘이 살게 하늘빛↓ 햇빛↑)
+  {at:"set",d:-2.0,sky:0xb6dcf0,hemi:0.64,sun:1.0,sc:0xffefd2,glow:0,lamp:0},
+  {at:"set",d:-0.7,sky:0xf0d2a0,hemi:0.56,sun:0.9,sc:0xffbe74,glow:0.1,lamp:0.1},  // 노을 전 금빛
   {at:"set",d:0.15,sky:0xe0a088,hemi:0.46,sun:0.32,sc:0xff9466,glow:0.7,lamp:0.8},  // 해질녘 분홍 주황
   {at:"set",d:0.75,sky:0x4b4b7a,hemi:0.40,sun:0.22,sc:0xa8a2d4,glow:1,lamp:1},      // 땅거미
   {at:"set",d:1.4,sky:0x223058,hemi:0.42,sun:0.26,sc:0xa9c0f0,glow:1,lamp:1}];      // 밤
@@ -103,7 +103,7 @@ function applyTime(){
     sky.lerp(cloud,0.7);he*=0.85;su*=0.35}
   scene.background=sky;scene.fog=scene.fog||new THREE.Fog(0,1,2);scene.fog.color.copy(sky);scene.fog.near=clear?32:20;scene.fog.far=clear?75:55;
   hemi.intensity=he;sun.intensity=su;
-  hemi.color.setHex(0xffffff).lerp(_cb.setHex(0x9ab0e8),night);hemi.groundColor.setHex(0x8aa070).lerp(_cb.setHex(0x3a4660),night); // 밤엔 푸르스름한 달빛
+  hemi.color.setHex(0xe4eeff).lerp(_cb.setHex(0x9ab0e8),night);hemi.groundColor.setHex(0x93a46c).lerp(_cb.setHex(0x3a4660),night); // 밤엔 푸르스름한 달빛
   winMat.emissive.setRGB(1,0.7,0.28).multiplyScalar(s.glow); // 밤엔 창호지에 불이 켜져요
   lampMat.emissive.setRGB(1,0.62,0.25).multiplyScalar(s.lamp);
   lampLights.forEach(l=>l.intensity=1.4*s.lamp);
@@ -111,7 +111,7 @@ function applyTime(){
   stars.material.opacity=clear?night*0.9:0;stars.visible=stars.material.opacity>0.02;
   moon.material.opacity=clear?night:night*0.15;moon.visible=night>0.02&&moonP>0.03&&moonP<0.97;
   skyNow={night,rise:t.rise,set:t.set};
-  ground.material=M(w==="눈"?0xe4e8e2:0xa9c97f);
+  if(typeof wetGround==="undefined"||ground.material!==wetGround)ground.material=groundMat;groundMat.color.setHex(w==="눈"?0xf2f5f0:GROUND_C);
   rainG.visible=w==="비";snowG.visible=w==="눈";
   const hh=Math.floor(h);
   $("clock").textContent=(d.getMonth()+1)+"월 "+d.getDate()+"일 · "+termNow(d)+" 무렵 · "+timeLabel(h)+(timelapse?" "+hh+"시":"")+(timePick!=null?" "+fmt12(timePick)+" (시간 미리보기)":"")+" · "+w+(weather.preview?" (미리보기)":"");

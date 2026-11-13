@@ -203,7 +203,7 @@ const BUS={cycle:75,t:20};let bus;
 (function(){
   busStop.add(box(90,0.03,5.2,0x55575a,0,0.015,-4));for(let i=0;i<22;i++){const d=box(1.4,0.01,0.12,0xe8c040,-42+i*4,0.035,-4);d.castShadow=false;busStop.add(d)} // 찻길, 가운데 노란 줄
   busStop.add(box(90,0.08,1.2,0xc8c4bc,0,0.04,-0.8)); // 인도
-  busStop.add(box(28,0.03,12,0xd9c59b,0,0.015,6.2));
+  busStop.add(dirtBox(28,0.03,12,0xdcc29a,0,0.015,6.2));
   // 정류장 (뒤 벽은 유리라 앉아서도 찻길이 보여요)
   const sh=new THREE.Group();sh.add(new THREE.Mesh(new THREE.BoxGeometry(4.6,2.0,0.06),new THREE.MeshLambertMaterial({color:0xbfd8e4,transparent:true,opacity:0.3})));sh.children[0].position.set(0,1.3,0.45);
   sh.add(box(4.9,0.12,1.7,0x3f6f8f,0,2.45,0));[-2.3,2.3].forEach(x=>{sh.add(cyl(0.05,0.05,2.45,0x8a8a8a,x,1.22,0.45,6));sh.add(cyl(0.05,0.05,2.45,0x8a8a8a,x,1.22,-0.7,6))});
