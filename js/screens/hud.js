@@ -7,7 +7,7 @@ $("modal").addEventListener("click",e=>{if(e.target.id==="modal")closeSheet()});
 
 function refresh(){
   $("money").textContent=S.money.toLocaleString()+"원";
-  $("dexBtn").textContent="도감 "+Object.keys(S.dex).length+"/"+RECIPES.length;
+  {const [a,b]=typeof dexTotal==="function"?dexTotal():[Object.keys(S.dex).length,RECIPES.length];$("dexBtn").textContent="도감 "+a+"/"+b}
   $("brand").textContent=PLACES[mode]?PLACES[mode].name:visiting?visiting.name+"네":inHouse?(HOUSE_IN==="sarang"?"사랑채":"우리 집 안"):"우리 땅";
   $("homeBtn").hidden=mode==="home";$("fishBtn").hidden=mode!=="stream";$("mapBtn").hidden=inHouse;mapBtnTip();
   $("hint").textContent=PLACES[mode]?PLACES[mode].hint:visiting?"마른 밭에 물을 주면 품앗이가 돼요. 집을 누르면 선물을 두고 와요.":"빈 밭엔 씨앗을, 논엔 모를 심어요. 집 뒤 땔감 숲에서 나무를 해요. 장터·뒷산 같은 곳은 오른쪽 아래 '마을 지도'로 가요.";
@@ -43,6 +43,7 @@ function openInv(){
   const ks=Object.keys(ITEMS).filter(k=>S.inv[k]>0||CROPS[k]||k==="egg");
   let h='<h2>창고</h2><div class="goods">'+ks.map(k=>`<div class="good"><div class="gname">${ITEMS[k].name}<small>${S.inv[k]||0}개${ITEMS[k].sea?" · 바다 것":""}</small></div></div>`).join("")+'</div>';
   h+=`<h3>씨앗</h3><div class="goods">`+Object.keys(CROPS).map(k=>`<div class="good"><div class="gname">${CROPS[k].name} 씨앗<small>${S.seeds[k]}봉지</small></div></div>`).join("")+'</div>';
+  if((S.pantry||[]).length){const c={};S.pantry.forEach(id=>c[id]=(c[id]||0)+1);h+='<h3>찬장 · 우리 평상에 앉아 꺼내 먹어요</h3><div class="goods">'+Object.entries(c).map(([id,n])=>`<div class="good"><div class="gname">${dishName(id)}<small>${n}개</small></div></div>`).join("")+'</div>'}
   h+='<p class="hint">채소는 채소가게 아줌마, 달걀은 닭집 아저씨가 사 줘요 (마을 장터)</p>';
   openSheet(h)}
 $("invBtn").onclick=openInv;

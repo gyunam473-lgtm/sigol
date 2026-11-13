@@ -14,7 +14,7 @@ Object.assign(CH,{
 
 // 오늘 돋은 것 (날마다 새로)
 function rollForage(){const lv=forageLv(),se=seasonOf(new Date());
-  const L=Object.entries(FORAGE).filter(([k,f])=>!f.season||f.season.includes(se));
+  const L=Object.entries(FORAGE).filter(([k,f])=>(!f.season||f.season.includes(se))&&unlocked("forage",k,lv));
   const wts=L.map(([k,f])=>f.w*(f.w<15?1+0.3*lv:1)*(k==="sansam"?1+0.5*lv:1));
   let r=Math.random()*wts.reduce((a,b)=>a+b,0),i=0;while(r>wts[i]){r-=wts[i];i++}return L[Math.min(i,L.length-1)][0]}
 function forageToday(){const d=dayKey(new Date());
@@ -57,10 +57,11 @@ function useForage(i){
       applyForage();
       if(k==="sansam"){endChore("");sfx("level");buzz([60,40,60,40,120]);
         openSheet(`<h2>심봤다!!!</h2><p class="hint">빨간 열매 아래, 백 년 묵은 산삼 한 뿌리를 캤어요.</p><div class="item"><div>산삼<small>채소가게 아줌마가 ${f.sell.toLocaleString()}원에 사 줘요 · 아니면 고이 간직해요</small></div><span class="done">대박</span></div><div class="item"><div>캐기 숙련도 +${xp}<small>${FORAGE_LV[lv1].name}</small></div></div>`);return}
-      endChore(`${f.name} ${n}${dig?"뿌리를":"줌을"} 캤어요${good?" · 실한 걸로!":""}${first?" · 산나물 도감에 새로 담았어요":""} · 캐기 숙련도 +${xp}`+(lv1>lv0?` · '${FORAGE_LV[lv1].name}'가 됐어요!`:""))}})}
+      endChore(`${f.name} ${n}${dig?"뿌리를":"줌을"} 캤어요${good?" · 실한 걸로!":""}${first?" · 산나물 도감에 새로 담았어요":""} · 캐기 숙련도 +${xp}`+(lv1>lv0?` · '${FORAGE_LV[lv1].name}'가 됐어요!`+newlyOpen("forage",lv1,q=>FORAGE[q].name):""))}})}
 
 function forageDexHtml(){const lv=forageLv();
   let h=`<h3>산나물 도감 · 캐기 숙련도 ${FORAGE_LV[lv].name} (${forageXp()}${FORAGE_LV[lv+1]?"/"+FORAGE_LV[lv+1].xp:""})</h3>`;
   Object.entries(FORAGE).forEach(([k,f])=>{const d=S.forageDex[k];
-    h+=`<div class="item"><div>${d?f.name:"???"}<small>${d?`${d.n}개 캤어요 · ${f.desc}`:(f.season?f.season.map(s=>SEASON_NAME[s]).join("·")+"에 돋아요":"뒷산 어딘가에")}</small></div>${d?'<span class="done">캤어요</span>':""}</div>`});
+    const lk=(UNLOCK.forage[k]||0)>lv;
+    h+=`<div class="item${lk?" locked":""}"><div>${d?f.name:lk?"🔒 ???":"???"}<small>${lk?"캐기 숙련도 '"+FORAGE_LV[UNLOCK.forage[k]].name+"'가 되면 눈에 띄어요":d?`${d.n}개 캤어요 · ${f.desc}`:(f.season?f.season.map(s=>SEASON_NAME[s]).join("·")+"에 돋아요":"뒷산 어딘가에")}</small></div>${d?'<span class="done">캤어요</span>':""}</div>`});
   return h}

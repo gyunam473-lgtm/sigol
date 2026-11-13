@@ -186,8 +186,8 @@ function openKimjang(){if(!kjSeason()){toast("다음 마을 행사는 준비 중
   openSheet(h+"</div>");
   if($("kjCab"))$("kjCab").onclick=()=>{let add=1;if(S.inv.cabbage>0)S.inv.cabbage--;else{S.inv.cabbage_top--;add=2}K.mine+=add;sfx("pop");save();refresh();toast("배추를 대야에 보탰어요 · 아주머니: \"아이고 실하다!\"");openKimjang()};
   if($("kjHelp"))$("kjHelp").onclick=()=>{closeSheet();startKimjangWork()}; // play/village3.js
-  if($("kjFeast"))$("kjFeast").onclick=()=>{K.feast=1;let n=0;for(let i=0;i<2;i++)if(S.dishes.length<DISH_MAX){S.dishes.push("kimjang");n++}drawHomeTable();S.jeong=S.jeong||{};NB.forEach(q=>S.jeong[q.name]=(S.jeong[q.name]||0)+1);
-    save();sfx("level");closeSheet();toast(`마을 김장 잔치! 김장김치 ${n}접시를 우리 평상에 올려 뒀어요 · 이웃 모두와 정 +1`)}}
+  if($("kjFeast"))$("kjFeast").onclick=()=>{K.feast=1;const n=toPantry("kimjang",2);S.jeong=S.jeong||{};NB.forEach(q=>S.jeong[q.name]=(S.jeong[q.name]||0)+1);
+    save();sfx("level");closeSheet();toast(`마을 김장 잔치! 김장김치 ${n}접시를 찬장에 넣어 뒀어요 · 이웃 모두와 정 +1`)}}
 
 /* ---------- 매 순간 ---------- */
 function village2Frame(dt,now){fireFrame(dt,now);

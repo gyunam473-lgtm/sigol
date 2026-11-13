@@ -24,7 +24,7 @@ Object.assign(CH,{
 const noop=()=>{};
 const tierOf=(L,xp)=>{let l=0;L.forEach((v,i)=>{if(xp>=v.xp)l=i});return l};
 function skillUp(key,L,add,what){S.skill=S.skill||{};const a=tierOf(L,S.skill[key]||0);S.skill[key]=(S.skill[key]||0)+add;const b=tierOf(L,S.skill[key]);
-  if(b>a)setTimeout(()=>{sfx("level");toast(what+" 숙련도가 올랐어요! 이제 \""+L[b].name+"\"")},1400)}
+  if(b>a)setTimeout(()=>{sfx("level");toast(what+" 숙련도가 올랐어요! 이제 \""+L[b].name+"\""+(key==="bug"?newlyOpen("bug",b,k=>INSECTS[k].name):""))},1400)}
 const near=(c,r)=>Array.from({length:r.n},(_,i)=>{const a=i/r.n*TAU+fr(-0.3,0.3),d=r.d*(0.6+Math.random()*0.5);return new THREE.Vector3(c.x+Math.cos(a)*d,c.y,c.z+Math.sin(a)*d*0.7)});
 // 작업 카메라: 그 자리를 앞에서 내려다봐요
 const camAt=(x,y,z,back=1.9,up=1.5)=>({focus:new THREE.Vector3(x,y,z),cam:new THREE.Vector3(x+0.3,y+up,z+back),look:new THREE.Vector3(x,y-0.1,z)});
@@ -35,7 +35,7 @@ const BUG_STATE={};let BUGS=[];
 const bugLv=()=>tierOf(BUG_LV,(S.skill||{}).bug||0);
 const nightNow=()=>(skyNow.night||0)>0.5;
 function rollBug(place){const se=seasonOf(new Date()),n=nightNow(),lv=bugLv();
-  const L=Object.entries(INSECTS).filter(([k,b])=>b.season.includes(se)&&b.where.includes(place)&&(b.time==="any"||(b.time==="night")===n));if(!L.length)return null;
+  const L=Object.entries(INSECTS).filter(([k,b])=>b.season.includes(se)&&b.where.includes(place)&&(b.time==="any"||(b.time==="night")===n)&&unlocked("bug",k,lv));if(!L.length)return null;
   const w=L.map(([k,b])=>b.w*(b.w<10?1+0.35*lv:1));let r=Math.random()*w.reduce((a,b)=>a+b,0),i=0;while(r>w[i]){r-=w[i];i++}return L[Math.min(i,L.length-1)][0]}
 let _bsm=null; // 곤충 위 반짝이 (어디 있는지 잘 보이게)
 function bugSparkMat(){if(_bsm)return _bsm;const c=document.createElement("canvas");c.width=c.height=64;const x=c.getContext("2d"),g=x.createRadialGradient(32,32,2,32,32,30);g.addColorStop(0,"rgba(255,250,200,1)");g.addColorStop(0.35,"rgba(255,236,140,.6)");g.addColorStop(1,"rgba(255,236,140,0)");x.fillStyle=g;x.fillRect(0,0,64,64);
@@ -75,7 +75,7 @@ function catchBug(b){if(!BUGS.includes(b)){toast("날아가 버렸어요");retur
       b.state.until=Date.now()+25000;b.state.k=null;applyBugs();skillUp("bug",BUG_LV,rare?6:B.w<20?3:1,"채집");bugQuestCatch(b.k,cm);sfx("level");buzz([30,30,60]);
       endChore(`${josa(B.name,"을","를")} 잡았어요! ${cm}cm`+(first?" · 곤충 도감에 새로 담았어요":rec?" · 최고 기록!":"")+" · 분교 선생님이 사 줘요")}}))}
 function bugDexHtml(){const L=Object.entries(INSECTS);let h=`<h3>곤충 도감 · ${L.filter(([k])=>(S.bugDex||{})[k]).length}/${L.length} · ${BUG_LV[bugLv()].name}</h3><div class="goods">`;
-  L.forEach(([k,b])=>{const d=(S.bugDex||{})[k];h+=`<div class="good"><div class="gname">${d?b.name:"???"}<small>${d?`${d.n}마리 · 최고 ${d.best}cm`:["봄","여름","가을","겨울"].filter((_,i)=>b.season.includes(i)).join("·")+" "+(b.time==="night"?"밤":"낮")+" · "+b.where.map(w=>PLACES[w].name).join("·")}</small></div></div>`});
+  L.forEach(([k,b])=>{const d=(S.bugDex||{})[k],lk=(UNLOCK.bug[k]||0)>bugLv();h+=`<div class="good${lk?" locked":""}"><div class="gname">${d?b.name:lk?"🔒 ???":"???"}<small>${lk?"채집 숙련도 '"+BUG_LV[UNLOCK.bug[k]].name+"'가 되면 보여요":d?`${d.n}마리 · 최고 ${d.best}cm`:["봄","여름","가을","겨울"].filter((_,i)=>b.season.includes(i)).join("·")+" "+(b.time==="night"?"밤":"낮")+" · "+b.where.map(w=>PLACES[w].name).join("·")}</small></div></div>`});
   return h+"</div>"}
 // 분교 선생님: 곤충 사 주기 (자연 학습 표본)
 function openTeacher(line){const have=Object.keys(INSECTS).filter(k=>S.inv["bug_"+k]>0);let b='<div class="goods">';
@@ -222,7 +222,8 @@ Object.assign(ITEMS,{jaecheop:{name:"재첩",price:25,stuff:true},saeu:{name:"�
   dongjeon:{name:"옛날 동전",price:400,stuff:true},sageum:{name:"사금 한 톨",price:1500,stuff:true},pebble:{name:"예쁜 조약돌",price:0,stuff:true}});
 CH.hulgi={name:"바닥 훑기",g:"rub",n:3,guide:n=>`두 손으로 바닥 모래를 좌우로 훑어요 · ${n}번 남음`,pop:"촤악",sfx:"pour"};
 const hulgiEye=()=>Math.min(1,((S.hulgi||{}).n||0)/150); // 눈썰미: 150번이면 최고
-function rollHulgi(){const e=hulgiEye(),w=HULGI.map(([k,,w])=>w*(w<3?1+1.5*e:1)*(k==="mud"||k==="stone"?1-0.3*e:1));
+const hulgiLv=()=>tierOf(HULGI_LV,(S.hulgi||{}).n||0);
+function rollHulgi(){const e=hulgiEye(),lv=hulgiLv(),w=HULGI.map(([k,,w])=>unlocked("hulgi",k,lv)?w*(w<3?1+1.5*e:1)*(k==="mud"||k==="stone"?1-0.3*e:1):0);
   let r=Math.random()*w.reduce((a,b)=>a+b,0),i=0;while(r>w[i]){r-=w[i];i++}return HULGI[Math.min(i,HULGI.length-1)]}
 function foundMesh(k,peb){const g=new THREE.Group();
   if(k==="mud"){const m=sph(0.12,0x6a4a2e,0,0,0);m.scale.y=0.6;g.add(m)}
@@ -244,9 +245,10 @@ function useHulgi(){if(!inWater()||PD||SIT||FS)return;const p=me.g.position,x=p.
     onTap:noop,onHold:noop,
     frame(dt){mud.forEach(m=>{m.scale.multiplyScalar(1+dt*0.8);m.material.opacity=Math.max(0,m.material.opacity-dt*0.25)});
       if(this.found){const f=this.found;f.position.y=Math.min(0.55,f.position.y+dt*0.9);f.rotation.y+=dt*2}},
-    finish(){const [k,name,,say]=rollHulgi(),H=S.hulgi=S.hulgi||{n:0,got:{}};H.n++;H.got[k]=(H.got[k]||0)+1;let msg=say,peb=0,big=false;
+    finish(){const [k,name,,say]=rollHulgi(),H=S.hulgi=S.hulgi||{n:0,got:{}};const hl0=hulgiLv();H.n++;const hl1=hulgiLv();
+      if(hl1>hl0)setTimeout(()=>{sfx("level");toast("바닥 훑기 눈썰미가 늘었어요! 이제 \""+HULGI_LV[hl1].name+"\""+newlyOpen("hulgi",hl1,q=>(HULGI.find(x=>x[0]===q)||[])[1]))},2600);H.got[k]=(H.got[k]||0)+1;let msg=say,peb=0,big=false;
       if(["daseulgi","jaecheop","saeu"].includes(k)){const n=k==="saeu"?1+Math.floor(Math.random()*2):1+Math.floor(Math.random()*3);S.inv[k]=(S.inv[k]||0)+n;msg=`${name} ${n}${k==="saeu"?"마리":"개"}를 건졌어요!`}
-      if(k==="pebble"){peb=Math.random()<0.06?4:Math.floor(Math.random()*4);S.inv.pebble=(S.inv.pebble||0)+1;H.peb=H.peb||{};const first=!H.peb[peb];H.peb[peb]=(H.peb[peb]||0)+1;msg=`${PEBBLES[peb][0]}을 주웠어요`+(first?" · 조약돌 모음에 새로!":"");big=peb===4}
+      if(k==="pebble"){peb=Math.random()<0.06&&hulgiLv()>=3?4:Math.floor(Math.random()*4);S.inv.pebble=(S.inv.pebble||0)+1;H.peb=H.peb||{};const first=!H.peb[peb];H.peb[peb]=(H.peb[peb]||0)+1;msg=`${PEBBLES[peb][0]}을 주웠어요`+(first?" · 조약돌 모음에 새로!":"");big=peb===4}
       if(k==="trash"){S.money+=10;msg+=" · 이장님이 고맙다고 10원"}
       if(k==="gaje"){S.inv.gaje=(S.inv.gaje||0)+1;msg="가재다! 집게를 번쩍 들고 있어요 · 분교 선생님이 사 줘요";big=true}
       if(k==="dongjeon"){S.inv.dongjeon=(S.inv.dongjeon||0)+1;msg="옛날 동전이에요! 녹슨 십 원짜리 · 구멍가게 할머니가 반가워하실 거예요";big=true}
@@ -263,7 +265,7 @@ function wadeFrame(){const w=inWater()&&!SIT&&!PD&&!FS&&!W;
     if(w&&!S.wadeTip){S.wadeTip=1;save();toast("냇물에 들어왔어요. 발이 시원해요! 오른쪽 아래 '바닥 훑기'로 바닥을 훑어봐요")}}
   if(me&&!SIT&&!PD)me.b.position.y=inWater()?-0.3:me.b.position.y<0?0:me.b.position.y} // 물에 들어가면 발목까지 잠겨요
 // 냇가 바닥 도감
-function hulgiDexHtml(){const H=S.hulgi||{n:0,got:{}};let h=`<h3>냇가 바닥에서 찾은 것 · ${H.n}번 훑었어요</h3><div class="goods">`;
-  HULGI.forEach(([k,name])=>{const n=H.got[k]||0;h+=`<div class="good"><div class="gname">${n||k==="mud"||k==="stone"?name:"???"}<small>${n}번</small></div></div>`});
+function hulgiDexHtml(){const H=S.hulgi||{n:0,got:{}},lv=hulgiLv();let h=`<h3>냇가 바닥에서 찾은 것 · ${H.n}번 훑었어요 · ${HULGI_LV[lv].name}</h3><div class="goods">`;
+  HULGI.forEach(([k,name])=>{const n=H.got[k]||0,lk=(UNLOCK.hulgi[k]||0)>lv;h+=`<div class="good${lk?" locked":""}"><div class="gname">${n||k==="mud"||k==="stone"?name:lk?"🔒 ???":"???"}<small>${lk?"'"+HULGI_LV[UNLOCK.hulgi[k]].name+"'(바닥 ${HULGI_LV[UNLOCK.hulgi[k]].xp}번)가 되면":n+"번"}</small></div></div>`});
   h+=`</div><h3>조약돌 모음 · ${Object.keys(H.peb||{}).length}/${PEBBLES.length}</h3><div class="goods">`;
   PEBBLES.forEach(([nm],i)=>{const n=(H.peb||{})[i]||0;h+=`<div class="good"><div class="gname">${n?nm:"???"}<small>${n}개</small></div></div>`});return h+"</div>"}

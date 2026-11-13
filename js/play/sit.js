@@ -44,8 +44,8 @@ function sitDown(place){
 }
 function standUp(){
   if(!SIT)return;cancelEat();if(SIT.cupMesh){SIT.cupMesh.parent.remove(SIT.cupMesh);SIT.cupMesh=null}let msg="";if(SIT.sky)lookSky(false);unseatAll();
-  if(SIT.order.length){const room=DISH_MAX-S.dishes.length,keep=SIT.order.slice(0,Math.max(0,room));
-    S.dishes.push(...keep);if(!visiting)drawHomeTable();msg=keep.length?(SIT.place==="nbBench"?"남은 음식은 싸 주셨어요. 우리 평상에서 먹어요":"남은 음식은 싸 왔어요. 우리 평상에서 먹을 수 있어요"):"평상 소반이 꽉 차서 남은 음식은 두고 왔어요"}
+  if(SIT.order.length){const n=SIT.order.length,k=SIT.order.reduce((a,id)=>a+toPantry(id),0);
+    msg=k?(SIT.place==="nbBench"?"남은 음식은 싸 주셨어요. 찬장에 넣어 뒀어요 · 우리 평상에 앉아 꺼내 먹어요":"남은 음식은 싸 왔어요. 찬장에 넣어 뒀어요 · 우리 평상에 앉아 꺼내 먹어요"):"찬장이 꽉 차서 남은 음식은 두고 왔어요"}
   if(SIT.place==="nbBench")drawDishes(homeTable,[]);
   if(!SIT.free&&SIT.place!=="home"&&SIT.place!=="nbBench")drawDishes(SIT.table(),[]);
   SIT.hidLabels.forEach(o=>o.visible=true);
@@ -72,12 +72,14 @@ function renderSit(){
   if(!dishes.length)h+=`<p class="hint">${home?"소반이 비었어요. 부뚜막에서 요리해 들고 오면 올려져요.":nb?"상이 비었어요. 들고 온 음식이 있으면 같이 나눠 먹어요.":"차림표에서 먹고 싶은 걸 시켜 보세요."}</p>`;
   dishes.forEach((id,k)=>{h+=`<div class="item"><div ${k<4?`class="look" data-look="${k}"`:""}>${dishName(id)}${k<4?"<small>눌러서 가까이 보기</small>":""}</div><button class="go" data-eat="${k}">먹기</button></div>`});
   if(home&&dishes.length>4)h+=`<p class="hint">소반엔 네 접시까지 보여요. 나머지 ${dishes.length-4}접시는 찬장에 있어요.</p>`;
+  if(home)h+=pantryHtml();
   if(home&&S.inv.makgeolli>0)h+=`<div class="item"><div>막걸리 한 병<small>${S.inv.makgeolli}병 있어요 · 사발에 따라 소반에 올려요</small></div><button id="pourBtn">따르기</button></div>`;
   h+=noeulBtnHtml();
   h+=`<div class="sitbtns">${home?`<button class="close" id="invBtn2">이웃 부르기${s.guests.length?" ("+s.guests.length+")":""}</button>`:""}<button class="close" id="skyBtn">하늘 보기</button><button class="close" id="standBtn">일어나기</button></div>`;
   const p=$("sitPanel");p.innerHTML=h;
   p.querySelectorAll("[data-order]").forEach(b=>b.onclick=()=>order(b.dataset.order));
   p.querySelectorAll("[data-bottle]").forEach(b=>b.onclick=()=>{const f=MARKET_FOOD.find(x=>x.id===b.dataset.bottle);if(S.money<f.price)return;S.money-=f.price;S.inv.makgeolli=(S.inv.makgeolli||0)+1;sfx("coin");save();refresh();toast("막걸리 한 병 샀어요. 집 평상에서 이웃이랑 나눠 마셔요");renderSit()});
+  if(home)bindPantry(renderSit);
   if($("invBtn2"))$("invBtn2").onclick=renderInvite;if($("noeulBtn"))$("noeulBtn").onclick=watchNoeul;if($("pourBtn"))$("pourBtn").onclick=pourMakgeolli;
   p.querySelectorAll("[data-eat]").forEach(b=>b.onclick=()=>eat(+b.dataset.eat));
   p.querySelectorAll("[data-look]").forEach(b=>b.onclick=()=>focusDish(+b.dataset.look));

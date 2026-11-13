@@ -64,7 +64,16 @@ const FORAGE={
   sansam:{name:"산삼",w:0.4,sell:8000,how:"dig",desc:"심봤다! 백 년 묵은 산삼"}};
 const FORAGE_LV=[{name:"산길 초보",xp:0},{name:"나물 캐는 이",xp:25},{name:"산 귀신",xp:80},{name:"약초꾼",xp:200},{name:"심마니",xp:450}];
 const FORAGE_REGROW=180; // 캔 자리에 새로 돋기까지 (초). 자주 돋게 (2026-11-10)
-const FORAGE_SPOTS=8; // 뒷산에 하루 새로 돋는 자리
+const FORAGE_SPOTS=8;
+// 채집 숙련도가 오르면 새로 만날 수 있는 것 (숫자 = 그 숙련도 단계부터). 처음엔 흔한 것만, 오를수록 귀한 것 (2026-11-13)
+const UNLOCK={fish:{songsari:0,pirami:0,bungeo:1,kkeokji:2,megi:2,ssogari:3,baemjang:4,hwanggeum:5},
+  forage:{gosari:0,chwi:0,doraji:0,bam:0,dotori:0,dureup:1,pyogo:1,deodeok:2,songi:3,sansam:4},
+  bug:{nabi:0,mudang:0,mettugi:0,gwiddu:0,gochu:1,maemi:1,jabang:1,banga:2,bandi:2,horang:3,jangsu:3,pungdeng:4,saseum:4},
+  hulgi:{mud:0,stone:0,daseulgi:0,jaecheop:0,olchaengi:0,trash:0,saeu:1,pebble:1,gaje:2,dongjeon:3,sageum:4}};
+const HULGI_LV=[{name:"물가 초보",xp:0},{name:"냇가 눈썰미",xp:15},{name:"모래 박사",xp:40},{name:"보물 찾는 이",xp:90},{name:"사금 캐는 사람",xp:160}]; // 바닥 훑은 횟수
+const unlocked=(kind,k,lv)=>(UNLOCK[kind][k]||0)<=lv;
+// 이번 단계에서 새로 열린 이름들
+function newlyOpen(kind,lv,names){const L=Object.entries(UNLOCK[kind]).filter(([k,v])=>v===lv).map(([k])=>names(k)).filter(Boolean);return L.length?" · 새로 만날 수 있어요: "+L.join(", "):""} // 뒷산에 하루 새로 돋는 자리
 // 다방 차림표 (소파에 앉아 시켜요)
 const DABANG_MENU=[
   {id:"dabang_coffee",name:"다방 커피",price:200,fill:5,drink:25,desc:"커피 둘, 설탕 둘, 프림 둘"},

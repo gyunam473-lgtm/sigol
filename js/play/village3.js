@@ -50,7 +50,7 @@ DISH.suyuk=g=>{g.add(plateMesh(0.19));for(let i=0;i<5;i++){const b=box(0.08,0.02
 /* ================= 2) 곤충 채집 과제 ================= */
 const BUGQ_PAY={count:80,size:150,rare:300};
 function bugQuests(){const d=dayKey(new Date());if(S.bugQ&&S.bugQ.day===d)return S.bugQ.list;
-  const se=seasonOf(new Date()),L=Object.entries(INSECTS).filter(([k,b])=>b.season.includes(se)),rnd=a=>a[Math.floor(Math.random()*a.length)];
+  const se=seasonOf(new Date()),L0=Object.entries(INSECTS).filter(([k,b])=>b.season.includes(se)),L=L0.filter(([k])=>unlocked("bug",k,bugLv())).length?L0.filter(([k])=>unlocked("bug",k,bugLv())):L0,rnd=a=>a[Math.floor(Math.random()*a.length)];
   const common=L.filter(([k,b])=>b.w>=15),mid=L.filter(([k,b])=>b.w>=8),rare=L.filter(([k,b])=>b.w<10).concat(L.filter(([k,b])=>b.w<15));
   const list=[];const c=rnd(common.length?common:L);list.push({t:"count",k:c[0],n:3,got:0});
   const z=rnd(mid.length?mid:L);const [a,b]=INSECTS[z[0]].cm;list.push({t:"size",k:z[0],n:1,got:0,min:Math.round((a+(b-a)*0.7)*10)/10});
@@ -123,7 +123,7 @@ function startKimjangWork(){const st=pickOne(KJ_STATIONS),C=new THREE.Vector3(KJ
       if(s==="kmuchae"){mu.scale.y=1-0.8*n/need;mu.position.x=O.board.x-0.12*n/need;for(let i=0;i<4;i++){const c=box(0.12,0.006,0.006,0xf6f4ec,O.board.x+0.1+fr(-0.05,0.05),0.17+muchae.length*0.002,O.board.z+fr(-0.08,0.08));c.rotation.y=fr(-0.4,0.4);g.add(c);muchae.push(c)}}
       if(s==="kbeomuri"){mix.material.color.lerp(new THREE.Color(0xb8281a),0.35);mix.position.y=O.bowl.y+0.15;muchae.forEach(c=>{c.material=mix.material;c.position.set(O.bowl.x+fr(-0.2,0.2),O.bowl.y+0.17,O.bowl.z+fr(-0.2,0.2))})}},
     finish(){const K=(S.kj=S.kj||{})[kjKey()]=(S.kj||{})[kjKey()]||{mine:0},q=avg(this.scores);K.mine+=5;K.made=(K.made||0)+1;sweat(6);
-      let home="";if(S.dishes.length<DISH_MAX){S.dishes.push("kimjang");drawHomeTable();home=" · 내가 담근 김장김치 한 접시를 우리 평상에 올려 뒀어요"}
+      const home=toPantry("kimjang")?" · 내가 담근 김장김치는 찬장에 넣어 뒀어요 (평상에 앉아 꺼내 먹어요)":"";
       const day=new Date().toDateString(),feed=K.suyuk!==day;if(feed)K.suyuk=day;save();
       endChore(`배추 한 포기 김장 끝! (+5포기, 마을 김장 ${kjTotal()}/${KJ.goal})`+(q>0.85?" · 솜씨가 좋다고 칭찬받았어요":"")+home);
       if(feed)setTimeout(()=>{const tmp=dish3D("suyuk");tmp.position.copy(me.g.localToWorld(new THREE.Vector3(0,me.b.position.y+0.95,0.42)));scene.add(tmp);toast("아주머니가 갓 버무린 김치에 수육 한 점을 싸서 입에 쏙!");

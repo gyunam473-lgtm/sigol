@@ -115,11 +115,11 @@ function openMill(line){const r=S.inv.ssal||0;let b='<div class="goods">';
   MILL_FOOD.forEach(f=>b+=goods(f.name,`쌀 ${f.rice}되 + 삯 ${f.fee}원 · ${f.desc}`,`<button class="go" data-tteok="${f.id}" ${r>=f.rice&&S.money>=f.fee?"":"disabled"}>뽑아 주세요</button>`));
   b+=goods("볏짚 한 묶음",`볏짚 5단 40원 · 짚공예 재료 · 가진 것 ${S.inv.jip||0}단`,`<button data-jipbuy="1" ${S.money>=40?"":"disabled"}>사기</button>`);
   b+=goods("쌀 팔기",`한 되에 ${MILL.ssalSell}원 · 가진 쌀 ${r}되`,`<button data-ssal="1" ${r?"":"disabled"}>1되 팔기</button>`);
-  b+=`</div><p class="hint">쌀은 논에서 거둬요. 떡은 손이 비었으면 들고 가고, 아니면 우리 평상 소반에 올려 둬요</p>`;
+  b+=`</div><p class="hint">쌀은 논에서 거둬요. 떡은 손이 비었으면 들고 가고, 아니면 우리 집 찬장에 넣어 둬요</p>`;
   shopSheet("mill",line||pickOne(["쌀 가져왔으면 떡 뽑아 줄게. 김 모락모락 나는 걸로","햅쌀이여? 때깔 좋네","우리 방앗간 가래떡은 쫄깃한 게 남달라"]),b);
   sheet.querySelectorAll("[data-tteok]").forEach(x=>x.onclick=()=>{const f=MILL_FOOD.find(q=>q.id===x.dataset.tteok);if((S.inv.ssal||0)<f.rice||S.money<f.fee)return;
-    if(S.hold&&S.dishes.length>=DISH_MAX){openMill("손도 꽉 찼고 평상도 꽉 찼구먼. 좀 먹고 와");return}
-    S.inv.ssal-=f.rice;S.money-=f.fee;let where;if(!S.hold){setHold(f.id);where="들고 가"}else{S.dishes.push(f.id);drawHomeTable();where="평상에 올려 둘게"}
+    if(S.hold&&(S.pantry||[]).length>=PANTRY_MAX){openMill("손도 꽉 찼고 찬장도 꽉 찼구먼. 좀 먹고 와");return}
+    S.inv.ssal-=f.rice;S.money-=f.fee;let where;if(!S.hold){setHold(f.id);where="들고 가"}else{toPantry(f.id);where="찬장에 넣어 둘게"}
     sfx("coin");burst(0.6,500,0.15);save();refresh();openMill(f.name+" 다 됐어! 뜨끈할 때 먹어. "+where)});
   sheet.querySelectorAll("[data-jipbuy]").forEach(x=>x.onclick=()=>{if(S.money<40)return;S.money-=40;S.inv.jip=(S.inv.jip||0)+5;sfx("coin");save();refresh();openMill("볏짚 다섯 단. 새끼 꼬기 딱 좋은 걸로 골랐어")});
   sheet.querySelectorAll("[data-ssal]").forEach(x=>x.onclick=()=>{if(!(S.inv.ssal>0))return;S.inv.ssal--;S.money+=MILL.ssalSell;sfx("coin");save();refresh();openMill(pickOne(["쌀 좋네. "+MILL.ssalSell+"원 쳐줄게","찰기가 좋구먼. 여기 "+MILL.ssalSell+"원"]))})}

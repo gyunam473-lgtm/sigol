@@ -53,7 +53,7 @@ function planBites(){const n=Math.floor(Math.random()*3);FS.ev=[];let t=1.2+Math
 // 어떤 고기가 물었나 (철, 밤낮, 깊은 데, 숙련도)
 function pickFresh(){
   const lv=fishLv(),night=skyNow.night>0.5,se=seasonOf(new Date());
-  const L=Object.entries(FRESH).filter(([k,f])=>(!f.season||f.season.includes(se))&&(f.when!=="night"||night));
+  const L=Object.entries(FRESH).filter(([k,f])=>(!f.season||f.season.includes(se))&&(f.when!=="night"||night)&&unlocked("fish",k,fishLv()));
   const wts=L.map(([k,f])=>f.w*(f.w<12?(1+0.3*lv)*(FS.deep?1.5:1):1)*(k==="hwanggeum"?1+0.5*lv:1));
   let r=Math.random()*wts.reduce((a,b)=>a+b,0),i=0;while(r>wts[i]){r-=wts[i];i++}
   const [k,f]=L[Math.min(i,L.length-1)],cm=Math.round(f.cm[0]+(f.cm[1]-f.cm[0])*Math.pow(Math.random(),Math.max(0.7,1.6-lv*0.12)));
@@ -89,7 +89,7 @@ function caught(){
   const next=()=>{closeSheet();if(FS){FS.g.remove(FS.dangle);FS.dangle=null;FS.fishM=null;setFishStage("cast")}};
   $("fKeep").onclick=next;
   $("fRelease").onclick=()=>{S.inv[k]--;S.bag.pop();S.skill.fish=fishXp()+1;sfx("water");save();refresh();next();toast(f.name+"를 냇물에 놓아줬어요. 잘 가~")};
-  if(lv1>lv0)setTimeout(()=>toast("낚시 숙련도가 올랐어요! 이제 '"+FISH_LV[lv1].name+"' · 초록 칸이 넓어지고 귀한 고기가 잘 물어요"),600);
+  if(lv1>lv0)setTimeout(()=>toast("낚시 숙련도가 올랐어요! 이제 '"+FISH_LV[lv1].name+"'"+newlyOpen("fish",lv1,k=>FRESH[k].name)),600);
 }
 function lostFish(msg){if(FS.fishM){FS.g.remove(FS.fishM);FS.fishM=null}sfx("pop");wPopAt(msg);buzz(10);setTimeout(()=>{if(FS)setFishStage("cast")},900)}
 
@@ -129,5 +129,6 @@ function ripple(s=0.7){FS.ring.position.set(FS.bob.position.x,0.06,FS.bob.positi
 function fishDexHtml(){const lv=fishLv();
   let h=`<h3>물고기 도감 · 낚시 숙련도 ${FISH_LV[lv].name} (${fishXp()}${FISH_LV[lv+1]?"/"+FISH_LV[lv+1].xp:""})</h3>`;
   Object.entries(FRESH).forEach(([k,f])=>{const d=S.fishDex[k];
-    h+=`<div class="item"><div>${d?f.name:"???"}<small>${d?`${d.n}마리 · 최고 ${d.best}cm · ${f.desc}`:(f.when==="night"?"밤에만 물어요":f.season?f.season.map(s=>SEASON_NAME[s]).join("·")+"에 나와요":"냇가 어딘가에")}</small></div>${d?'<span class="done">잡았어요</span>':""}</div>`});
+    const lk=(UNLOCK.fish[k]||0)>lv;
+    h+=`<div class="item${lk?" locked":""}"><div>${d?f.name:lk?"🔒 ???":"???"}<small>${lk?"낚시 숙련도 '"+FISH_LV[UNLOCK.fish[k]].name+"'가 되면 물기 시작해요":d?`${d.n}마리 · 최고 ${d.best}cm · ${f.desc}`:(f.when==="night"?"밤에만 물어요":f.season?f.season.map(s=>SEASON_NAME[s]).join("·")+"에 나와요":"냇가 어딘가에")}</small></div>${d?'<span class="done">잡았어요</span>':""}</div>`});
   return h}
