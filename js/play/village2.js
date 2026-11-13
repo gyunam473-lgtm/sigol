@@ -1,58 +1,72 @@
 /* 마을 다같이 (2026-11-13): 사람들이 모이는 곳에 깔아 두는 은근한 힐링
-   1) 장터 모닥불: 해가 지면 불이 피어요. 통나무 의자에 앉아 불멍, 장작을 보태면 불이 커지고 곁에 앉으면 덜 지쳐요
+   1) 분교 운동장 큰 모닥불: 해가 지면 불이 피어요. 통나무 의자 두 겹(스무 자리 넘게)에 앉아 불멍, 장작을 보태면 불이 커지고 곁에 앉으면 덜 지쳐요
    2) 당산나무 소원 매듭: 장터 느티나무에 한마디 적은 천을 매달고, 남이 단 것도 읽어요
    3) 마을 꽃길: 장터 남쪽 길가·냇가 둑 빈자리에 꽃씨를 심으면 마을이 점점 예뻐져요 (누가 심었는지 살짝)
    5) 노을 정자: 해 질 녘 장터 정자·꼭대기 정자에 앉으면 "노을 보기"
-   6) 공동 김장: 입동·소설 무렵 마을회관 마당. 배추를 보태고 일손을 거들어 100포기를 채우면 마을 잔치
+   6) 공동 김장: 입동·소설 무렵 넓힌 마을회관 앞마당에서 크게. 배추를 보태고 일손을 거들어 100포기를 채우면 마을 잔치
    지금은 예시 이웃·장터 사람이 같이 하는 모습. 서버가 붙으면 진짜 사람들이 보태요 */
 
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]);
 
-/* ================= 1) 장터 모닥불 ================= */
-const FIRE={x:0,z:1.2,decay:300000}; // 장작 하나(+0.35)가 5분에 0.1씩 사그라들어요
-const fireG=new THREE.Group();fireG.position.set(FIRE.x,0,FIRE.z);plaza.add(fireG);
+/* ================= 1) 분교 운동장 큰 모닥불 (캠프파이어) =================
+   마을에서 제일 넓은 분교 운동장 한가운데. 불이 크고, 통나무 의자가 두 겹으로 둘러 있어 여럿이 모여 앉아요.
+   운동장 들어오는 쪽(앞)은 통로로 비워 뒀어요. 밤엔 마을 사람들이 둘레에 모여 서 있어요 */
+const FIRE={x:0,z:-1,decay:300000,scale:2.4}; // 장작 하나(+0.35)가 5분에 0.1씩 사그라들어요
+const fireG=new THREE.Group();fireG.position.set(FIRE.x,0,FIRE.z);school.add(fireG);
+const fireCore=new THREE.Group();fireCore.scale.setScalar(FIRE.scale);fireG.add(fireCore);
 const flames=[],fireSparks=[];let fireLight;
 (function(){
-  for(let i=0;i<10;i++){const a=i/10*TAU,s=sph(0.17,i%2?0x7a7570:0x8a857e,Math.cos(a)*0.75,0.08,Math.sin(a)*0.75);s.scale.y=0.6;fireG.add(s)}
-  [0,1.2,2.4].forEach(a=>{const l=cyl(0.08,0.09,1.0,0x5a3a22,0,0.16,0,6);l.rotation.z=Math.PI/2;l.rotation.y=a;fireG.add(l)});
-  fireG.add(cyl(0.5,0.5,0.02,0x2a1a10,0,0.03,0,16));
-  [[0.42,1.0,0xff6a10,0.9],[0.3,0.8,0xffa020,0.85],[0.17,0.55,0xffe080,0.9]].forEach(([r,h,c,o],i)=>{const m=new THREE.Mesh(new THREE.ConeGeometry(r,h,8),new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:o,depthWrite:false,blending:THREE.AdditiveBlending}));
-    m.geometry.translate(0,h/2,0);m.position.y=0.18;m.userData.h=h;fireG.add(m);flames.push(m)});
-  for(let i=0;i<14;i++){const s=new THREE.Mesh(new THREE.SphereGeometry(0.025,5,4),new THREE.MeshBasicMaterial({color:0xffb040}));s.userData.ph=Math.random();fireG.add(s);fireSparks.push(s)}
-  fireLight=new THREE.PointLight(0xff8a3a,0,14,2);fireLight.position.y=1;fireG.add(fireLight);
-  const hit=hitBox(1.8,1.4,1.8,0,0.7,0);fireG.add(hit);poke(fireG,()=>addFireWood(),[FIRE.x+1.0,FIRE.z+1.5]);
+  for(let i=0;i<12;i++){const a=i/12*TAU,s=sph(0.17,i%2?0x7a7570:0x8a857e,Math.cos(a)*0.75,0.08,Math.sin(a)*0.75);s.scale.y=0.6;fireCore.add(s)}
+  [0,0.8,1.6,2.4].forEach(a=>{const l=cyl(0.08,0.09,1.0,0x5a3a22,0,0.16,0,6);l.rotation.z=Math.PI/2;l.rotation.y=a;fireCore.add(l)});
+  fireCore.add(cyl(0.55,0.55,0.02,0x2a1a10,0,0.03,0,16));
+  [[0.42,1.1,0xff6a10,0.9],[0.3,0.9,0xffa020,0.85],[0.17,0.6,0xffe080,0.9]].forEach(([r,h,c,o])=>{const m=new THREE.Mesh(new THREE.ConeGeometry(r,h,8),new THREE.MeshBasicMaterial({color:c,transparent:true,opacity:o,depthWrite:false,blending:THREE.AdditiveBlending}));
+    m.geometry.translate(0,h/2,0);m.position.y=0.18;fireCore.add(m);flames.push(m)});
+  for(let i=0;i<30;i++){const s=new THREE.Mesh(new THREE.SphereGeometry(0.025,5,4),new THREE.MeshBasicMaterial({color:0xffb040}));s.userData.ph=Math.random();fireCore.add(s);fireSparks.push(s)}
+  fireLight=new THREE.PointLight(0xff8a3a,0,30,2);fireLight.position.y=2.4;fireG.add(fireLight);
+  fireG.add(hitBox(4.2,3,4.2,0,1.5,0));poke(fireG,()=>addFireWood(),[FIRE.x+2.4,FIRE.z+2.6]);
 })();
-const FIRE_LOGS=[0,60,120,240,300].map((d,i)=>{const a=d*Math.PI/180,x=FIRE.x+Math.cos(a)*2.1,z=FIRE.z+Math.sin(a)*2.1;return {i,x,z,face:Math.atan2(FIRE.x-x,FIRE.z-z)}});
+// 통나무 의자 두 겹: 안쪽 12개(반지름 4.2), 바깥 16개(6.2). 앞쪽(+z, 들어오는 쪽)은 비워요
+const FIRE_LOGS=[];
+[[4.2,12],[6.2,16]].forEach(([R,n],ring)=>{for(let k=0;k<n;k++){const a=k/n*TAU+(ring?0.1:0),x=FIRE.x+Math.cos(a)*R,z=FIRE.z+Math.sin(a)*R;
+  if(Math.abs(x-FIRE.x)<1.6&&z>FIRE.z)continue;FIRE_LOGS.push({i:FIRE_LOGS.length,x,z,R,ring,face:Math.atan2(FIRE.x-x,FIRE.z-z)})}});
 const fireLogMeshes=FIRE_LOGS.map(L=>{const g=new THREE.Group();const c=cyl(0.2,0.22,1.1,0x7a5434,0,0.22,0,10);c.rotation.z=Math.PI/2;g.add(c);g.add(cyl(0.19,0.19,0.01,0xc8a070,0.555,0.22,0,10).rotateZ(Math.PI/2));
-  g.position.set(L.x,0,L.z);g.rotation.y=L.face+Math.PI/2;g.userData={kind:"seat",seat:"fireLog"+L.i};plaza.add(g);
-  FREE_SEATS["fireLog"+L.i]={title:"모닥불 곁",where:"plaza",note:"타닥타닥 장작 타는 소리. 불꽃을 멍하니 바라봐요.",
-    get:()=>({pos:[L.x,0.42,L.z],face:L.face,stand:[L.x-Math.sin(L.face)*0.9,L.z-Math.cos(L.face)*0.9],cam:[1.7,1.25,-0.9],look:[-0.4,-0.25,2.1]}),
+  g.position.set(L.x,0,L.z);g.rotation.y=L.face+Math.PI/2;g.userData={kind:"seat",seat:"fireLog"+L.i};school.add(g);
+  FREE_SEATS["fireLog"+L.i]={title:"운동장 모닥불 곁",where:"school",note:"타닥타닥 장작 타는 소리. 둘러앉은 사람들 얼굴이 불빛에 붉어요.",
+    get:()=>({pos:[L.x,0.42,L.z],face:L.face,stand:[L.x-Math.sin(L.face)*0.9,L.z-Math.cos(L.face)*0.9],cam:L.ring?[2.0,1.9,-1.3]:[1.7,1.4,-1.0],look:[-0.4,0.1,L.R]}),
     panel:firePanel,bind:fireBind};return g});
-addToPlace("plaza",[fireG,...fireLogMeshes],[[FIRE.x-1.0,FIRE.z-1.0,FIRE.x+1.0,FIRE.z+1.0],...FIRE_LOGS.map(L=>[L.x-0.35,L.z-0.35,L.x+0.35,L.z+0.35])]);
-WAYP.forEach(w=>{if(Math.hypot(w[0]-FIRE.x,w[1]-FIRE.z)<2.8){w[0]=FIRE.x;w[1]=FIRE.z-3.1}});
-function fireBase(){return (skyNow.night||0)>0.35?0.3:0} // 밤엔 마을 사람들이 늘 지펴 둬요
+addToPlace("school",[fireG,...fireLogMeshes],[[FIRE.x-2.0,FIRE.z-2.0,FIRE.x+2.0,FIRE.z+2.0],...FIRE_LOGS.map(L=>[L.x-0.35,L.z-0.35,L.x+0.35,L.z+0.35])]);
+PLACES.school.way=[[-8,4],[8,4],[-8,-7],[7,-6],[-3,7.5],[3,7.5],[-10,1],[10,1],[0,8.5]]; // 동네 사람들은 모닥불 둘레 밖으로 다녀요
+PLACES.school.sub="넓은 운동장 · 큰 모닥불(밤에 다같이) · 그네 · 스탠드";
+PLACES.school.hint="운동장 한가운데 큰 모닥불이 있어요. 통나무에 앉아 불멍, 장작을 보태요. 그네·스탠드·학교 종도 있어요.";
+// 밤에 모닥불 둘레에 모여 선 마을 사람들 (처음 분교에 들어갈 때 만들어요)
+let fireCrowd=null;
+function fireCrowdApply(){if(mode!=="school"||!me)return;
+  if(!fireCrowd)fireCrowd=[["동네 할아버지",0x7a6a54,{hat:true,hair:0xdedad2}],["동네 아주머니",0xc87a6a,{scarf:0xf2e6c8}],["윗마을 청년",0x4a6a8a,{cap:0x2a3a4a}],["새댁",0xd8a0b0,{hat:false,hair:0x2a1a14}],
+    ["동네 아이",0xf2c040,{cap:0xd8321e}],["읍내 손님",0x6a6a6a,{hat:false,hair:0x3a332c}],["이웃 할머니",0x9a7aa8,{hat:false,hair:0xc9c4bc}],["귀농 새내기",0x5a8a6a,{}]]
+    .map(([n,c,o],k)=>{const p=person(c,n,Object.assign({style:"nb"},o));scene.remove(p.g);const a=-Math.PI/2+(k-3.5)*0.42,R=7.6;p.g.position.set(FIRE.x+Math.cos(a)*R,0,FIRE.z+Math.sin(a)*R);
+      p.g.rotation.y=Math.atan2(FIRE.x-p.g.position.x,FIRE.z-p.g.position.z);if(k%3)p.label.visible=false;school.add(p.g);return p});
+  const on=fireBase()>0;fireCrowd.forEach(p=>p.g.visible=on)}
+function fireBase(){return (skyNow.night||0)>0.35?0.35:0} // 밤엔 마을 사람들이 늘 지펴 둬요
 function fireOwn(){const f=S.fire;if(!f)return 0;return Math.max(0,f.lv-(Date.now()-f.t)/FIRE.decay*0.1)}
 const fireLv=()=>Math.min(1,Math.max(fireBase(),fireOwn()));
 function addFireWood(who){if(!who){if(!((S.inv.jangjak||0)>0)){toast("장작이 없어요. 모탕에서 패 오거나 목공소에서 한 짐 사 와요");return false}S.inv.jangjak--}
-  S.fire={lv:Math.min(1,Math.max(fireOwn(),fireBase())+0.35),t:Date.now()};save();refresh();burst(0.4,900,0.12);burst(0.1,3000,0.05,0.15);
-  toast(who?who+"이(가) 모닥불에 장작을 하나 보탰어요":pickOne(["장작을 넣으니 불길이 확 살아나요","타닥타닥, 불꽃이 하늘로 튀어 올라요","불이 커졌어요. 둘레가 환해요"]));
+  S.fire={lv:Math.min(1,Math.max(fireOwn(),fireBase())+0.35),t:Date.now()};save();refresh();burst(0.5,700,0.16);burst(0.12,3000,0.06,0.15);
+  toast(who?josa(who,"이","가")+" 모닥불에 장작을 보탰어요. 불길이 확!":pickOne(["장작을 넣으니 불길이 하늘 높이 솟아요","타닥타닥, 불꽃이 별까지 튀어 올라요","불이 커졌어요. 운동장이 환해요"]));
   if(SIT&&SIT.id&&SIT.id.startsWith("fireLog"))renderFreeSit();return true}
-const FIRE_NOTES=["불꽃이 춤을 춰요. 아무 생각이 안 나요","장작 속이 빨갛게 숨을 쉬어요","연기 냄새가 옷에 배어요. 싫지 않아요","불티가 별 사이로 날아가요","손을 쬐니 손바닥이 따끈해요"];
+const FIRE_NOTES=["불꽃이 춤을 춰요. 아무 생각이 안 나요","장작 속이 빨갛게 숨을 쉬어요","연기 냄새가 옷에 배어요. 싫지 않아요","불티가 별 사이로 날아가요","손을 쬐니 손바닥이 따끈해요","건너편 사람들 웃음소리가 들려요"];
 function firePanel(){const lv=fireLv(),n=S.inv.jangjak||0,warm=lv>=0.2;
   return `<div class="item"><div>모닥불 ${lv>0.7?"활활":lv>0.3?"잔잔하게":lv>0?"사그라드는 중":"불씨만 남았어요"}<small>${warm?"곁에 앉아 있으면 덜 지쳐요 (땀 흘려도 든든함·물이 반만 줄어요)":"해가 지면 마을 사람들이 불을 지펴요 · 장작을 넣으면 지금도 피워요"} · 가진 장작 ${n}개</small></div><button class="go" id="fireWood" ${n?"":"disabled"}>장작 넣기</button></div><p class="hint">${pickOne(FIRE_NOTES)}</p>`}
 function fireBind(){if($("fireWood"))$("fireWood").onclick=()=>addFireWood()}
 let fireNpcT=0;
 function fireFrame(dt,now){const lv=fireLv(),n=skyNow.night||0;
-  flames.forEach((m,i)=>{const s=lv*(1+0.18*Math.sin(now/90+i*2)+0.08*Math.sin(now/37+i));m.visible=lv>0.02;m.scale.set(Math.max(0.01,lv*(0.9+0.1*Math.sin(now/70+i))),Math.max(0.01,s),Math.max(0.01,lv))});
-  fireSparks.forEach(s=>{const u=(now/1600+s.userData.ph)%1;s.visible=lv>0.25;s.position.set(Math.sin(s.userData.ph*40+u*6)*0.25,0.4+u*2.4*lv,Math.cos(s.userData.ph*30+u*5)*0.25);s.scale.setScalar(1-u)});
-  fireLight.intensity=lv*(0.6+1.6*n)*(0.9+0.1*Math.sin(now/60));
-  if(mode!=="plaza")return;
-  // 타닥타닥 소리 (가까이 있을 때)
-  const d=me?Math.hypot(me.g.position.x-FIRE.x,me.g.position.z-FIRE.z):99;if(lv>0.1&&d<8&&Math.random()<dt*1.2)burst(0.04,2600,0.05*lv*(1-d/8));
-  // 곁에 앉아 있으면 따뜻해요
+  flames.forEach((m,i)=>{const s=lv*(1.15+0.2*Math.sin(now/90+i*2)+0.1*Math.sin(now/37+i));m.visible=lv>0.02;m.scale.set(Math.max(0.01,lv*(0.95+0.12*Math.sin(now/70+i))),Math.max(0.01,s),Math.max(0.01,lv))});
+  fireSparks.forEach(s=>{const u=(now/1800+s.userData.ph)%1;s.visible=lv>0.25;s.position.set(Math.sin(s.userData.ph*40+u*6)*0.35,0.4+u*3.0*lv,Math.cos(s.userData.ph*30+u*5)*0.35);s.scale.setScalar(1-u)});
+  fireLight.intensity=lv*(1.0+2.4*n)*(0.9+0.1*Math.sin(now/60));
+  if(mode!=="school")return;
+  const d=me?Math.hypot(me.g.position.x-FIRE.x,me.g.position.z-FIRE.z):99;if(lv>0.1&&d<16&&Math.random()<dt*1.8)burst(0.05,2400,0.07*lv*(1-d/16)); // 타닥타닥
   if(SIT&&SIT.id&&SIT.id.startsWith("fireLog")&&lv>=0.2){if(!(S.warmUntil>Date.now()+60000))toast("불 곁에 앉으니 몸이 녹아요 · 10분 동안 덜 지쳐요");S.warmUntil=Date.now()+600000}
-  // 밤엔 가끔 마을 사람이 장작을 보태요
-  fireNpcT+=dt;if(n>0.35&&fireNpcT>200){fireNpcT=0;if(fireOwn()<0.5)addFireWood(pickOne(["옆집 할머니","이장님","귀농 2년차","국밥집 아주머니"]))}}
+  fireNpcT+=dt;if(n>0.35&&fireNpcT>150){fireNpcT=0;if(fireOwn()<0.6)addFireWood(pickOne(["옆집 할머니","이장님","귀농 2년차","분교 선생님","동네 할아버지","윗마을 청년"]))}
+  if(Math.random()<dt)fireCrowdApply()}
 
 /* ================= 2) 당산나무 소원 매듭 ================= */
 const WISH_BASE=[["옆집 할머니","손주들 건강하게 해 주이소",0xd8321e],["이장님","올해도 마을에 큰 탈 없기를",0x3f6f9a],["귀농 2년차","내년엔 배추 농사 성공!",0x4f8a3a],
@@ -140,30 +154,37 @@ const kjKey=()=>"kj"+new Date().getFullYear();
 function kjBase(){const d=new Date(),s=new Date(d.getFullYear(),KJ.start[0]-1,KJ.start[1]);return Math.max(0,Math.min(80,Math.floor((d-s)/3600000*0.9)))} // 마을 사람들이 조금씩 보태요
 const kjMine=()=>((S.kj||{})[kjKey()]||{}).mine||0;
 const kjTotal=()=>Math.min(KJ.goal,kjBase()+kjMine());
+// 넓힌 회관 앞마당 동쪽에 커다란 김장판: 큰 깔개, 고무 대야 넷, 배추 산 둘, 고춧가루 양푼, 둘러앉은 마을 사람들
+hall.add(box(38,0.03,26,0xd5d0c4,4,0.015,3)); // 회관 앞마당 넓히기 (옛 마당보다 살짝 낮게)
+const KJ_C={x:12,z:4.6,w:11,d:7};
 const kjSite=new THREE.Group();
-(function(){kjSite.add(box(3.6,0.02,2.6,0x3f6fa8,0,0.02,0));
-  [[-0.9,0.2],[0.6,-0.3]].forEach(([x,z])=>{kjSite.add(cyl(0.55,0.45,0.35,0xc8322a,x,0.2,z,16));kjSite.add(cyl(0.5,0.5,0.02,0x9ac078,x,0.37,z,16));
-    for(let i=0;i<4;i++){const c=sph(0.13,i%2?0xe6f2c6:0x8ac060,x+(i-1.5)*0.18,0.42,z+((i%2)-0.5)*0.15);c.scale.set(1,0.6,1.3);kjSite.add(c)}});
-  for(let i=0;i<9;i++){const c=sph(0.16,0x9ac078,1.2+(i%3)*0.3,0.14+Math.floor(i/3)*0.2,0.7-(i%2)*0.1);c.scale.set(1,0.85,1.2);kjSite.add(c)} // 배추 더미
-  kjSite.add(cyl(0.22,0.18,0.12,0xf2f0ea,1.3,0.08,-0.7,12));kjSite.add(cyl(0.2,0.2,0.02,0xc0392b,1.3,0.14,-0.7,12)); // 고춧가루 양푼
-  kjSite.add(hitBox(3.8,1.2,2.8,0,0.6,0));kjSite.position.set(-3.6,0,3.9);hall.add(kjSite);poke(kjSite,()=>openKimjang(),[-3.6,5.8])})();
-addToPlace("hall",[kjSite],[[-5.4,2.6,-1.8,5.2]]); // 들어오는 길(가운데)은 비워 둬요
+const KJ_STATIONS=[[-4,2.4],[-1.3,2.4],[1.3,2.4],[4,2.4],[-4,-0.6],[4,-0.6]]; // 내가 거드는 자리 (깔개 기준)
+(function(){const {w,d}=KJ_C;kjSite.add(box(w,0.02,d,0x3f6fa8,0,0.02,0));
+  [[-4,-1.6],[-1.3,-1.6],[1.3,-1.6],[4,-1.6]].forEach(([x,z])=>{kjSite.add(cyl(0.75,0.6,0.42,0xc8322a,x,0.23,z,18));kjSite.add(cyl(0.7,0.7,0.02,0x9ac078,x,0.44,z,18));
+    for(let i=0;i<6;i++){const c=sph(0.15,i%2?0xe6f2c6:0x8ac060,x+((i%3)-1)*0.3,0.5,z+(Math.floor(i/3)-0.5)*0.3);c.scale.set(1,0.6,1.3);kjSite.add(c)}});
+  [[-4.6,1.4],[4.6,1.4]].forEach(([x,z])=>{for(let i=0;i<20;i++){const c=sph(0.17,0x9ac078,x+((i%4)-1.5)*0.32,0.15+Math.floor(i/8)*0.24,z+((Math.floor(i/4)%2)-0.5)*0.34);c.scale.set(1,0.85,1.2);kjSite.add(c)}}); // 배추 산
+  [[-2.6,1.2],[0,1.2],[2.6,1.2]].forEach(([x,z])=>{kjSite.add(cyl(0.3,0.24,0.14,0xf2f0ea,x,0.09,z,14));kjSite.add(cyl(0.27,0.27,0.02,0xc0392b,x,0.16,z,14))}); // 고춧가루 속 양푼
+  kjSite.add(hitBox(w+0.4,1.2,d+0.4,0,0.6,0));kjSite.position.set(KJ_C.x,0,KJ_C.z);hall.add(kjSite);poke(kjSite,()=>openKimjang(),[KJ_C.x,KJ_C.z+KJ_C.d/2+0.9])})();
+addToPlace("hall",[kjSite],[[KJ_C.x-KJ_C.w/2-0.2,KJ_C.z-KJ_C.d/2-0.2,KJ_C.x+KJ_C.w/2+0.2,KJ_C.z+KJ_C.d/2+0.2]]);
 let kjPeople=null;
-function kjApply(){const on=kjSeason();kjSite.visible=on;if(!on||kjPeople||!me)return;
-  kjPeople=[["김장 품앗이 아주머니",0xb85a6a,{scarf:0xf2e6c8,apron:0xf6f0e2},[-5.0,3.4,1.2]],["동네 아저씨",0x6a7a5a,{cap:0x3a4a3a},[-2.0,4.6,-1.6]]].map(([n,c,o,[x,z,r]])=>{const p=person(c,n,Object.assign({style:"nb"},o));
-    scene.remove(p.g);p.g.position.set(x,0,z);p.g.rotation.y=r;p.b.scale.y=0.72;hall.add(p.g);return p})}
+function kjApply(){const on=kjSeason();kjSite.visible=on;if(kjPeople)kjPeople.forEach(p=>p.g.visible=on);if(!on||kjPeople||!me)return;
+  const who=[["김장 품앗이 아주머니",0xb85a6a,{scarf:0xf2e6c8,apron:0xf6f0e2}],["동네 아저씨",0x6a7a5a,{cap:0x3a4a3a}],["옆마을 할머니",0x9a7aa8,{scarf:0xe8d8c8,apron:0xf6f0e2}],["새댁",0xd8a0b0,{hat:false,hair:0x2a1a14,apron:0xf2e6c8}],
+    ["부녀회장님",0xc84a6a,{scarf:0xf6f0e2,apron:0xe8e0d0}],["동네 할아버지",0x7a6a54,{hat:true,hair:0xdedad2}],["윗마을 아주머니",0xd8785a,{scarf:0xf2e6c8,apron:0xf6f0e2}],["귀농 새내기",0x5a8a6a,{apron:0xe8e0d0}],
+    ["이장님 사모님",0x8a6aa8,{scarf:0xf2f0e8,apron:0xf6f0e2}],["동네 청년",0x4a6a8a,{cap:0x2a3a4a}]];
+  const spots=[[-5.6,-1.6,Math.PI/2],[-2.7,-3.0,0],[-0.1,-3.0,0],[2.7,-3.0,0],[5.6,-1.6,-Math.PI/2],[-5.8,1.4,Math.PI/2],[5.8,1.4,-Math.PI/2],[-2.6,2.2,Math.PI],[2.6,2.2,Math.PI],[0,-3.6,0]];
+  kjPeople=who.map(([n,c,o],k)=>{const p=person(c,n,Object.assign({style:"nb"},o)),[x,z,r]=spots[k];scene.remove(p.g);p.g.position.set(KJ_C.x+x,0,KJ_C.z+z);p.g.rotation.y=r;p.b.scale.y=0.72;if(k%3)p.label.visible=false;hall.add(p.g);return p})}
 CH.jeorim={name:"배추 절이기",g:"rub",n:4,guide:n=>`반 가른 배추에 굵은소금을 슥슥 뿌려 절여요 · ${n}번 남음`,pop:"솔솔",sfx:"scrape"};
 CH.sok={name:"속 넣기",g:"tap",guide:()=>"배춧잎 사이사이 콕콕 빨간 속을 넣어요"};
 function openKimjang(){if(!kjSeason()){toast("다음 마을 행사는 준비 중이에요. 입동·소설 무렵엔 여기서 다같이 김장해요");return}
   const tot=kjTotal(),done=tot>=KJ.goal,K=(S.kj=S.kj||{})[kjKey()]=(S.kj||{})[kjKey()]||{mine:0},cab=(S.inv.cabbage||0)+(S.inv.cabbage_top||0);
-  let h=`<h2>마을 공동 김장</h2><p class="hint">입동·소설 무렵, 온 마을이 회관 마당에 모여 김장해요. 다같이 ${KJ.goal}포기를 채우면 마을 잔치!</p>
+  let h=`<h2>마을 공동 김장</h2><p class="hint">입동·소설 무렵, 온 마을 사람이 회관 앞마당에 모여 크게 김장해요. 다같이 ${KJ.goal}포기를 채우면 마을 잔치!</p>
     <div class="kjbar"><i style="width:${tot/KJ.goal*100}%"></i><span>${tot}/${KJ.goal}포기</span></div><p class="hint">내가 보탠 것 ${K.mine}포기 · 나머지는 마을 사람들이 조금씩 보태요</p><div class="goods">`;
   if(!done){h+=goods("배추 보태기",`가진 배추 ${cab}포기 · 특상은 두 포기로 쳐요`,`<button class="go" id="kjCab" ${cab?"":"disabled"}>한 포기</button>`);
     h+=goods("일손 거들기","배추 절이고 속 넣기 · 세 포기만큼 일한 셈이에요",`<button class="go" id="kjHelp">거들기</button>`)}
   else h+=goods("마을 김장 잔치!",K.feast?"김장김치를 받아 왔어요. 내년에 또 만나요":"다 채웠어요! 김장김치 두 접시를 받아 가요",K.feast?"":`<button class="go" id="kjFeast">받기</button>`);
   openSheet(h+"</div>");
   if($("kjCab"))$("kjCab").onclick=()=>{let add=1;if(S.inv.cabbage>0)S.inv.cabbage--;else{S.inv.cabbage_top--;add=2}K.mine+=add;sfx("pop");save();refresh();toast("배추를 대야에 보탰어요 · 아주머니: \"아이고 실하다!\"");openKimjang()};
-  if($("kjHelp"))$("kjHelp").onclick=()=>{closeSheet();const c=kjSite.position,F=new THREE.Vector3(c.x-0.9,0.45,c.z+0.2);
+  if($("kjHelp"))$("kjHelp").onclick=()=>{closeSheet();const st=pickOne(KJ_STATIONS),F=new THREE.Vector3(KJ_C.x+st[0],0.45,KJ_C.z+st[1]);
     startChore(Object.assign(camAt(F.x,F.y,F.z,1.5,1.2),{steps:["jeorim","sok"],targets:()=>near(F,{n:5,d:0.25}),
       onRub(){for(let i=0;i<3;i++){const s=sph(0.012,0xffffff,F.x+fr(-0.2,0.2),F.y+0.05,F.z+fr(-0.15,0.15));this.g.add(s)}},onTap(s,t){sfx("pluck");this.g.add(sph(0.03,0xc0392b,t.p.x,t.p.y+0.02,t.p.z))},onHold:noop,
       finish(){K.mine+=3;let ext="";const d=new Date().toDateString();if(K.suyuk!==d){K.suyuk=d;S.full=Math.min(100,fullNow()+10);ext=" · 아주머니가 수육 한 점에 김치를 싸서 입에 넣어 주셨어요! 든든함 +10"}

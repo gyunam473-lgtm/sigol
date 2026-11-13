@@ -30,7 +30,7 @@ const near=(c,r)=>Array.from({length:r.n},(_,i)=>{const a=i/r.n*TAU+fr(-0.3,0.3)
 const camAt=(x,y,z,back=1.9,up=1.5)=>({focus:new THREE.Vector3(x,y,z),cam:new THREE.Vector3(x+0.3,y+up,z+back),look:new THREE.Vector3(x,y-0.1,z)});
 
 /* ================= 1) 곤충 채집 ================= */
-const BUG_SPOTS={stream:[[-10,1.6],[-5.5,2.6],[2,3.2],[8.5,2.4],[12.5,1.2],[-13.5,4]],school:[[-6,4],[4,-4],[7,3],[-4,-6],[1,5.5],[-7,0.5],[9,-6]],dwitsan:[[-5,3],[5,0.5],[-7,-5],[6,-8],[-3,-10],[3,-13],[-9,-2]]};
+const BUG_SPOTS={stream:[[-10,1.6],[-5.5,2.6],[2,3.2],[8.5,2.4],[12.5,1.2],[-13.5,4]],school:[[-8,5],[7.5,-7],[8,4],[-7.5,-7],[3,8],[-9,0.5],[10,1]],dwitsan:[[-5,3],[5,0.5],[-7,-5],[6,-8],[-3,-10],[3,-13],[-9,-2]]};
 const BUG_STATE={};let BUGS=[];
 const bugLv=()=>tierOf(BUG_LV,(S.skill||{}).bug||0);
 const nightNow=()=>(skyNow.night||0)>0.5;

@@ -102,7 +102,7 @@ const JIP_LV=[{name:"짚 만지는 이",xp:0},{name:"새끼 꼬는 손",xp:15},{
 /* ---------- 마을 품삯 일 (회관 게시판): 받아 두고 그 장소에 가면 반짝이는 자리에서 해요. 10분마다 새 일거리 ---------- */
 const JOBS=[
   {id:"gama",place:"mill",at:[-6,-2.6],title:"방앗간 쌀가마 나르기",steps:["gama","gama","gama"],pay:130,who:"방앗간 아저씨"},
-  {id:"pull",place:"school",at:[4,2],title:"분교 운동장 풀 뽑기",steps:["pull","pull"],pay:100,who:"분교 선생님"},
+  {id:"pull",place:"school",at:[-7.5,6],title:"분교 운동장 풀 뽑기",steps:["pull","pull"],pay:100,who:"분교 선생님"},
   {id:"flower",place:"clinic",at:[-5.2,-0.3],title:"보건소 화단 물 주기",steps:["water2","pull"],pay:90,who:"보건소 선생님"},
   {id:"trash",place:"stream",at:[3,1.2],title:"냇가 쓰레기 줍기",steps:["pick","pick"],pay:100,who:"이장님"},
   {id:"sweep",place:"plaza",at:[0,7],title:"장터 마당 쓸기",steps:["sweep","sweep","pick"],pay:110,who:"이장님"},
