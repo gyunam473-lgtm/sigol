@@ -7,6 +7,10 @@ refresh();
 applyTime();setInterval(()=>{if(!timelapse)applyTime()},20000); // 하늘은 20초마다 조금씩 (빨리 보기 중엔 매 순간)
 
 /* ---------- 움직임 ---------- */
+// 폰 세로처럼 폭이 좁은 화면에선 옆이 잘리지 않게 시야를 넓혀요 (2026-11-14: 모내기·밭일 동그라미가 화면 밖이라 못 끝냄)
+// 좌우로 보이는 각도를 일할 땐 42도, 걸을 땐 36도 이상으로 맞춰요
+function fitFov(){const a=camera.aspect;let f=46;if(a<1){const task=!!(W||PD||CK||FS),h=(task?42:36)*Math.PI/180;f=Math.max(58,Math.min(task?80:72,2*Math.atan(Math.tan(h/2)/a)*180/Math.PI))}
+  if(Math.abs(camera.fov-f)>0.05){camera.fov+=(f-camera.fov)*0.2;camera.updateProjectionMatrix()}}
 function resize(){const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;renderer.setSize(w,h,false);camera.aspect=w/h;camera.fov=w<h?58:46;camera.updateProjectionMatrix()}
 window.addEventListener("resize",resize);
 if(window.ResizeObserver)new ResizeObserver(resize).observe(canvas);
@@ -69,6 +73,7 @@ function loop(now){
   if(inHouse){rainG.visible=snowG.visible=false;if(tick===0&&!(LIE&&LIE.off))roomLighting()}
   if(mode==="dabang"){rainG.visible=snowG.visible=false;if(tick===0)dabangLighting()}
   markers.forEach((m,i)=>m.position.y=m.userData.y+Math.sin(now/320+i)*0.08); // 가게 주인 말풍선
+  fitFov();
   loop.n=(loop.n||0)+1;if(loop.n%2===0)renderer.shadowMap.needsUpdate=true;
   renderer.render(scene,camera);
   if(me&&!loop.shown){loop.shown=true;$("loading").classList.add("done")}

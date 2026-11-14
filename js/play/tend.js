@@ -5,7 +5,8 @@
    밭 칸 위에 "목말라요 / 잡초 / 벌레" 표시가 떠요. 누르면 돌보기 작업 화면(play/work.js 의 kind "tend") */
 
 const ISSUE={dry:{name:"목말라요",step:"water",col:"#3a78b8"},weed:{name:"잡초",step:"weed",col:"#4f7a3a"},bug:{name:"벌레",step:"bug",col:"#a8402a"}};
-const tendGrace=p=>Math.max(15000,CROPS[p.crop].grow*1000*0.35); // 이 안에 해결하면 만점
+// 이 안에 해결하면 만점. 2026-11-14 1분으로 (왼쪽 할 일 목록 제한시간, play/quests.js)
+const tendGrace=p=>60000;
 // 처음 물을 줄 때: 자라는 동안 생길 일을 정해요 (at = 다 자라는 것 중 얼마쯤에)
 function planIssues(p){const g=CROPS[p.crop].grow,L=[{k:"dry",at:0.4+Math.random()*0.2}];
   if(Math.random()<0.8)L.push({k:"weed",at:0.12+Math.random()*0.2});

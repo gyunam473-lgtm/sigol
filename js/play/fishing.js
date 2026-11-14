@@ -60,7 +60,7 @@ function pickFresh(){
   return {k,f,cm}}
 
 /* ---------- 손 ---------- */
-wEl.addEventListener("pointerdown",e=>{if(!FS||e.target.closest("button"))return;e.preventDefault();FS.down=true;FS.hint=false;
+wEl.addEventListener("pointerdown",e=>{if(!FS||e.target.closest("button"))return;e.preventDefault();try{wEl.setPointerCapture(e.pointerId)}catch(_){}FS.down=true;FS.hint=false;
   if(FS.stage==="cast"&&!FS.flying)FS.charging=true;
   if(FS.stage==="wait"){if(FS.biting)hookFish();else if(FS.bob.visible&&!FS.flying){sfx("pop");wPopAt("너무 일찍 챘어요! 고기가 놀라 도망갔어요");FS.biting=false;FS.ev=[];setTimeout(()=>{if(FS&&FS.stage==="wait")planBites()},1200);FS.t=0}}});
 const fsUp=()=>{if(!FS)return;FS.down=false;if(FS.stage==="cast"&&FS.charging){FS.charging=false;castBob()}};
@@ -108,6 +108,8 @@ function fishFrame(dt,now){
       if(e.type==="nib"&&d<0.3){dip-=Math.sin(d/0.3*Math.PI)*0.025;if(!e.done){e.done=1;ripple(0.4)}}
       if(e.type==="bite"){if(d<FS.window){dip-=0.12;if(!e.done){e.done=1;FS.biting=true;ripple(1);sfx("water");buzz(15)}}
         else if(FS.biting){FS.biting=false;wPopAt("놓쳤어요. 다시 기다려요");FS.ev=[];FS.t=0;planBites()}}});
+    // 입질이 끊겨 찌만 떠 있으면(폰에서 멈춘 것처럼 보였어요) 다시 입질이 오게 해요 (2026-11-14)
+    const lastT=FS.ev.length?FS.ev[FS.ev.length-1].t+FS.window+1.5:0;if(!FS.biting&&FS.t>Math.max(lastT,6)){FS.ev=[];FS.t=0;planBites()}
     b.position.y=W+dip}
   if(FS.stage==="reel"&&FS.fish){
     const f=FS.fish.f,[z0,z1]=FS.zone;

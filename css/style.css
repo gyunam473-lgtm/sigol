@@ -402,3 +402,15 @@ body{margin:0}
   .stat .lvname{font-size:14px}
   .side .clockrow{align-items:center;gap:4px}
 }
+
+/* 왼쪽 할 일 목록 (밭 돌보기 · 제한시간 1분) */
+.quests{position:absolute;left:max(12px,env(safe-area-inset-left,0px));top:150px;width:min(220px,54vw);display:flex;flex-direction:column;gap:4px;pointer-events:auto;z-index:4}
+.quests[hidden]{display:none}
+.qhead{font-size:12px;color:var(--panel);background:rgba(40,32,20,.55);align-self:flex-start;padding:2px 9px;border-radius:99px}.qhead small{opacity:.8}
+.qrow{display:flex;align-items:center;gap:6px;padding:6px 9px;border-radius:10px;background:var(--panel);border:1px solid var(--line);color:var(--ink);font:inherit;font-size:12.5px;text-align:left;box-shadow:0 2px 6px rgba(0,0,0,.12)}
+.qrow .qt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qrow b{margin-left:auto;font-variant-numeric:tabular-nums;color:#3f7a3a;font-size:12px}
+.qrow.late{border-color:#e0a090}.qrow.late b{color:#c0392b}
+.qmore{font-size:11px;color:var(--panel);text-shadow:0 1px 2px rgba(0,0,0,.5)}
+/* 폰 세로: 알림은 내 캐릭터 아래·오른쪽 아래 단추 위 (왼쪽 할 일 목록과 안 겹치게, 2026-11-14) */
+@media (max-width:700px) and (min-height:521px){.toast{top:auto;bottom:calc(max(12px,env(safe-area-inset-bottom,0px)) + 220px)}}
