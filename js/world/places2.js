@@ -74,7 +74,8 @@ let dabangDoor;
 // 다방 안 불빛: 밤엔 천장 등이 환하고, 낮엔 창으로 빛이 들어와요
 function dabangLighting(){const n=skyNow.night||0;dabangLights.forEach(l=>l.intensity=0.45+n*0.9);dabangWinMat.emissive.setRGB(1,0.95,0.8).multiplyScalar((1-n)*0.6)}
 // 다방 안 카메라: 앞쪽 위에서 나를 따라 들여다봐요
-function dabangCam(){const p=me.g.position,cx=Math.max(-7,Math.min(7,p.x));camPos.set(cx,7.6,Math.min(p.z+7.2,DB.z1+6.5));lookT.set(cx,0.3,p.z-1.6)}
+// 2026-11-14 폰 세로에선 계산대(사장님)가 화면 밖이라 대화를 못 했어요 → 화면을 옆으로 끌면 좌우로 둘러봐요(RC.pan, freecam.js 끝), 걸으면 다시 나를 따라와요
+function dabangCam(){const p=me.g.position;if(me.moving)RC.pan*=0.9;const pl=(camera.aspect||1)<1?9.5:7;RC.pan=Math.max(-pl-p.x,Math.min(pl-p.x,RC.pan));const cx=Math.max(-pl,Math.min(pl,p.x+RC.pan));camPos.set(cx,7.6,Math.min(p.z+7.2,DB.z1+6.5));lookT.set(cx,0.3,p.z-1.6)}
 // 소파 자리: 시키면 탁자 위에 찻잔이 놓여요
 const DABANG_NOTES=["푹신한 소파. 난로 위 주전자가 보글보글","창으로 햇살이 들어와요. 어항 속 금붕어가 한가롭네요","전축에서 옛날 노래가 흘러나와요. 마음이 느긋해져요","괘종시계 소리가 똑딱똑딱. 시간이 천천히 가요","커튼 사이로 바람이 살랑. 차 한 잔이 딱이에요","옆 소파에서 두런두런 이야기 소리가 들려요"];
 DABANG_BOOTHS.forEach(([bx,bz],i)=>[-1,1].forEach(d=>{const id="dabang"+i+(d<0?"a":"b"),f=d<0?0:Math.PI;

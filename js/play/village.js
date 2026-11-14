@@ -4,7 +4,7 @@ const PLACE_HELLO={
   plaza:()=>"오늘도 장터가 북적여요. 먹거리 천막에서 국밥 한 그릇, 평상에 앉아 쉬어 가요. 말풍선 달린 주인을 누르면 사고팔아요",
   hall:()=>"마을회관이에요. 이장님께 궁금한 거나 불편한 걸 말씀드려요",
   cattle:()=>"우시장이에요. 음머~ 소장수 아저씨를 눌러 보세요",
-  dabang:()=>"딸랑~ 다방에 들어왔어요. 난로 위 주전자가 보글보글, 소파에 앉아 차 한 잔 해요",
+  dabang:()=>"딸랑~ 다방에 들어왔어요. 난로 위 주전자가 보글보글, 소파에 앉아 차 한 잔 해요"+(innerWidth<innerHeight?" · 화면을 옆으로 끌면 오른쪽 계산대의 사장님이 보여요":""),
   dwitsan:()=>"뒷산이에요. 솔향이 나요. 산길 따라 꼭대기 정자까지 올라가 봐요. 반짝이는 풀은 캐요",
   workshop:()=>"목공소예요. 쓱싹쓱싹 톱질 소리, 나무 냄새가 좋아요",
   stream:()=>"냇가예요. 물소리가 졸졸. 냇물에 들어가 바닥을 훑어보거나, 물가에서 낚시해요",
@@ -12,7 +12,7 @@ const PLACE_HELLO={
   school:()=>"분교예요. 운동장이 넓어요. 그네도 타고 스탠드에 앉아 쉬어 가요",
   clinic:()=>"보건소예요. 선생님이 건강을 살펴 주셔요. 하루 한 번 비타민도 주셔요",
   bus:()=>"버스 정류장이에요. 군내버스가 오가요. 구멍가게에서 식혜 한 병 어때요"};
-function goPlace(k){visiting=null;mode=k;applyCattle();if(k==="dwitsan")applyForage();applyMode();
+function goPlace(k){visiting=null;mode=k;RC.pan=0;applyCattle();if(k==="dwitsan")applyForage();applyMode();
   const tip=(S.placeTips||0)<3;if(tip){S.placeTips=(S.placeTips||0)+1;save()}
   setTimeout(()=>toast(PLACE_HELLO[k]()+(tip?" · 다른 곳에 가거나 돌아갈 땐 오른쪽 아래 '마을 지도'":"")),600)}
 function goPlaza(){goPlace("plaza")}

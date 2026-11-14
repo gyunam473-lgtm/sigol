@@ -86,8 +86,8 @@ function caught(){
     <div class="item"><div>낚시 숙련도 +${xp}<small>${FISH_LV[lv1].name} · ${fishXp()}${FISH_LV[lv1+1]?" / "+FISH_LV[lv1+1].xp:""}</small></div></div>
     <div class="sitbtns"><button class="close" id="fRelease">풀어 주기 (숙련도 +1)</button><button class="close go" id="fKeep">망태에 넣기</button></div>`);
   sheet.querySelector("#closeBtn").remove();
-  const next=()=>{closeSheet();if(FS){FS.g.remove(FS.dangle);FS.dangle=null;FS.fishM=null;setFishStage("cast")}};
-  $("fKeep").onclick=next;
+  const next=()=>{closeSheet();if(FS){FS.next=null;FS.g.remove(FS.dangle);FS.dangle=null;FS.fishM=null;setFishStage("cast")}};
+  $("fKeep").onclick=next;FS.next=next;
   $("fRelease").onclick=()=>{S.inv[k]--;S.bag.pop();S.skill.fish=fishXp()+1;sfx("water");save();refresh();next();toast(f.name+"를 냇물에 놓아줬어요. 잘 가~")};
   if(lv1>lv0)setTimeout(()=>toast("낚시 숙련도가 올랐어요! 이제 '"+FISH_LV[lv1].name+"'"+newlyOpen("fish",lv1,k=>FRESH[k].name)),600);
 }
@@ -123,6 +123,8 @@ function fishFrame(dt,now){
     if(FS.fishM){FS.fishM.position.set(b.position.x+Math.sin(now/150)*0.12,-0.03,b.position.z-0.15);FS.fishM.rotation.z=Math.sin(now/110)*0.5}
     $("wCare").textContent=FISH_LV[fishLv()].name+" · "+"●".repeat(Math.round(FS.P*5))+"○".repeat(5-Math.round(FS.P*5));
     if(FS.P>=1){FS.stage="done";caught()}}
+  // 잡은 고기 창을 바깥(어두운 곳)을 눌러 닫으면 멈춰 있었어요 → 망태에 넣은 걸로 하고 다시 던지기로 (2026-11-14)
+  if(FS.stage==="done"&&FS.next&&$("modal").hidden){FS.next();toast("망태에 넣었어요. 다시 던져 볼까요?")}
   const c=sp(FS.stage==="wait"&&b.visible?b.position:FS.look);const show=FS.hint&&FS.stage!=="done";wFinger.style.display=show?"block":"none";if(show){wFinger.style.left=c.x+"px";wFinger.style.top=c.y+"px"}
 }
 function ripple(s=0.7){FS.ring.position.set(FS.bob.position.x,0.06,FS.bob.position.z);FS.ring.scale.setScalar(1);FS.ring.material.opacity=s}

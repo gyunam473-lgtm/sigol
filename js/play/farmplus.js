@@ -34,10 +34,33 @@ function barnChore(kind){const F=new THREE.Vector3(BARN.x+0.6,0.5,BARN.z+2.4);le
       if(kind==="milk"){S.milkDay=d;const n=adultCows()*2+(avg(this.scores)>0.9?1:0);S.inv.milk=(S.inv.milk||0)+n;sweat(2);endChore(`우유 ${n}잔을 짰어요 · 평상에 앉아 꺼내 마시거나 다방 사장님이 사 줘요`)}
       else{S.cleanDay=d;const n=Math.max(1,S.herd.reduce((a,x)=>a+(ANIMALS[x.k].kind==="cow"?2:1),0));S.inv.geoleum=(S.inv.geoleum||0)+n;sweat(3);endChore(`외양간이 깨끗해졌어요 · 거름 ${n}포대 · 빈 밭에 씨앗 고를 때 "거름 넣고 심기"`)}}})}
 // 다방 사장님: 우유 사 주기 (밀크커피용)
-SHOPS.dabang.open=line=>{if(!(S.inv.milk>0)){toast("다방 사장님: \""+pickOne(["어서 와요~ 아무 데나 편히 앉아요","쌍화차에 노른자 동동 띄워 줄까?","소파에 앉으면 차 갖다줄게"])+"\"");sfx("pop");return}
-  const n=S.inv.milk,got=n*ITEMS.milk.price;
-  shopSheet("dabang",line||"어머, 갓 짠 우유네! 밀크커피 타게 내가 사 줄게",`<div class="goods">${goods("우유",n+"잔 · 한 잔 "+ITEMS.milk.price+"원",`<button class="go" id="sellMilk">다 팔기</button>`)}</div><p class="hint">소파에 앉으면 차를 시킬 수 있어요</p>`);
-  $("sellMilk").onclick=()=>{S.inv.milk=0;S.money+=got;sfx("coin");save();refresh();closeSheet();toast(`다방 사장님: "고마워! 우유 ${n}잔, ${got}원"`)}};
+// 다방 사장님과 이야기 (2026-11-14: 전엔 한마디만 하고 끝나서 "대화를 못 한다"고 느꼈어요)
+// 이야기 나누기(마을 소식·날씨·옛날이야기) · 차림표 보고 계산대 앞에 앉아 시키기 · 우유 팔기
+const DABANG_TALK=[
+  ()=>"요즘 장터 채소가게 아줌마가 특상 배추 보면 그렇게 좋아한대",
+  ()=>"분교 애들이 낮엔 운동장에서 술래잡기해. 해 지면 모닥불 피우고",
+  ()=>"보건소 아침 체조 나가 봤어? 어르신들 팔 올리는 거 보면 웃음 나와",
+  ()=>"방앗간 떡메치기는 힘들어도 인절미 맛은 최고야",
+  ()=>"냇가에서 황금 잉어 봤다는 사람이 있더라. 믿거나 말거나~",
+  ()=>"이장님은 맨날 확성기로 방송하시느라 목이 쉬셨어",
+  ()=>"당산나무에 소원 매듭 달았어? 나는 손님 많이 오게 해 달라고 했지",
+  ()=>"이 전축은 우리 엄마가 쓰던 거야. 아직 소리가 좋지?",
+  ()=>"어항 금붕어 이름은 복순이랑 복돌이. 귀엽지?",
+  ()=>(dayWeather(new Date())==="비"?"비 오는 날엔 쌍화차가 제일 잘 나가":"날 좋은 날은 유자차가 잘 나가. 상큼하잖아"),
+  ()=>skyNow.night>0.5?"밤엔 난로 곁이 최고지. 늦게까지 있어도 돼":"오후엔 동네 어르신들 바둑 두러 오셔",
+  ()=>"고생 많지? 귀농은 처음 일이 년이 제일 힘들대. 쉬엄쉬엄 해"];
+function openDabang(line){
+  const n=S.inv.milk||0,got=n*ITEMS.milk.price;
+  let b=`<div class="goods">${goods("이야기 나누기","사장님이 마을 소식을 들려줘요",`<button class="go" id="dbTalk">듣기</button>`)}`;
+  b+=goods("계산대 앞에 앉기","앉으면 차를 시킬 수 있어요 · 사장님이랑 마주 보고",`<button class="go" id="dbSit">앉기</button>`);
+  if(n)b+=goods("우유",n+"잔 · 한 잔 "+ITEMS.milk.price+"원",`<button class="go" id="sellMilk">다 팔기</button>`);
+  b+=`</div><h3>차림표</h3><div class="goods">${DABANG_MENU.map(f=>goods(f.name,f.price+"원 · "+f.desc,"")).join("")}</div><p class="hint">소파나 계산대 앞 의자에 앉으면 시켜 마셔요</p>`;
+  shopSheet("dabang",line||(n?"어머, 갓 짠 우유네! 밀크커피 타게 내가 사 줄게":pickOne(["어서 와요~ 아무 데나 편히 앉아요","쌍화차에 노른자 동동 띄워 줄까?","왔어? 오늘은 얼굴이 좋아 보이네"])),b);
+  $("dbTalk").onclick=()=>{sfx("pop");S.dbTalk=((S.dbTalk||0)+1)%DABANG_TALK.length;openDabang(DABANG_TALK[(S.dbTalk+Math.floor(Math.random()*3))%DABANG_TALK.length]())};
+  $("dbSit").onclick=()=>{closeSheet();const id=Object.keys(FREE_SEATS).filter(k=>k.startsWith("dbar")).map(k=>[k,FREE_SEATS[k].get()]).sort((x,y)=>Math.hypot(x[1].stand[0]-me.g.position.x,x[1].stand[1]-me.g.position.z)-Math.hypot(y[1].stand[0]-me.g.position.x,y[1].stand[1]-me.g.position.z))[0];
+    if(id)go(id[1].stand[0],id[1].stand[1],{type:"sit",place:id[0]})};
+  if(n)$("sellMilk").onclick=()=>{S.inv.milk=0;S.money+=got;sfx("coin");save();refresh();openDabang(`고마워! 우유 ${n}잔, ${got}원`)}}
+SHOPS.dabang.open=openDabang;
 
 /* ---------- 거름 넣고 심기 ---------- */
 {const os=openSeedPick;openSeedPick=function(i){os(i);if(!(S.inv.geoleum>0))return;

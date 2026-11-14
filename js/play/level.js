@@ -11,7 +11,7 @@ let lvQueue=null; // 작업 중에 레벨이 오르면, 작업이 끝난 뒤에 
 
 function sweat(n){
   const before=myLv();S.xp=(S.xp||0)+n;const after=myLv();tire(n); // 일하면 든든함이 조금 줄어요 (play/meal.js)
-  if(after>before){lvQueue=after;if(!W)showLevelUp()}
+  if(after>before){lvQueue=after;if(!W&&!FS)showLevelUp()} // 낚시 중엔 끝난 뒤에 (끌어올리는 중에 창이 떠서 막혔어요)
 }
 function showLevelUp(){
   const a=lvQueue;lvQueue=null;if(a==null)return;const L=LEVELS[a];
