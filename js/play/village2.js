@@ -55,16 +55,32 @@ function fireCrowdApply(){if(mode!=="school"||!me)return;
       p.g.rotation.y=Math.atan2(FIRE.x-p.g.position.x,FIRE.z-p.g.position.z);if(k%3)p.label.visible=false;school.add(p.g);return p});
   const on=fireBase()>0;fireCrowd.forEach(p=>p.g.visible=on)}
 function fireBase(){return (skyNow.night||0)>0.35?0.35:0} // 밤엔 마을 사람들이 늘 지펴 둬요
-function fireOwn(){const f=S.fire;if(!f)return 0;return Math.max(0,f.lv-(Date.now()-f.t)/FIRE.decay*0.1)}
+// 비 오는 날 (2026-11-14): 마을 사람들이 천막을 쳐 줘서 불은 계속 타요. 대신 조금 약하고 장작이 두 배 빨리 사그라들어요.
+// 큰비·태풍이 오는 동안엔 천막도 걷고 불을 꺼요. 눈 오는 밤은 그대로 활활
+const fireRain=()=>weather.kind==="비";
+const fireStorm=()=>{const e=typeof stormActive==="function"&&stormActive();return !!(e&&e.kind!=="frost")};
+function fireOwn(){const f=S.fire;if(!f)return 0;return Math.max(0,f.lv-(Date.now()-f.t)/FIRE.decay*0.1*(fireRain()?2:1))}
 // 낮엔 운동장을 아이들이 써서 모닥불을 치워 둬요 (play/village4.js 의 schoolDay)
-const fireLv=()=>typeof schoolDay==="function"&&schoolDay()?0:Math.min(1,Math.max(fireBase(),fireOwn()));
-function addFireWood(who){if(!who){if(!((S.inv.jangjak||0)>0)){toast("장작이 없어요. 모탕에서 패 오거나 목공소에서 한 짐 사 와요");return false}S.inv.jangjak--}
+const fireLv=()=>(typeof schoolDay==="function"&&schoolDay())||fireStorm()?0:Math.min(1,Math.max(fireBase(),fireOwn()))*(fireRain()?0.8:1);
+function addFireWood(who){if(fireStorm()){if(!who)toast("오늘은 비바람이 너무 세서 모닥불은 쉬어요. 그치면 다시 피워요");return false}if(!who){if(!((S.inv.jangjak||0)>0)){toast("장작이 없어요. 모탕에서 패 오거나 목공소에서 한 짐 사 와요");return false}S.inv.jangjak--}
   S.fire={lv:Math.min(1,Math.max(fireOwn(),fireBase())+0.35),t:Date.now()};save();refresh();burst(0.5,700,0.16);burst(0.12,3000,0.06,0.15);
   toast(who?josa(who,"이","가")+" 모닥불에 장작을 보탰어요. 불길이 확!":pickOne(["장작을 넣으니 불길이 하늘 높이 솟아요","타닥타닥, 불꽃이 별까지 튀어 올라요","불이 커졌어요. 운동장이 환해요"]));
   if(SIT&&SIT.id&&SIT.id.startsWith("fireLog"))renderFreeSit();return true}
+// 비 오는 날 모닥불 천막: 기둥 넷(안쪽·바깥 통나무 사이, 대각선)과 네모 지붕, 끝에서 똑똑 떨어지는 빗물
+const fireTent=new THREE.Group();fireTent.visible=false;fireG.add(fireTent);const tentDrips=[];
+(function(){const P=3.7,H=4.4;
+  [[-1,-1],[1,-1],[1,1],[-1,1]].forEach(([a,b])=>fireTent.add(cyl(0.07,0.08,H,0x6b4a2e,a*P,H/2,b*P,6)));
+  // 박공 지붕 두 쪽 (가운데 마룻대 위로 연기가 빠져요)
+  const th=0.33,half=P+0.9,L=half/Math.cos(th),rm=new THREE.MeshLambertMaterial({color:0xc9b48a});
+  [-1,1].forEach(sd=>{const r=new THREE.Mesh(new THREE.BoxGeometry(2*P+1.8,0.06,L),rm);r.rotation.x=sd*th;r.position.set(0,H+half*Math.tan(th)/2,sd*half/2);r.castShadow=true;fireTent.add(r)});
+  {const rg=cyl(0.06,0.06,2*P+1.8,0x6b4a2e,0,H+half*Math.tan(th)+0.03,0,6);rg.rotation.z=Math.PI/2;fireTent.add(rg)}
+  const dm=new THREE.MeshBasicMaterial({color:0xc4d6e8,transparent:true,opacity:0.7});
+  for(let i=0;i<16;i++){const d=new THREE.Mesh(new THREE.BoxGeometry(0.025,0.16,0.025),dm),a=i/16*TAU;d.userData={x:(i%8/7*2-1)*(P+0.8),z:(i<8?-1:1)*(P+0.85),ph:Math.random()};fireTent.add(d);tentDrips.push(d)}})();
+function tentFrame(now){const on=fireRain()&&!fireStorm()&&!(typeof schoolDay==="function"&&schoolDay());fireTent.visible=on;if(!on)return;
+  tentDrips.forEach(d=>{const u=(now/700+d.userData.ph)%1;d.position.set(d.userData.x,4.6-u*4.6,d.userData.z);d.visible=u<0.95})}
 const FIRE_NOTES=["불꽃이 춤을 춰요. 아무 생각이 안 나요","장작 속이 빨갛게 숨을 쉬어요","연기 냄새가 옷에 배어요. 싫지 않아요","불티가 별 사이로 날아가요","손을 쬐니 손바닥이 따끈해요","건너편 사람들 웃음소리가 들려요"];
 function firePanel(){const lv=fireLv(),n=S.inv.jangjak||0,warm=lv>=0.2;
-  return `<div class="item"><div>모닥불 ${lv>0.7?"활활":lv>0.3?"잔잔하게":lv>0?"사그라드는 중":"불씨만 남았어요"}<small>${warm?"곁에 앉아 있으면 덜 지쳐요 (땀 흘려도 든든함·물이 반만 줄어요)":"해가 지면 마을 사람들이 불을 지펴요 · 장작을 넣으면 지금도 피워요"} · 가진 장작 ${n}개</small></div><button class="go" id="fireWood" ${n?"":"disabled"}>장작 넣기</button></div><p class="hint">${pickOne(FIRE_NOTES)}</p>`}
+  return `<div class="item"><div>모닥불 ${lv>0.7?"활활":lv>0.3?"잔잔하게":lv>0?"사그라드는 중":"불씨만 남았어요"}<small>${fireStorm()?"비바람이 세서 오늘은 불을 껐어요 · ":fireRain()?"비가 와서 마을 사람들이 천막을 쳐 줬어요 · 장작이 두 배 빨리 사그라들어요 · ":""}${warm?"곁에 앉아 있으면 덜 지쳐요 (땀 흘려도 든든함·물이 반만 줄어요)":"해가 지면 마을 사람들이 불을 지펴요 · 장작을 넣으면 지금도 피워요"} · 가진 장작 ${n}개</small></div><button class="go" id="fireWood" ${n?"":"disabled"}>장작 넣기</button></div><p class="hint">${pickOne(FIRE_NOTES)}</p>`}
 function fireBind(){if($("fireWood"))$("fireWood").onclick=()=>addFireWood()}
 let fireNpcT=0;
 function fireFrame(dt,now){const lv=fireLv(),n=skyNow.night||0;
@@ -219,7 +235,7 @@ function openKimjang(){if(!kjSeason()){toast("다음 마을 행사는 준비 중
     save();sfx("level");closeSheet();toast(`마을 김장 잔치! 김장김치 ${n}접시를 찬장에 넣어 뒀어요 · 이웃 모두와 정 +1`)}}
 
 /* ---------- 매 순간 ---------- */
-function village2Frame(dt,now){fireFrame(dt,now);
+function village2Frame(dt,now){fireFrame(dt,now);tentFrame(now);
   if(mode==="hall")wishG.children.forEach(g=>g.rotation.z=Math.sin(now/700+g.userData.ph)*0.25);
   flowerT+=dt;if(flowerT>5){flowerT=0;if(mode==="plaza"||mode==="stream"){const k=Object.values(S.flowers||{}).filter(f=>Date.now()-f.t>=FLOWER_GROW).length;if(k!==village2Frame.bloomN){village2Frame.bloomN=k;drawFlowers()}}}
   if(mode==="hall")kjApply()}
