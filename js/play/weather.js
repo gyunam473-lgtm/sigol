@@ -140,4 +140,11 @@ function openTimePick(){const t=sunTimes(new Date()),cur=hourNow();
 
 // 휴대폰 맨 위(시계·배터리 줄)와 바탕색을 지금 하늘색에 맞춰요 (2026-11-14: 비 오는 밤인데 위 줄만 하늘색이라 띠처럼 보였어요)
 let _topHex="";
-function syncTopColor(c){const h="#"+c.getHexString();if(h===_topHex)return;_topHex=h;const m=document.querySelector("meta[name=theme-color]");if(m)m.setAttribute("content",h);document.documentElement.style.background=h;document.body.style.background=h}
+// 2026-11-14 폰 맨 위(시계 줄) 색: 하늘색을 칠했더니 카메라가 땅을 내려다볼 땐 화면 위쪽(나무·땅)과 달라 띠처럼 보였어요
+// → 그려진 화면 맨 위 줄 색을 1초마다 재서 그 색으로 (화면이 위로 이어져 보여요). 홈 화면에 추가하면 게임이 시계 줄 밑까지 그려져요(black-translucent)
+const _topPx=new Uint8Array(4);let _topT=0;
+function topColorFrame(now){if(now-_topT<1000)return;_topT=now;try{const gl=renderer.getContext(),W=gl.drawingBufferWidth,H=gl.drawingBufferHeight;let r=0,g=0,b=0;
+  [0.15,0.5,0.85].forEach(f=>{gl.readPixels(Math.floor(W*f),H-2,1,1,gl.RGBA,gl.UNSIGNED_BYTE,_topPx);r+=_topPx[0];g+=_topPx[1];b+=_topPx[2]});
+  _topAuto=true;syncTopColor(new THREE.Color(r/765,g/765,b/765),true)}catch(e){}}
+let _topAuto=false;
+function syncTopColor(c,auto){if(_topAuto&&!auto)return;const h="#"+c.getHexString();if(h===_topHex)return;_topHex=h;const m=document.querySelector("meta[name=theme-color]");if(m)m.setAttribute("content",h);document.documentElement.style.background=h;document.body.style.background=h}

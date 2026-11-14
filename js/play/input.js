@@ -78,6 +78,8 @@ function fieldRoute(p,t){
   if(mode==="dabang"){ // 다방: 소파 칸 사이 통로를 따라 앞쪽 넓은 곳으로 돌아가요
     const ax=x=>DABANG_AISLES.reduce((a,b)=>Math.abs(b-x)<Math.abs(a-x)?b:a),F=0.8;
     const fr=q=>q[1]>F-0.2,A=ax(p[0]),B=ax(t[0]);if(fr(p)&&fr(t))return [t];
+    // 계산대 앞 통로(소파 칸 오른쪽)나 같은 통로 안에선 앞으로 돌지 않고 곧장 (2026-11-14)
+    if(Math.min(p[0],t[0])>4.4||(A===B&&Math.abs(p[0]-A)<0.7&&Math.abs(t[0]-A)<0.7))return [t];
     return [...(fr(p)?[]:[[A,p[1]],[A,F]]),...(fr(t)?[t]:[[B,F],[B,t[1]],t])]} // 앞쪽 넓은 곳에선 곧장
   if(PLACES[mode])return [t];
   const F=fieldBox(),a=inField(p[0],p[1],F),b=inField(t[0],t[1],F),G=[FIELD.x,F.z1+0.9],IN=[FIELD.x,F.z1-0.9];

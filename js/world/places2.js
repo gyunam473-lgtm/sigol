@@ -11,6 +11,7 @@ const dabang=placeGroup();
 const DB={x0:-12,x1:12,z0:-13,z1:4,H:3.4};
 const DABANG_BOOTHS=[];[-10.4,-6.4,-2.4].forEach(z=>[-9,-5,-1,3].forEach(x=>DABANG_BOOTHS.push([x,z])));
 const DABANG_AISLES=[-11,-7,-3,1,5.6]; // 세로 통로 (input.js)
+const DB_COUNTER=[]; // 계산대·뒤 찬장 (누르면 사장님과 이야기)
 const DABANG_BAR=[-10.8,-9.4,-8,-6.6,-5.2]; // 계산대 앞 높은 의자 (z)
 const dabangLights=[],dabangWinMat=new THREE.MeshLambertMaterial({color:0xf2ead2,emissive:0x000000});
 let dabangDoor;
@@ -52,12 +53,13 @@ let dabangDoor;
   });
   [-7,-1,5].forEach(x=>[-8.4,-3.4].forEach(z=>{const l=new THREE.PointLight(0xffc890,0.5,10,1.4);l.position.set(x,2.7,z);dabang.add(l);dabangLights.push(l)}));
   // 계산대 (오른쪽 안쪽, 길게)와 높은 의자, 찻잔, 전화기, 금전등록기
-  dabang.add(box(0.8,1.05,7.2,0x6b4a2e,9.2,0.52,-8));dabang.add(box(0.95,0.06,7.3,0x8a5a32,9.2,1.07,-8));
+  // 2026-11-14 계산대·찬장을 눌러도 사장님과 이야기 (전엔 계산대 너머 바닥이 눌려서 계산대 뒤로 빙 돌아갔어요)
+  {const c1=box(0.8,1.05,7.2,0x6b4a2e,9.2,0.52,-8),c2=box(0.95,0.06,7.3,0x8a5a32,9.2,1.07,-8);[c1,c2].forEach(c=>{c.userData={kind:"shop",shop:"dabang"};dabang.add(c);DB_COUNTER.push(c)})}
   dabang.add(box(0.22,0.1,0.18,0xd8312a,9.3,1.15,-4.9));dabang.add(box(0.36,0.22,0.3,0x8a8a8a,9.3,1.2,-11.2));
   for(let i=0;i<8;i++)dabang.add(cyl(0.05,0.04,0.09,0xf2f0ea,9.4,1.14,-10.4+i*0.22,10));
   DABANG_BAR.forEach((z,i)=>{const s=new THREE.Group();s.userData={kind:"seat",seat:"dbar"+i};s.add(cyl(0.24,0.22,0.1,0xa8282a,0,0.72,0,14));s.add(cyl(0.04,0.04,0.68,0x9a9a9a,0,0.34,0,6));s.add(cyl(0.2,0.22,0.03,0x8a8a8a,0,0.02,0,12));
     s.position.set(8.25,0,z);dabang.add(s)});
-  dabang.add(box(0.3,1.8,6,0x5a3420,11.75,0.9,-8));for(let i=0;i<10;i++)dabang.add(cyl(0.06,0.06,0.25,[0x8a3a2a,0x3a6a3a,0xd8a33a][i%3],11.7,1.95+Math.floor(i/5)*0.32,-10.4+(i%5)*1.0,8)); // 뒤 찬장, 병
+  {const cb=box(0.3,1.8,6,0x5a3420,11.75,0.9,-8);cb.userData={kind:"shop",shop:"dabang"};dabang.add(cb);DB_COUNTER.push(cb)}for(let i=0;i<10;i++)dabang.add(cyl(0.06,0.06,0.25,[0x8a3a2a,0x3a6a3a,0xd8a33a][i%3],11.7,1.95+Math.floor(i/5)*0.32,-10.4+(i%5)*1.0,8)); // 뒤 찬장, 병
   // 연탄 난로와 주전자, 연통 (앞 왼쪽)
   dabang.add(cyl(0.32,0.36,0.75,0x3a3836,-11,0.38,1.6,14));dabang.add(cyl(0.13,0.17,0.2,0x9a9a9a,-11,0.85,1.6,12));dabang.add(cyl(0.06,0.06,2.6,0x6a6a6a,-11,2.05,1.6,8));
   // 어항 (뒷벽 앞, 금붕어)
@@ -84,7 +86,7 @@ DABANG_BOOTHS.forEach(([bx,bz],i)=>[-1,1].forEach(d=>{const id="dabang"+i+(d<0?"
 // 계산대 앞 높은 의자: 사장님이랑 이야기하며 마셔요
 DABANG_BAR.forEach((z,i)=>FREE_SEATS["dbar"+i]={title:"계산대 앞 의자",where:"dabang",dabang:true,note:["사장님이 커피 타는 모습이 보여요","찻잔 부딪는 소리가 정겨워요","사장님: \"오늘은 뭘로 줄까?\"","전화벨이 따르릉. 다방은 늘 바빠요","뒤 찬장에 병들이 반짝반짝"][i],
   get:()=>({pos:[8.25,0.77,z],face:Math.PI/2,stand:[7.2,z],cam:[2.4,2.0,-2.7],look:[0,0.6,1.0],cupAt:[8.95,1.12,z]})});
-SHOPS.dabang={name:"다방 사장님",role:"차 내려 드려요",shirt:0xc84a6a,o:{hat:false,hair:0x2a1a14,apron:0xf2ead6,style:"shop"},place:"dabang",spot:[10.4,-8,-Math.PI/2],stand:[7.2,-7.3]};
+SHOPS.dabang={name:"다방 사장님",role:"차 내려 드려요",shirt:0xc84a6a,o:{hat:false,hair:0x2a1a14,apron:0xf2ead6,style:"shop"},place:"dabang",spot:[10.4,-8,-Math.PI/2],get stand(){const z=me?Math.max(-11.2,Math.min(-4.8,me.g.position.z)):-7.3;return [7.2,z]}}; // 계산대 앞 아무 데서나 (내가 있는 줄에서 가장 가까운 자리)
 
 /* ---------- 뒷산 (진짜 언덕) ----------
    땅이 높낮이가 있는 산이에요(sanH). 입구는 평평하고, 구불구불 산길을 따라 오르면 꼭대기(높이 9)에 정자가 있어요.
@@ -129,7 +131,7 @@ FREE_SEATS.sanRock={title:"전망 바위",where:"dwitsan",note:"능선 바위에
 // 공용 장소에 더하기
 PLACES.dabang={g:dabang,name:"다방",sub:"실내 · 소파 24자리 + 계산대 앞 5자리 · 쌍화차 한 잔 · 쉬어 가는 곳",indoor:true,
   hint:"소파나 계산대 앞 의자를 누르면 앉아서 차를 시켜요. 앞 유리문을 누르면 나가요.",way:[[-9,1.2],[-5,2.6],[-1,1],[3,2.8],[7,1.4],[10,2.6],[6,-6],[6,-10]],
-  clicks:()=>[...dabang.children.filter(c=>c.userData.kind==="seat"),dabangDoor,...dabang.children.filter(c=>c.userData.kind==="dabangfloor")],
+  clicks:()=>[...dabang.children.filter(c=>c.userData.kind==="seat"),dabangDoor,...DB_COUNTER,...dabang.children.filter(c=>c.userData.kind==="dabangfloor")],
   obs:()=>{const R=[[DB.x0-3,DB.z0-3,DB.x0,DB.z1+3],[DB.x1,DB.z0-3,DB.x1+3,DB.z1+3],[DB.x0-3,DB.z0-3,DB.x1+3,DB.z0],
     [DB.x0,DB.z1-0.1,-1.2,DB.z1+3],[1.2,DB.z1-0.1,DB.x1,DB.z1+3],[-1.2,DB.z1+1.2,1.2,DB.z1+3], // 앞 낮은 벽, 문 밖
     [8.7,-11.7,9.7,-4.3],[11.4,-11.2,12,-4.8],[-11.5,1.1,-10.5,2.1],[-7.8,-13,-6.2,-12.2],[11,-2.3,12,1.1],[-11.7,2.9,-10.9,3.7],[10.9,2.9,11.7,3.7],[6.6,-12.9,7.4,-12.1]];

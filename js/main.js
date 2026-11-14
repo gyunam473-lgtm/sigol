@@ -77,7 +77,7 @@ function loop(now){
   markers.forEach((m,i)=>m.position.y=m.userData.y+Math.sin(now/320+i)*0.08); // 가게 주인 말풍선
   fitFov();
   loop.n=(loop.n||0)+1;if(loop.n%2===0)renderer.shadowMap.needsUpdate=true;
-  renderer.render(scene,camera);
+  renderer.render(scene,camera);topColorFrame(now);
   if(me&&!loop.shown){loop.shown=true;$("loading").classList.add("done")}
   requestAnimationFrame(loop)}
 camera.position.set(0,12,24);camera.lookAt(0,0,4);
