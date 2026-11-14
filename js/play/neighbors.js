@@ -47,6 +47,6 @@ function openGift(){
   Object.keys(ITEMS).filter(k=>!ITEMS[k].sea||S.inv[k]>0).forEach(k=>{h+=`<div class="item"><div>${ITEMS[k].name}<small>가진 것 ${S.inv[k]}개</small></div><button class="go" data-gift="${k}" ${S.inv[k]?"":"disabled"}>선물하기</button></div>`});
   openSheet(h);
   if(S.hold)$("giveHold").onclick=()=>giveHold(n);
-  sheet.querySelectorAll("[data-gift]").forEach(b=>b.onclick=()=>{const k=b.dataset.gift;S.inv[k]--;const back=Object.keys(CROPS)[Math.floor(Math.random()*4)];S.seeds[back]++;
+  sheet.querySelectorAll("[data-gift]").forEach(b=>b.onclick=()=>{const k=b.dataset.gift;S.inv[k]--;const back=(()=>{const L=sowCrops();return L[Math.floor(Math.random()*L.length)]})();S.seeds[back]++;
     closeSheet();toast(josa(n.name,"이","가")+" 답례로 "+CROPS[back].name+" 씨앗을 줬어요");save();refresh()});
 }

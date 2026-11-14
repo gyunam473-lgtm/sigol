@@ -21,11 +21,12 @@ function usePlot(i){
 
 // 빈 밭을 누르면: 무엇을 심을지 고르고 → 손동작으로 심어요
 function openSeedPick(i){
-  const ks=Object.keys(CROPS),any=ks.some(k=>S.seeds[k]>0);
-  let h=`<h2>무엇을 심을까요?</h2><div class="goods">`;
-  ks.forEach(k=>{const c=CROPS[k],n=S.seeds[k]||0;
-    h+=`<div class="good ${n?"":"lack"}"><div class="gname">${c.name}<small>씨앗 ${n}봉지 · ${c.grow}초면 자라요(초안) · 거두면 ${c.yield}개쯤, 하나에 ${c.price}원</small></div><div class="gbtn"><button class="go" data-plant="${k}" ${n?"":"disabled"}>${n?"심기":"씨앗 없음"}</button></div></div>`});
-  h+=`</div><p class="hint">${any?"고르면 밭 갈기부터 손으로 해요.":"씨앗이 하나도 없어요."} 씨앗은 장터 씨앗가게 할아버지한테 사요.</p>`;
+  // 2026-11-14 철마다 심는 게 달라요: 이번 철 작물(가진 씨앗 먼저) → 씨앗은 있지만 철이 아닌 것(흐리게)
+  const se=SEASON_NAME[seasonOf(new Date())],now=sowCrops().sort((a,b)=>(S.seeds[b]>0)-(S.seeds[a]>0)),later=Object.keys(CROPS).filter(k=>!sowNow(k)&&S.seeds[k]>0),any=now.some(k=>S.seeds[k]>0);
+  const row=(k,ok)=>{const c=CROPS[k],n=S.seeds[k]||0;return `<div class="good ${n&&ok?"":"lack"}"><div class="gname">${c.name}<small>${ok?"씨앗 "+n+"봉지 · "+c.grow+"초면 자라요(초안) · 거두면 "+c.yield+"개쯤, 하나에 "+c.price+"원":"씨앗 "+n+"봉지 · "+sowText(k)+"에 심어요"}</small></div><div class="gbtn"><button class="go" data-plant="${k}" ${n&&ok?"":"disabled"}>${!ok?sowText(k)+"에":n?"심기":"씨앗 없음"}</button></div></div>`};
+  let h=`<h2>무엇을 심을까요?</h2><p class="hint">지금은 <b>${se}</b>이에요. 철에 맞는 걸 심어요</p><div class="goods">${now.map(k=>row(k,true)).join("")}</div>`;
+  if(later.length)h+=`<h3>철이 아니라 기다려요</h3><div class="goods">${later.map(k=>row(k,false)).join("")}</div>`;
+  h+=`<p class="hint">${any?"고르면 밭 갈기부터 손으로 해요.":"이번 철 씨앗이 없어요."} 씨앗은 장터 씨앗가게 할아버지한테 사요.</p>`;
   openSheet(h);sheet.classList.add("seedpick");
   sheet.querySelectorAll("[data-plant]").forEach(b=>b.onclick=()=>{S.sel=b.dataset.plant;closeSheet();startWork(i,"plant")});
 }

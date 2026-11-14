@@ -49,7 +49,8 @@ function openShop(k,line){if(SHOPS[k].open)return SHOPS[k].open(line);
   if(k==="dabang"){toast("다방 사장님: \""+pickOne(["어서 와요~ 아무 데나 편히 앉아요","쌍화차에 노른자 동동 띄워 줄까?","소파에 앉으면 차 갖다줄게"])+"\"");sfx("pop");return}
   const hello=line||pickOne(SHOP_HELLO[k]);let b='<div class="goods">';
   if(k==="veg"||k==="egg"){
-    const list=k==="veg"?Object.keys(CROPS).concat(Object.keys(ITEMS).filter(i=>(ITEMS[i].grade||ITEMS[i].snack||i==="gam")&&S.inv[i]>0)):["egg"];
+    const list=k==="veg"?Object.keys(CROPS).filter(i=>S.inv[i]>0).concat(Object.keys(ITEMS).filter(i=>(ITEMS[i].grade||ITEMS[i].snack||i==="gam")&&S.inv[i]>0)):["egg"];
+    if(k==="veg"&&!list.length)b+=`<p class="hint">팔 채소가 없어요. 밭에서 거둬 오면 사 줄게요</p>`;
     list.forEach(i=>{const n=S.inv[i]||0;b+=goods(ITEMS[i].name,`가진 것 ${n}개 · 하나에 ${ITEMS[i].price}원`,`<button class="go" data-sell="${i}" ${n?"":"disabled"}>1개 팔기</button><button data-sellall="${i}" ${n>1?"":"disabled"}>다 팔기</button>`)});
     if(k==="veg"){const fo=Object.keys(FORAGE).filter(i=>S.inv[i]>0);if(fo.length){b+='</div><h3>뒷산에서 캔 것도 사 줘요</h3><div class="goods">';
       fo.forEach(i=>{const n=S.inv[i];b+=goods(FORAGE[i].name,`가진 것 ${n}개 · 하나에 ${FORAGE[i].sell.toLocaleString()}원`,`<button class="go" data-sell="${i}">1개 팔기</button><button data-sellall="${i}" ${n>1?"":"disabled"}>다 팔기</button>`)})}}
@@ -60,8 +61,10 @@ function openShop(k,line){if(SHOPS[k].open)return SHOPS[k].open(line);
   }
   if(k==="seed"){
     b+=goods("모 한 판",`${RICE.moPrice}원 · 논에 심는 어린 벼 · 가진 것 ${S.inv.mo||0}판`,`<button class="go" data-mo="1" ${S.money>=RICE.moPrice?"":"disabled"}>사기</button>`);
-    Object.keys(CROPS).forEach(i=>{const c=CROPS[i];b+=goods(c.name+" 씨앗",`${c.seed}원 · ${c.grow}초면 자라요(초안) · 가진 것 ${S.seeds[i]}`,`<button class="go" data-buy="${i}" ${S.money>=c.seed?"":"disabled"}>사기</button>`)});
-    b+="</div>";
+    const sb=i=>{const c=CROPS[i];return goods(c.name+" 씨앗",`${c.seed}원 · ${c.desc||""} · ${c.grow}초(초안) · 가진 것 ${S.seeds[i]}`,`<button class="go" data-buy="${i}" ${S.money>=c.seed?"":"disabled"}>사기</button>`)};
+    b+=sowCrops().map(sb).join("")+"</div>";
+    const other=Object.keys(CROPS).filter(i=>!sowNow(i));
+    if(other.length)b+=`<details class="otherseed"><summary>다른 철 씨앗 ${other.length}가지 · 미리 사 둘 수 있어요(그 철에 심어요)</summary><div class="goods">${other.map(i=>{const c=CROPS[i];return goods(c.name+" 씨앗",`${c.seed}원 · ${sowText(i)}에 심어요 · 가진 것 ${S.seeds[i]}`,`<button data-buy="${i}" ${S.money>=c.seed?"":"disabled"}>사기</button>`)}).join("")}</div></details>`;
   }
   b+=`<p class="hint">생선 트럭, 정육점, 우시장도 날마다 열려요</p>`;
   shopSheet(k,hello,b);

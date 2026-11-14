@@ -72,7 +72,7 @@ function stashHold(){if(S.hold&&mode==="home")putDownHome(true)}
 function giveHold(n){
   const id=S.hold;if(!id)return;setHold(null);
   S.jeong=S.jeong||{};S.jeong[n.name]=(S.jeong[n.name]||0)+2;
-  const a=Object.keys(CROPS)[Math.floor(Math.random()*4)],b=Object.keys(CROPS)[Math.floor(Math.random()*4)];S.seeds[a]++;S.seeds[b]++;
+  const a=(()=>{const L=sowCrops();return L[Math.floor(Math.random()*L.length)]})(),b=(()=>{const L=sowCrops();return L[Math.floor(Math.random()*L.length)]})();S.seeds[a]++;S.seeds[b]++;
   sweat(1);save();refresh();closeSheet();
   const say={"옆집 할머니":"아이고, 이걸 다 해 왔어? 잘 먹을게. 손맛이 좋네","이장님":"허허, 자네 솜씨가 늘었구먼. 고맙네","귀농 2년차":"와, 저 이거 진짜 좋아해요! 감사합니다"}[n.name]||"잘 먹을게요!";
   toast(n.name+": "+say+" · 답례로 "+CROPS[a].name+"·"+CROPS[b].name+" 씨앗");

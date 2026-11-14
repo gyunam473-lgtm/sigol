@@ -1,13 +1,41 @@
 /* 게임 숫자와 정보: 작물, 요리, 살림 늘리기 값, 예시 이웃, 절기, 날씨 종류. 값을 바꾸고 싶으면 대부분 여기만 고치면 돼요. */
 
 // 초안이라 시간이 빨라요. 실제 버전에선 작물은 몇 시간~며칠, 달걀은 하루 한 번
+// sow: 심을 수 있는 철 (0 봄 3~5월 · 1 여름 6~8월 · 2 가을 9~11월 · 3 겨울 12~2월, 실제 날짜 기준) · hardy: 서리에 안 죽어요(겨울 작물)
+// 2026-11-14 철마다 심는 작물로 크게 늘림 (5 → 28가지). 거두기는 철과 상관없이 언제든
 const CROPS={
-  lettuce:{name:"상추",grow:30,yield:2,price:100,seed:50},
-  potato:{name:"감자",grow:45,yield:3,price:120,seed:70},
-  tomato:{name:"토마토",grow:60,yield:3,price:180,seed:90},
-  cabbage:{name:"배추",grow:90,yield:2,price:250,seed:120},
-  goguma:{name:"고구마",grow:75,yield:4,price:160,seed:90}}; // 고구마: 줄기 밑을 호미로 캐요
-const ROOT_CROPS=["potato","goguma"]; // 땅속 작물: 거둘 땐 호미로 캐고 → 하나씩 주워요
+  lettuce:{name:"상추",grow:30,yield:2,price:100,seed:50,sow:[0,2],desc:"쌈 싸 먹는 잎채소. 봄·가을"},
+  potato:{name:"감자",grow:45,yield:3,price:120,seed:70,sow:[0,1],desc:"씨감자를 묻어요. 하지 무렵 캐요"},
+  tomato:{name:"토마토",grow:60,yield:3,price:180,seed:90,sow:[0,1],desc:"지주대 타고 빨갛게"},
+  cabbage:{name:"배추",grow:90,yield:2,price:250,seed:120,sow:[1,2],desc:"늦여름에 심어 김장 배추로"},
+  goguma:{name:"고구마",grow:75,yield:4,price:160,seed:90,sow:[0,1],desc:"순을 꽂아 키워요. 가을에 캐요"},
+  gochu:{name:"고추",grow:80,yield:4,price:170,seed:100,sow:[0,1],desc:"모종을 심어 여름내 빨갛게"},
+  oi:{name:"오이",grow:50,yield:3,price:130,seed:60,sow:[0,1],desc:"덩굴 타고 주렁주렁"},
+  gaji:{name:"가지",grow:60,yield:3,price:150,seed:80,sow:[0,1],desc:"보랏빛 반들반들"},
+  hobak:{name:"애호박",grow:65,yield:2,price:220,seed:90,sow:[0,1],desc:"넓은 잎 아래 동글동글"},
+  oksusu:{name:"옥수수",grow:85,yield:3,price:200,seed:100,sow:[0,1],desc:"키가 훌쩍, 수염이 나면 다 익어요"},
+  kong:{name:"콩",grow:70,yield:4,price:140,seed:70,sow:[1],desc:"꼬투리 속 콩알. 콩고물·두부 재료"},
+  yeolmu:{name:"열무",grow:25,yield:2,price:90,seed:40,sow:[0,1,2],desc:"금방 자라요. 열무김치·비빔밥"},
+  kkaennip:{name:"깻잎",grow:40,yield:3,price:110,seed:50,sow:[0,1],desc:"향긋한 들깻잎"},
+  ssukgat:{name:"쑥갓",grow:30,yield:2,price:100,seed:45,sow:[0,2],desc:"매운탕에 한 줌"},
+  chamoe:{name:"참외",grow:90,yield:2,price:380,seed:150,sow:[0],desc:"노란 줄무늬, 아삭 달콤"},
+  subak:{name:"수박",grow:120,yield:1,price:900,seed:200,sow:[0,1],desc:"여름 원두막의 주인공"},
+  ttalgi:{name:"딸기",grow:100,yield:4,price:260,seed:150,sow:[0],desc:"봄볕에 새빨갛게"},
+  deulkkae:{name:"들깨",grow:90,yield:4,price:160,seed:70,sow:[1],desc:"깨를 털어 들기름"},
+  danggeun:{name:"당근",grow:70,yield:3,price:150,seed:70,sow:[1,2],desc:"쏙 뽑으면 주황빛"},
+  mu:{name:"무",grow:70,yield:2,price:200,seed:80,sow:[1,2],desc:"깍두기·뭇국 · 김장 무"},
+  daepa:{name:"대파",grow:55,yield:3,price:120,seed:60,sow:[0,2],desc:"국에도 볶음에도"},
+  jjokpa:{name:"쪽파",grow:35,yield:3,price:100,seed:50,sow:[2],desc:"파김치·파전"},
+  gat:{name:"갓",grow:45,yield:3,price:120,seed:60,sow:[2],desc:"톡 쏘는 갓김치"},
+  sigeumchi:{name:"시금치",grow:40,yield:3,price:110,seed:50,sow:[2,3],hardy:true,desc:"겨울을 나는 달큰한 섬초"},
+  bomdong:{name:"봄동",grow:50,yield:2,price:160,seed:70,sow:[3],hardy:true,desc:"납작 엎드려 겨울을 나는 배추"},
+  maneul:{name:"마늘",grow:110,yield:5,price:150,seed:100,sow:[2,3],hardy:true,desc:"가을에 심어 겨울을 나요"},
+  yangpa:{name:"양파",grow:100,yield:4,price:140,seed:90,sow:[2,3],hardy:true,desc:"겨울을 나고 동그랗게"},
+  bori:{name:"보리",grow:95,yield:4,price:130,seed:60,sow:[2,3],hardy:true,desc:"겨울 들판의 초록 · 보리밥"}};
+const sowNow=k=>CROPS[k].sow.includes(seasonOf(new Date())); // 지금 심을 수 있나 (실제 날짜)
+const sowCrops=()=>Object.keys(CROPS).filter(sowNow); // 이번 철에 심는 것
+const sowText=k=>CROPS[k].sow.map(i=>SEASON_NAME[i]).join("·");
+const ROOT_CROPS=["potato","goguma","danggeun","mu","maneul","yangpa"]; // 땅속 작물: 거둘 땐 호미로 캐고 → 하나씩 주워요
 // 해산물: 우리 마을은 논농사 짓는 내륙이라 바다 것은 생선 트럭이 날마다 싣고 와요.
 // 철마다 들어오는 게 달라요. 멀리서 오니까 값이 비싸고, 되팔 순 없어요(sea:true).
 const SEA={
@@ -85,7 +113,7 @@ const FISH_LV=[{name:"초보 낚시꾼",xp:0},{name:"동네 낚시꾼",xp:25},{n
 const ITEMS=Object.assign({},CROPS,Object.fromEntries(Object.entries(FORAGE).map(([k,v])=>[k,{name:v.name,price:v.sell,forage:true}])),Object.fromEntries(Object.entries(FRESH).map(([k,v])=>[k,{name:v.name,price:0,fresh:true}])),{egg:{name:"달걀",price:60}},STUFF,{makgeolli:{name:"막걸리 한 병",price:0,stuff:true}},
   Object.fromEntries(Object.entries(MEAT).map(([k,v])=>[k,{name:v.name,price:0,meat:true}])),Object.fromEntries(Object.entries(SEA).map(([k,v])=>[k,{name:v.name,price:0,sea:true}])));
 /* ---------- 밭 품질 (2026-11-10): 잘 돌볼수록 특상(값 2배)이 많이, 아주 가끔 왕(값 8배) ---------- */
-const KING_KG={lettuce:[0.8,1.6],potato:[1.2,2.6],tomato:[0.6,1.2],cabbage:[5,9],goguma:[1.0,2.2]}; // 왕 작물 무게 (kg)
+const KING_KG={lettuce:[0.8,1.6],potato:[1.2,2.6],tomato:[0.6,1.2],cabbage:[5,9],goguma:[1.0,2.2],gochu:[0.1,0.25],oi:[0.8,1.6],gaji:[0.5,1.1],hobak:[2,5],oksusu:[0.6,1.2],kong:[0.3,0.6],yeolmu:[0.6,1.2],kkaennip:[0.1,0.2],ssukgat:[0.3,0.6],chamoe:[1,2],subak:[12,22],ttalgi:[0.06,0.12],deulkkae:[0.4,0.8],danggeun:[0.6,1.2],mu:[3,6],daepa:[0.6,1.2],jjokpa:[0.3,0.6],gat:[0.8,1.5],sigeumchi:[0.4,0.8],bomdong:[1,2],maneul:[0.15,0.3],yangpa:[0.6,1.2],bori:[0.5,1]}; // 왕 작물 무게 (kg)
 Object.keys(CROPS).forEach(k=>{ITEMS[k+"_top"]={name:"특상 "+CROPS[k].name,price:CROPS[k].price*2,grade:"top",base:k};ITEMS[k+"_king"]={name:"왕"+CROPS[k].name,price:CROPS[k].price*8,grade:"king",base:k}});
 /* ---------- 곤충 채집 (잠자리채): 냇가·분교·뒷산. season 0봄 1여름 2가을 3겨울, time day/night/any, sell 분교 선생님이 사 줘요 ---------- */
 const INSECTS={

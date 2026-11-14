@@ -53,7 +53,7 @@ function helpNbPlot(i){const n=visiting,p=nbPlots[i],acts=activeIssues(p);if(!ac
       S.pum=S.pum||{};const before=pumOf(n.name),got=Math.min(PUMASI.max,before+acts.length)-before;S.pum[n.name]=before+got;
       S.jeong=S.jeong||{};S.helped=S.helped||{};let extra="";
       if(S.helped[n.name]!==today){S.helped[n.name]=today;S.money+=PUMASI.pay;S.jeong[n.name]=(S.jeong[n.name]||0)+1;extra=` · 품삯 ${PUMASI.pay}원, 정 +1`;
-        if(Math.random()<0.4){const back=Object.keys(CROPS)[Math.floor(Math.random()*4)];S.seeds[back]++;extra+=` · 답례로 ${CROPS[back].name} 씨앗`}}
+        if(Math.random()<0.4){const back=(()=>{const L=sowCrops();return L[Math.floor(Math.random()*L.length)]})();S.seeds[back]++;extra+=` · 답례로 ${CROPS[back].name} 씨앗`}}
       drawPlot(i,true);
       endChore(`${n.name}네 ${CROPS[p.crop].name} 칸을 거들었어요!`+(got?` 품앗이 품 +${got} (지금 ${pumOf(n.name)})`:` (품은 이미 가득 · ${PUMASI.max})`)+extra+
         (nbNeeds()?"":` · ${n.name}: "${pickOne(["덕분에 한시름 놨네","나중에 자네 밭도 봐 줌세","역시 이웃이 최고여"])}"`))}});

@@ -10,6 +10,8 @@ while(S.plots.length<15)S.plots.push(null);
 if(S.coop&&!S.coopLv)S.coopLv=1; // 예전 저장: 닭장 있으면 1단계
 S.herd=S.herd||[];S.furn=S.furn||{};
 // 처음엔 장작 10개를 쌓아 두고 시작해요
+// 처음 시작하는 사람은 이번 철에 심는 씨앗으로 (2026-11-14 철 작물)
+if(!S.seedSeason){S.seedSeason=1;if(!S.lastSeen){const L=Object.keys(CROPS).filter(k=>CROPS[k].sow.includes(seasonOf(new Date())));S.seeds={};Object.keys(CROPS).forEach(k=>S.seeds[k]=0);L.slice(0,3).forEach((k,i)=>S.seeds[k]=[3,2,2][i])}}
 if(!S.woodInit){S.woodInit=1;S.inv.jangjak=(S.inv.jangjak||0)+10}
 S.reports=S.reports||[];S.skill=S.skill||{};S.fishDex=S.fishDex||{};S.forageDex=S.forageDex||{};
 // 망태 속 물고기 하나하나의 크기 (값이 크기 따라 달라요). 예전 저장은 보통 크기로 채워요

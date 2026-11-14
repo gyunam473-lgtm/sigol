@@ -40,9 +40,9 @@ $("skyHud").onclick=()=>standSky(true);
 $("fishBtn").onclick=()=>{if(mode!=="stream"||SIT||FS)return;const x=fishBankX(me.g.position.x);go(x,FISH_SPOT.z+0.6,{type:"fish",x});toast("물가로 가서 낚싯대를 펴요")};
 // 창고: 거둔 것, 달걀, 장날에 산 바다 것
 function openInv(){
-  const ks=Object.keys(ITEMS).filter(k=>S.inv[k]>0||CROPS[k]||k==="egg");
+  const ks=Object.keys(ITEMS).filter(k=>S.inv[k]>0||k==="egg");
   let h='<h2>창고</h2><div class="goods">'+ks.map(k=>`<div class="good"><div class="gname">${ITEMS[k].name}<small>${S.inv[k]||0}개${ITEMS[k].sea?" · 바다 것":""}</small></div></div>`).join("")+'</div>';
-  h+=`<h3>씨앗</h3><div class="goods">`+Object.keys(CROPS).map(k=>`<div class="good"><div class="gname">${CROPS[k].name} 씨앗<small>${S.seeds[k]}봉지</small></div></div>`).join("")+'</div>';
+  h+=`<h3>씨앗</h3><div class="goods">`+Object.keys(CROPS).filter(k=>S.seeds[k]>0||sowNow(k)).map(k=>`<div class="good"><div class="gname">${CROPS[k].name} 씨앗<small>${S.seeds[k]}봉지${sowNow(k)?" · 지금 심어요":" · "+sowText(k)}</small></div></div>`).join("")+'</div>';
   if((S.pantry||[]).length){const c={};S.pantry.forEach(id=>c[id]=(c[id]||0)+1);h+='<h3>찬장 · 우리 평상에 앉아 꺼내 먹어요</h3><div class="goods">'+Object.entries(c).map(([id,n])=>`<div class="good"><div class="gname">${dishName(id)}<small>${n}개</small></div></div>`).join("")+'</div>'}
   h+='<p class="hint">채소는 채소가게 아줌마, 달걀은 닭집 아저씨가 사 줘요 (마을 장터)</p>';
   openSheet(h)}
