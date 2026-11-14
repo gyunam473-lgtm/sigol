@@ -33,15 +33,15 @@ function wetFromWeather(silent){
 /* ---------- 하늘색 순서 (해 뜨고 지는 시간 기준으로 몇 시간 전후인지) ----------
    sky 하늘, hemi 주변 밝기, sun 햇빛(밤엔 달빛) 세기, sc 빛 색, glow 창호지 불, lamp 초롱 */
 const SKY_KEYS=[
-  {at:"rise",d:-1.3,sky:0x223058,hemi:0.42,sun:0.26,sc:0xa9c0f0,glow:1,lamp:1},    // 밤
+  {at:"rise",d:-1.3,sky:0x2a3c6e,hemi:0.5,sun:0.36,sc:0xb4c8f6,glow:1,lamp:1},    // 밤 (2026-11-14 어둡지만 포근하게: 푸른 달빛 조금 밝게)
   {at:"rise",d:-0.35,sky:0x8a86ad,hemi:0.42,sun:0.22,sc:0xd9a0b0,glow:0.7,lamp:0.7}, // 새벽 보랏빛
   {at:"rise",d:0.45,sky:0xf2c8a2,hemi:0.55,sun:0.7,sc:0xffc690,glow:0.15,lamp:0},  // 해 뜰 녘 복숭앗빛
   {at:"rise",d:2.0,sky:0xb6dcf0,hemi:0.64,sun:1.0,sc:0xffefd2,glow:0,lamp:0},      // 낮 (2026-11-13 그늘이 살게 하늘빛↓ 햇빛↑)
   {at:"set",d:-2.0,sky:0xb6dcf0,hemi:0.64,sun:1.0,sc:0xffefd2,glow:0,lamp:0},
   {at:"set",d:-0.7,sky:0xf0d2a0,hemi:0.56,sun:0.9,sc:0xffbe74,glow:0.1,lamp:0.1},  // 노을 전 금빛
   {at:"set",d:0.15,sky:0xe0a088,hemi:0.46,sun:0.32,sc:0xff9466,glow:0.7,lamp:0.8},  // 해질녘 분홍 주황
-  {at:"set",d:0.75,sky:0x4b4b7a,hemi:0.40,sun:0.22,sc:0xa8a2d4,glow:1,lamp:1},      // 땅거미
-  {at:"set",d:1.4,sky:0x223058,hemi:0.42,sun:0.26,sc:0xa9c0f0,glow:1,lamp:1}];      // 밤
+  {at:"set",d:0.75,sky:0x4b4f80,hemi:0.46,sun:0.28,sc:0xa8a2d4,glow:1,lamp:1},      // 땅거미
+  {at:"set",d:1.4,sky:0x2a3c6e,hemi:0.5,sun:0.36,sc:0xb4c8f6,glow:1,lamp:1}];      // 밤
 const _ca=new THREE.Color(),_cb=new THREE.Color();
 function skyAt(h,t){
   const ks=SKY_KEYS.map(k=>Object.assign({},k,{h:t[k.at]+k.d}));
@@ -89,6 +89,12 @@ function hourNow(){if(timePick!=null)return timePick;
 function startTimelapse(){timePick=null;refreshTimeChip();timelapse={t0:performance.now(),h0:hourNow()};toast("하루를 1분 만에 보여 드려요")}
 
 let skyNow={night:0};
+// 해 지고 얼마나 지났나 (0 낮 ~ 1 밤) · applyTime 의 night 와 같은 셈
+function night0(h,t){const f=(h-t.rise)/(t.set-t.rise);return f<0?Math.min(1,-f*(t.set-t.rise)/1.3):f>1?Math.min(1,(f-1)*(t.set-t.rise)/1.4):0}
+// 3. 밤엔 내 둘레를 은은하게 (손전등처럼 세지 않게, 바깥에서만)
+let meGlow=null;
+function meGlowFrame(){if(!me)return;if(!meGlow){meGlow=new THREE.PointLight(0xffc88a,0,7,2);meGlow.position.set(0,2.2,0.6);me.g.add(meGlow)}
+  const out=!inHouse&&!(PLACES[mode]&&PLACES[mode].indoor);meGlow.intensity=out?skyNow.night*1.0:0}
 const _dir=new THREE.Vector3(),_sunE=new THREE.Vector3();
 function applyTime(){
   const d=new Date(),h=hourNow(),t=sunTimes(d),w=weather.kind,s=skyAt(h,t),clear=w==="맑음";
@@ -99,15 +105,16 @@ function applyTime(){
   _dir.copy(sunDir(f)).lerp(MOON_DIR,night).normalize();
   sun.position.copy(_dir).multiplyScalar(40);sun.color.copy(s.sc);
   let sky=s.sky.clone(),he=s.hemi,su=s.sun;
-  if(!clear){const day=Math.max(0,(he-0.3)/0.5),cloud=new THREE.Color(w==="눈"?0xd9e0e4:0xa9b3b9).multiplyScalar(0.18+0.82*day);
-    sky.lerp(cloud,0.7);he*=0.85;su*=0.35}
+  if(!clear){const day=Math.max(0,(he-0.3)/0.5),nt=night0(h,t),cloud=new THREE.Color(w==="눈"?0xd9e0e4:0xa9b3b9).multiplyScalar(0.18+0.82*day).lerp(_cb.setHex(w==="눈"?0x5a6478:0x3c4860),nt*0.7);
+    // 밤엔 구름 낀 하늘도 푸르스름한 회색, 빛은 덜 깎아요 (비 오는 밤이 너무 우중충했어요)
+    sky.lerp(cloud,0.7);he*=0.85+0.12*nt;su*=0.35+0.3*nt}
   scene.background=sky;scene.fog=scene.fog||new THREE.Fog(0,1,2);scene.fog.color.copy(sky);scene.fog.near=clear?32:20;scene.fog.far=clear?75:55;
   hemi.intensity=he;sun.intensity=su;
   syncTopColor(sky);
-  hemi.color.setHex(0xe4eeff).lerp(_cb.setHex(0x9ab0e8),night);hemi.groundColor.setHex(0x93a46c).lerp(_cb.setHex(0x3a4660),night); // 밤엔 푸르스름한 달빛
+  hemi.color.setHex(0xe4eeff).lerp(_cb.setHex(0xa8bcf2),night);hemi.groundColor.setHex(0x93a46c).lerp(_cb.setHex(0x485880),night); // 밤엔 푸르스름한 달빛
   winMat.emissive.setRGB(1,0.7,0.28).multiplyScalar(s.glow); // 밤엔 창호지에 불이 켜져요
   lampMat.emissive.setRGB(1,0.62,0.25).multiplyScalar(s.lamp);
-  lampLights.forEach(l=>l.intensity=1.4*s.lamp);
+  lampLights.forEach(l=>{l.intensity=1.8*s.lamp;l.distance=11});
   // 달과 별은 맑은 밤에만
   stars.material.opacity=clear?night*0.9:0;stars.visible=stars.material.opacity>0.02;
   moon.material.opacity=clear?night:night*0.15;moon.visible=night>0.02&&moonP>0.03&&moonP<0.97;
@@ -143,7 +150,7 @@ let _topHex="";
 // 2026-11-14 폰 맨 위(시계 줄) 색: 하늘색을 칠했더니 카메라가 땅을 내려다볼 땐 화면 위쪽(나무·땅)과 달라 띠처럼 보였어요
 // → 그려진 화면 맨 위 줄 색을 1초마다 재서 그 색으로 (화면이 위로 이어져 보여요). 홈 화면에 추가하면 게임이 시계 줄 밑까지 그려져요(black-translucent)
 const _topPx=new Uint8Array(4);let _topT=0;
-function topColorFrame(now){if(now-_topT<1000)return;_topT=now;try{const gl=renderer.getContext(),W=gl.drawingBufferWidth,H=gl.drawingBufferHeight;let r=0,g=0,b=0;
+function topColorFrame(now){meGlowFrame();if(now-_topT<1000)return;_topT=now;try{const gl=renderer.getContext(),W=gl.drawingBufferWidth,H=gl.drawingBufferHeight;let r=0,g=0,b=0;
   [0.15,0.5,0.85].forEach(f=>{gl.readPixels(Math.floor(W*f),H-2,1,1,gl.RGBA,gl.UNSIGNED_BYTE,_topPx);r+=_topPx[0];g+=_topPx[1];b+=_topPx[2]});
   _topAuto=true;syncTopColor(new THREE.Color(r/765,g/765,b/765),true)}catch(e){}}
 let _topAuto=false;
