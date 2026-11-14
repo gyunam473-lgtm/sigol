@@ -54,7 +54,7 @@ function scatterAll(){const jobs=[["home",land,650]];
   Object.entries(PLACES).forEach(([k,P])=>{if(k!=="dwitsan"&&k!=="dabang"&&!P.indoor)jobs.push([k,P.g,450])});
   jobs.forEach(([k,src,n],i)=>setTimeout(()=>{try{scatter(k,src,n)}catch(e){console.warn("deco",k,e)}},300+i*120))}
 // 그 장소가 보일 때만, 집 안에선 안 보여요
-function decoFrame(){if(typeof ywG!=="undefined")ywG.visible=mode==="home"&&!PD; // 마당 잡초: 우리 땅에서만, 뽑는 동안엔 숨겨요
+function decoFrame(){{const on=!PLACES[mode];homeRoads.forEach(r=>r.visible=on)}if(typeof ywG!=="undefined")ywG.visible=mode==="home"&&!PD; // 마당 잡초: 우리 땅에서만, 뽑는 동안엔 숨겨요
   for(const k in DECO){const g=DECO[k];g.visible=g.userData.src.visible&&ground.visible&&!(typeof inHouse!=="undefined"&&inHouse)}}
 
 /* ================= 멀리 보이는 이웃 마을 (2026-11-13) =================

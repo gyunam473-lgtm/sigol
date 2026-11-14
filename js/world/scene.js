@@ -48,7 +48,8 @@ const dirtTex=noiseTex("dirt");
 function dirtBox(w,h,d,c,x,y,z){const t=dirtTex.clone();t.needsUpdate=true;t.repeat.set(w/2,d/2);const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),new THREE.MeshLambertMaterial({color:c,map:t}));m.position.set(x,y,z);m.receiveShadow=true;return m}
 const ground=new THREE.Mesh(new THREE.PlaneGeometry(90,90),groundMat);ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;ground.userData.kind="ground";scene.add(ground);clickables.push(ground);
 // 흙길
-scene.add(dirtBox(2,0.02,26,0xdcc29a,0,0.01,1));scene.add(dirtBox(22,0.02,2,0xdcc29a,0,0.012,1.5));
+// 우리 땅·이웃 땅에서만 보여요 (2026-11-14: 마을회관·장터 넓힌 마당과 높이가 같아 가운데가 번쩍거렸어요 · deco.js 의 decoFrame 이 켜고 꺼요)
+const homeRoads=[dirtBox(2,0.02,26,0xdcc29a,0,0.01,1),dirtBox(22,0.02,2,0xdcc29a,0,0.012,1.5)];homeRoads.forEach(r=>scene.add(r));
 // 뒷산
 [[-22,-34,16,22,0x8fae86],[0,-40,20,28,0x9cb893],[24,-34,15,20,0x86a57d],[-40,-20,12,16,0x9cb893],[40,-18,13,18,0x8fae86]].forEach(([x,z,r,h,c])=>{const m=cone(r,h,c,x,h/2,z,7);m.castShadow=false;scene.add(m)});
 // 나무
