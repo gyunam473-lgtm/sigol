@@ -11,7 +11,7 @@ const dabang=placeGroup();
 const DB={x0:-12,x1:12,z0:-13,z1:4,H:3.4};
 const DABANG_BOOTHS=[];[-10.4,-6.4,-2.4].forEach(z=>[-9,-5,-1,3].forEach(x=>DABANG_BOOTHS.push([x,z])));
 const DABANG_AISLES=[-11,-7,-3,1,5.6]; // 세로 통로 (input.js)
-const DB_COUNTER=[]; // 계산대·뒤 찬장 (누르면 사장님과 이야기)
+const DB_COUNTER=[]; // 계산대·뒤 찬장·사장님 둘레 (누르면 사장님과 이야기)
 const DABANG_BAR=[-10.8,-9.4,-8,-6.6,-5.2]; // 계산대 앞 높은 의자 (z)
 const dabangLights=[],dabangWinMat=new THREE.MeshLambertMaterial({color:0xf2ead2,emissive:0x000000});
 let dabangDoor;
@@ -59,6 +59,8 @@ let dabangDoor;
   for(let i=0;i<8;i++)dabang.add(cyl(0.05,0.04,0.09,0xf2f0ea,9.4,1.14,-10.4+i*0.22,10));
   DABANG_BAR.forEach((z,i)=>{const s=new THREE.Group();s.userData={kind:"seat",seat:"dbar"+i};s.add(cyl(0.24,0.22,0.1,0xa8282a,0,0.72,0,14));s.add(cyl(0.04,0.04,0.68,0x9a9a9a,0,0.34,0,6));s.add(cyl(0.2,0.22,0.03,0x8a8a8a,0,0.02,0,12));
     s.position.set(8.25,0,z);dabang.add(s)});
+  // 사장님 둘레 넓게 보이지 않는 누르기 칸 (사장님이 작아서 누르기 어려웠어요)
+  {const hb=new THREE.Mesh(new THREE.BoxGeometry(1.6,2.4,2.2),new THREE.MeshBasicMaterial({transparent:true,opacity:0,depthWrite:false}));hb.position.set(10.4,1.2,-8);hb.userData={kind:"shop",shop:"dabang"};hb.castShadow=false;dabang.add(hb);DB_COUNTER.push(hb)}
   {const cb=box(0.3,1.8,6,0x5a3420,11.75,0.9,-8);cb.userData={kind:"shop",shop:"dabang"};dabang.add(cb);DB_COUNTER.push(cb)}for(let i=0;i<10;i++)dabang.add(cyl(0.06,0.06,0.25,[0x8a3a2a,0x3a6a3a,0xd8a33a][i%3],11.7,1.95+Math.floor(i/5)*0.32,-10.4+(i%5)*1.0,8)); // 뒤 찬장, 병
   // 연탄 난로와 주전자, 연통 (앞 왼쪽)
   dabang.add(cyl(0.32,0.36,0.75,0x3a3836,-11,0.38,1.6,14));dabang.add(cyl(0.13,0.17,0.2,0x9a9a9a,-11,0.85,1.6,12));dabang.add(cyl(0.06,0.06,2.6,0x6a6a6a,-11,2.05,1.6,8));
@@ -77,7 +79,8 @@ let dabangDoor;
 function dabangLighting(){const n=skyNow.night||0;dabangLights.forEach(l=>l.intensity=0.45+n*0.9);dabangWinMat.emissive.setRGB(1,0.95,0.8).multiplyScalar((1-n)*0.6)}
 // 다방 안 카메라: 앞쪽 위에서 나를 따라 들여다봐요
 // 2026-11-14 폰 세로에선 계산대(사장님)가 화면 밖이라 대화를 못 했어요 → 화면을 옆으로 끌면 좌우로 둘러봐요(RC.pan, freecam.js 끝), 걸으면 다시 나를 따라와요
-function dabangCam(){const p=me.g.position;if(me.moving)RC.pan*=0.9;const pl=(camera.aspect||1)<1?9.5:7;RC.pan=Math.max(-pl-p.x,Math.min(pl-p.x,RC.pan));const cx=Math.max(-pl,Math.min(pl,p.x+RC.pan));camPos.set(cx,7.6,Math.min(p.z+7.2,DB.z1+6.5));lookT.set(cx,0.3,p.z-1.6)}
+// 폰 세로: 계산대 앞에선 사장님이 보이게 카메라를 살짝 오른쪽으로 (bias)
+function dabangCam(){const p=me.g.position;if(me.moving)RC.pan*=0.9;const pl=(camera.aspect||1)<1?9.5:7;RC.pan=Math.max(-pl-p.x,Math.min(pl-p.x,RC.pan));const bias=(camera.aspect||1)<1&&p.x>4.4?2.2:0,cx=Math.max(-pl,Math.min(pl,p.x+bias+RC.pan));camPos.set(cx,7.6,Math.min(p.z+7.2,DB.z1+6.5));lookT.set(cx,0.3,p.z-1.6)}
 // 소파 자리: 시키면 탁자 위에 찻잔이 놓여요
 const DABANG_NOTES=["푹신한 소파. 난로 위 주전자가 보글보글","창으로 햇살이 들어와요. 어항 속 금붕어가 한가롭네요","전축에서 옛날 노래가 흘러나와요. 마음이 느긋해져요","괘종시계 소리가 똑딱똑딱. 시간이 천천히 가요","커튼 사이로 바람이 살랑. 차 한 잔이 딱이에요","옆 소파에서 두런두런 이야기 소리가 들려요"];
 DABANG_BOOTHS.forEach(([bx,bz],i)=>[-1,1].forEach(d=>{const id="dabang"+i+(d<0?"a":"b"),f=d<0?0:Math.PI;

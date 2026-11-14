@@ -75,12 +75,15 @@ function fieldRoute(p,t){
   if(inHouse){ // 다른 칸으로 갈 땐 앞 툇마루로 나와서 건너가요
     const a=spaceOf(p[0]-ROOM.x),b=spaceOf(t[0]-ROOM.x),walk=ROOM.z+ROOM.D/2+0.6;
     return a===b?[t]:[[p[0],walk],[t[0],walk],t]}
-  if(mode==="dabang"){ // 다방: 소파 칸 사이 통로를 따라 앞쪽 넓은 곳으로 돌아가요
-    const ax=x=>DABANG_AISLES.reduce((a,b)=>Math.abs(b-x)<Math.abs(a-x)?b:a),F=0.8;
+  if(mode==="dabang"){ // 다방: 소파 칸 사이 세로 통로 + 가로 통로(소파 줄 사이 두 곳, 앞쪽 넓은 곳) 중 가장 짧은 길로
+    // 2026-11-14 전엔 늘 입구 쪽 넓은 곳까지 갔다가 돌아와서 한 바퀴 도는 것처럼 보였어요
+    const ax=x=>DABANG_AISLES.reduce((a,b)=>Math.abs(b-x)<Math.abs(a-x)?b:a),F=0.8,CZ=[-8.4,-4.4,F];
     const fr=q=>q[1]>F-0.2,A=ax(p[0]),B=ax(t[0]);if(fr(p)&&fr(t))return [t];
-    // 계산대 앞 통로(소파 칸 오른쪽)나 같은 통로 안에선 앞으로 돌지 않고 곧장 (2026-11-14)
-    if(Math.min(p[0],t[0])>4.4||(A===B&&Math.abs(p[0]-A)<0.7&&Math.abs(t[0]-A)<0.7))return [t];
-    return [...(fr(p)?[]:[[A,p[1]],[A,F]]),...(fr(t)?[t]:[[B,F],[B,t[1]],t])]} // 앞쪽 넓은 곳에선 곧장
+    if(Math.min(p[0],t[0])>4.4||(A===B&&Math.abs(p[0]-A)<0.7&&Math.abs(t[0]-A)<0.7))return [t]; // 계산대 앞 통로·같은 통로 안
+    const len=r=>{let L=0,c=p;r.forEach(q=>{L+=Math.hypot(q[0]-c[0],q[1]-c[1]);c=q});return L};
+    const S=fr(p)?[]:[[A,p[1]]],E=fr(t)?[t]:[[B,t[1]],t];
+    if(A===B)return [...S,...E];
+    let best=null;CZ.forEach(z=>{const r=[...S,[A,z],[B,z],...E];const L=len(r);if(!best||L<best.L)best={L,r}});return best.r}
   if(PLACES[mode])return [t];
   const F=fieldBox(),a=inField(p[0],p[1],F),b=inField(t[0],t[1],F),G=[FIELD.x,F.z1+0.9],IN=[FIELD.x,F.z1-0.9];
   const back=q=>toGate(q,F).reverse();
