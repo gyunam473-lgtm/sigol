@@ -417,3 +417,5 @@ body{margin:0}
 /* 씨앗가게 다른 철 씨앗 (접혀 있어요, 2026-11-14) */
 .otherseed{margin-top:6px}.otherseed summary{cursor:pointer;font-size:13px;color:var(--ink2,#6b5a48);padding:8px 2px}
 .otherseed .goods{margin-top:6px}
+/* 부뚜막: 재료가 모자란 요리는 접어 둬요 (2026-11-14) */
+.rcmore{margin-top:8px}.rcmore summary{cursor:pointer;font-size:14px;padding:8px 2px;color:var(--ink2,#6b5a48)}

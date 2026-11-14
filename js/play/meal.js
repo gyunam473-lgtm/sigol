@@ -29,7 +29,7 @@ function tire(n){if(S.warmUntil>Date.now())n*=0.5; // 모닥불 곁에 있었으
 // 먹으면 차요. 일하다 먹으면 새참 기운
 const BAPSIM=15; // 밥과 반찬을 10분 안에 같이 먹으면 든든함 더
 function nourish(id,where){
-  const isBap=id==="bap",side=!isBap&&!drinkOf(id),now=Date.now();let bonus=0;
+  const isBap=id==="bap"||!!(anyFood(id)||{}).bap,side=!isBap&&!drinkOf(id),now=Date.now();let bonus=0;
   if(isBap&&S.sideAt&&now-S.sideAt<600000||side&&S.bapAt&&now-S.bapAt<600000){bonus=BAPSIM;S.sideAt=S.bapAt=0}else{if(isBap)S.bapAt=now;if(side)S.sideAt=now}
   S.full=Math.min(100,fullNow()+fillOf(id)+bonus);if(bonus)setTimeout(()=>toast("밥이랑 반찬을 같이 먹으니 밥심이 나요! 든든함 +"+bonus),1200);if(drinkOf(id))S.water=Math.min(100,waterNow()+drinkOf(id));
   const worked=S.lastWork&&Date.now()-S.lastWork<WORK_RECENT_MIN*60000;

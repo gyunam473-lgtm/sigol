@@ -19,7 +19,8 @@ function recipeListHtml(){
   let h="";
   if(yes.length)h+=`<h3>지금 해 먹을 수 있어요</h3><div class="recipes">${yes.map(card).join("")}</div>`;
   else h+=`<p class="hint">재료가 없어요. 밭에서 거두거나 장터에서 사 와요.</p>`;
-  if(no.length)h+=`<h3>재료가 모자라요</h3><div class="recipes">${no.map(card).join("")}</div>`;
+  // 2026-11-14 요리가 많아져서 재료가 모자란 건 접어 둬요 (누르면 펼쳐져요)
+  if(no.length)h+=`<details class="rcmore"${yes.length?"":" open"}><summary>재료가 모자란 요리 ${no.length}가지 · 눌러서 보기</summary><div class="recipes">${no.map(card).join("")}</div></details>`;
   if(!sea.length)h+=`<p class="hint">바다 것 요리는 장터 생선 트럭에서 생선을 사 오면 생겨요. 고기 요리는 정육점에서 고기를 사 와요.</p>`;
   return h}
 function bindCook(atStove){sheet.querySelectorAll("[data-cook]").forEach(b=>b.onclick=()=>{closeSheet();atStove?startCook(b.dataset.cook):goCook(b.dataset.cook)})}
