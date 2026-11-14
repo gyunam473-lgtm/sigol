@@ -48,3 +48,11 @@ setInterval(fcChanged,400);
 function camSensLabel(){const b=$("camSensBtn");if(b)b.textContent="화면 돌리기: "+CAM_SENS[S.camSens==null?1:S.camSens][0]}
 $("camSensBtn").onclick=()=>{S.camSens=((S.camSens==null?1:S.camSens)+1)%3;camSensLabel();save();sfx("pop");toast("화면 돌리기 빠르기: "+CAM_SENS[S.camSens][0])};
 setTimeout(camSensLabel,800);
+
+// 집 안: 화면을 좌우로 끌면 옆 칸 둘러보기 (house.js 의 RC.pan). 짧게 누르면 그대로 걸어가요
+{let rd=null,rMoved=false;
+  canvas.addEventListener("pointerdown",e=>{if(!inHouse||LIE||SIT)return;rd={x:e.clientX,id:e.pointerId};rMoved=false});
+  canvas.addEventListener("pointermove",e=>{if(!rd||rd.id!==e.pointerId||!inHouse)return;const dx=e.clientX-rd.x;
+    if(!rMoved&&Math.abs(dx)<14)return;rMoved=true;RC.pan-=dx*0.02*camSens();rd.x=e.clientX});
+  const up=e=>{if(rd&&rd.id===e.pointerId)rd=null};canvas.addEventListener("pointerup",up);canvas.addEventListener("pointercancel",up);
+  canvas.addEventListener("click",e=>{if(rMoved){rMoved=false;e.stopImmediatePropagation()}},true);}

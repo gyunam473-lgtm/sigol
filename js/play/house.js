@@ -15,11 +15,11 @@ const SARANG_FRONT={x:-14,z:1.45}; // 사랑채 앞
 function enterHouse(which){
   sfx("pop");
   fadeDo(()=>{
-    HOUSE_IN=which||"main";inHouse=true;buildRoom();room.visible=true;
+    HOUSE_IN=which||"main";inHouse=true;RC.pan=0;buildRoom();room.visible=true;
     npcs.forEach(n=>n.g.visible=false);rainG.visible=snowG.visible=false;
     const [x,z]=doorStand();me.g.position.set(x,0,z);me.tx=x;me.tz=z;me.route=[];me.moving=false;pending=null;me.g.rotation.y=-Math.PI/2;
     OBS=obstacles();roomLighting();roomCam(true);refresh();
-    toast(HOUSE_IN==="sarang"?"사랑채에 들어왔어요. 손님 맞고 책 읽는 방이에요":skyNow.night>0.5?"집에 들어왔어요. 등잔불이 따뜻해요":"집에 들어왔어요. 툇마루를 따라 부엌, 안방"+((S.houseLv||1)>=2?", 대청, 건넌방":"")+"으로 다녀요");
+    toast(HOUSE_IN==="sarang"?"사랑채에 들어왔어요. 손님 맞고 책 읽는 방이에요":skyNow.night>0.5?"집에 들어왔어요. 등잔불이 따뜻해요":"집에 들어왔어요. 툇마루를 따라 부엌, 안방"+((S.houseLv||1)>=2?", 대청, 건넌방":"")+"으로 다녀요"+(ROOM.W>8?" · 화면을 옆으로 끌면 다른 칸을 둘러봐요":""));
   })}
 // 바로 나가기 (이웃·장터로 갈 때는 화면 효과 없이)
 function exitRoom(){if(!inHouse)return;if(LIE)getUp(true);inHouse=false;room.visible=false;applyTime()}
@@ -32,10 +32,18 @@ function leaveHouse(after){
     if(after)after();else toast("마당으로 나왔어요");
   })}
 // 방 안 카메라: 앞쪽 위에서 들여다봐요 (앞벽은 없는 것처럼)
-// 칸이 여럿이면 내가 있는 쪽으로 따라가요
+// 2026-11-14 폰 세로에서 방이 잘리고 캐릭터가 크게 가려서: 화면 너비에 맞춰 칸 하나 반쯤(작은 집은 집 전체)이 보이게 거리를 재고,
+// 칸이 여럿이면 내가 있는 쪽을 따라가요. 화면을 좌우로 끌면 옆 칸을 둘러봐요(RC.pan, freecam.js), 걸으면 다시 나를 따라와요
+const RC={pan:0};
 function roomCam(snap){
-  const p=me.g.position,half=ROOM.W/2,cx=ROOM.x+(half<=3.6?0:Math.max(-half+3.2,Math.min(half-3.2,p.x-ROOM.x)));
-  camPos.set(cx,6.3,ROOM.z+ROOM.D/2+5.3);lookT.set(cx,0.4,ROOM.z-0.2);
+  const p=me.g.position,half=ROOM.W/2,a=camera.aspect||1,vf=camera.fov*Math.PI/180,hf=2*Math.atan(Math.tan(vf/2)*a);
+  const span=Math.min(ROOM.W+0.6,a<1?7.6:11),sh=span/2;
+  if(me.moving)RC.pan*=0.9;
+  const lim=Math.max(0,half+0.3-sh);RC.pan=Math.max(-lim*2,Math.min(lim*2,RC.pan));
+  const cx=ROOM.x+Math.max(-lim,Math.min(lim,p.x-ROOM.x+RC.pan));
+  // 보고 싶은 너비가 화면 좌우에 들어오는 거리 (높이는 그만큼 같이)
+  const d=Math.max(9.5,sh/Math.tan(hf/2)+1.2),dy=0.62*d,dz=0.78*d;
+  lookT.set(cx,0.4,ROOM.z-0.2);camPos.set(cx,lookT.y+dy,lookT.z+dz);
   if(snap){camera.position.copy(camPos);look.copy(lookT);camera.lookAt(look)}}
 
 /* ---------- 눕기 ---------- */
