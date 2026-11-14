@@ -22,7 +22,9 @@ function stepActor(a,dt){
       const sx=Math.sign(dx)*s,sz=Math.sign(dz)*s;
       if(!blocked(p.x+sx,p.z))[nx,nz]=[p.x+sx,p.z];else if(!blocked(p.x,p.z+sz))[nx,nz]=[p.x,p.z+sz];
       else if(!blocked(p.x+s,p.z))[nx,nz]=[p.x+s,p.z];else if(!blocked(p.x-s,p.z))[nx,nz]=[p.x-s,p.z];else{nx=p.x;nz=p.z}
-      a.stuck=(a.stuck||0)+dt;if(a.stuck>2.5){a.tx=p.x;a.tz=p.z;pending=null;a.route=[];a.stuck=0;toast("길이 막혔어요. 다른 쪽으로 돌아가 볼까요?")}}
+      a.stuck=(a.stuck||0)+dt;
+      if(a===me&&pending&&a.stuck>1.0){const f=a.route&&a.route.length?a.route[a.route.length-1]:[a.tx,a.tz];if(Math.hypot(f[0]-p.x,f[1]-p.z)<3.5){nx=f[0];nz=f[1];a.route=[];a.tx=f[0];a.tz=f[1];a.stuck=0}}
+      if(a.stuck>2.5){a.tx=p.x;a.tz=p.z;pending=null;a.route=[];a.stuck=0;toast("길이 막혔어요. 다른 쪽으로 돌아가 볼까요?")}}
     p.x=nx;p.z=nz;a.g.rotation.y=Math.atan2(dx,dz);a.moving=true;a.b.position.y=Math.abs(Math.sin(performance.now()/110))*0.08}
   else{if(a.moving){a.moving=false;a.b.position.y=0;return true}}
   return false}

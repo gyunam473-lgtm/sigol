@@ -57,7 +57,19 @@ function go(x,z,act){
   if(inHouse){x=Math.max(ROOM.x-ROOM.W/2+0.4,Math.min(ROOM.x+ROOM.W/2-0.4,x));z=Math.max(ROOM.z-ROOM.D/2+0.4,Math.min(ROOM.z+ROOM.D/2+0.9,z))}
   else{x=Math.max(-30,Math.min(30,x));z=Math.max(-30,Math.min(30,z))}
   [x,z]=pushOut(x,z);pending=act;me.moving=true;me.stuck=0;
-  me.route=fieldRoute([me.g.position.x,me.g.position.z],[x,z]);const n=me.route.shift();me.tx=n[0];me.tz=n[1]}
+  me.route=detour([me.g.position.x,me.g.position.z],fieldRoute([me.g.position.x,me.g.position.z],[x,z]));const n=me.route.shift();me.tx=n[0];me.tz=n[1]}
+// 가는 길에 물건(의자·평상·가게 …)이 막고 있으면 모서리를 따라 돌아가요 (2026-11-14: 의자 뒤에서 누르면 막혀서 못 앉았어요)
+function segHitsRect(a,b,r,m){const x0=r[0]-m,z0=r[1]-m,x1=r[2]+m,z1=r[3]+m;let t0=0,t1=1;const dx=b[0]-a[0],dz=b[1]-a[1];
+  for(const [p,q] of [[-dx,a[0]-x0],[dx,x1-a[0]],[-dz,a[1]-z0],[dz,z1-a[1]]]){if(p===0){if(q<0)return false}else{const t=q/p;if(p<0){if(t>t1)return false;if(t>t0)t0=t}else{if(t<t0)return false;if(t<t1)t1=t}}}return t1>t0+1e-6}
+function detour(start,route){const out=[];let a=start;const M=PAD+0.05,C=PAD+0.3;
+  for(const b of route){let guard=0,cur=a;
+    while(guard++<6){const r=OBS.find(r=>segHitsRect(cur,b,r,M)&&!(cur[0]>r[0]-M&&cur[0]<r[2]+M&&cur[1]>r[1]-M&&cur[1]<r[3]+M)&&!(b[0]>r[0]-M&&b[0]<r[2]+M&&b[1]>r[1]-M&&b[1]<r[3]+M));if(!r)break;
+      const cs=[[r[0]-C,r[1]-C],[r[2]+C,r[1]-C],[r[2]+C,r[3]+C],[r[0]-C,r[3]+C]],ok=(p,q)=>!segHitsRect(p,q,r,M),d=(p,q)=>Math.hypot(p[0]-q[0],p[1]-q[1]);let best=null;
+      cs.forEach((c,i)=>{if(blocked(c[0],c[1]))return;if(ok(cur,c)&&ok(c,b)){const L=d(cur,c)+d(c,b);if(!best||L<best.L)best={L,p:[c]}}
+        [cs[(i+1)%4],cs[(i+3)%4]].forEach(c2=>{if(blocked(c2[0],c2[1]))return;if(ok(cur,c)&&ok(c,c2)&&ok(c2,b)){const L=d(cur,c)+d(c,c2)+d(c2,b);if(!best||L<best.L)best={L,p:[c,c2]}}})});
+      if(!best)break;out.push(...best.p);cur=best.p[best.p.length-1]}
+    out.push(b);a=b}
+  return out}
 // 텃밭 울타리 돌아가기: 안과 밖을 오갈 땐 앞쪽 입구로, 밭 옆·뒤로 갈 땐 울타리 바깥 모서리를 따라 돌아가요
 function fieldRoute(p,t){
   if(inHouse){ // 다른 칸으로 갈 땐 앞 툇마루로 나와서 건너가요
