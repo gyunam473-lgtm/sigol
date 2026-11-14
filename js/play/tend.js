@@ -33,7 +33,7 @@ function harvestGrade(p){const care=p.care==null?0.5:p.care,t=tendScore(p),q=0.4
 let tendSaid=0;
 function tendTick(){if(mode!=="home"||!S.plots)return;const rain=weather.kind==="비"||weather.kind==="눈";const news={};let ch=false,wet=0;
   S.plots.forEach((p,i)=>{if(!p)return;const got=tickIssues(p);if(got.length){ch=true;got.forEach(k=>(news[k]=news[k]||[]).push(CROPS[p.crop].name))}
-    if(rain&&activeIssues(p).some(x=>x.k==="dry")){resolveIssue(p,"dry");wet++;ch=true}
+    if(rain&&i<15&&activeIssues(p).some(x=>x.k==="dry")){resolveIssue(p,"dry");wet++;ch=true}
     if(got.length||wet)drawPlot(i,true)});
   if(ch)save();
   if(wet)toast("비가 내려 목마른 밭이 촉촉해졌어요");

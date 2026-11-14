@@ -30,7 +30,7 @@ const puddles=new THREE.Group();land.add(puddles);
 // 밭 칸마다: 대비 안 한 칸엔 물 차오름 / 서리 / 흔들림
 function plotFxStart(e){
   plotFxEnd();
-  plots.forEach((P,i)=>{const p=S.plots[i];if(!p||p.dead||!P.g.visible)return;const safe=isPrepped(p,e);let m=null;
+  plots.forEach((P,i)=>{const p=S.plots[i];if(!p||p.dead||!P.g.visible||i>=15)return;const safe=isPrepped(p,e);let m=null;
     if(e.kind==="heavy"&&!safe){m=new THREE.Mesh(new THREE.BoxGeometry(1.75,0.02,1.75),new THREE.MeshLambertMaterial({color:0x8a8270,transparent:true,opacity:0}));m.position.y=0.26}
     if(e.kind==="frost"){m=new THREE.Mesh(new THREE.BoxGeometry(1.8,0.3,1.8),new THREE.MeshLambertMaterial({color:0xffffff,emissive:0x5a6670,transparent:true,opacity:0}));m.position.y=safe?0.26:0.4;m.scale.y=safe?0.05:1}
     if(m){P.g.add(m)}FX.plotFx.push({P,i,m,safe})})}

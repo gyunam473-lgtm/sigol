@@ -47,9 +47,9 @@ function checkStorms(){
 function strike(e){
   S.wxDone[e.id]=1;if(e===S.testEv||(S.testEv&&S.testEv.id===e.id))S.testEv=null;
   const W=WX_EV[e.kind],dead=[],safe=[];
-  S.plots.forEach((p,i)=>{if(!p||p.dead||(p.pt&&p.pt>e.at))return;
+  S.plots.forEach((p,i)=>{if(!p||p.dead||(p.pt&&p.pt>e.at)||i>=15)return; // 15번부터는 비닐하우스
     if(isPrepped(p,e)||(e.kind==="frost"&&CROPS[p.crop].hardy)){safe.push(CROPS[p.crop].name);delete p.prep}else{p.dead=e.kind;delete p.prep;dead.push(CROPS[p.crop].name)}});
-  save();for(let i=0;i<15;i++)drawPlot(i,true);refresh();
+  save();for(let i=0;i<plots.length;i++)drawPlot(i,true);refresh();
   if(!dead.length&&!safe.length)return;
   const msg=W.name+(dead.length?" · 밭 "+dead.length+"칸이 "+W.dead:"")+(safe.length?" · "+W.prep+" 한 "+safe.length+"칸은 무사해요":"");
   if(SIT||W_busy())return toast(msg);

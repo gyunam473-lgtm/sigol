@@ -22,7 +22,7 @@ function applyMode(){
       else{const w=P.way[Math.floor(Math.random()*P.way.length)];p.g.position.set(w[0],0,w[1]);p.tx=w[0];p.tz=w[1]}}
     else if(mode==="visit"){const own=p.name===n.name;p.g.visible=own;p.stay=own;if(own){p.g.position.set(n.full?-1.9:HF.x+3,0,n.full?-2.6:HF.z-0.6);p.tx=p.g.position.x;p.tz=p.g.position.z;p.g.rotation.y=0.6}}
     else{p.g.visible=false;p.stay=!!p.shop}}); // 우리 땅엔 나 혼자
-  arriveAt();for(let i=0;i<15;i++)drawPlot(i,true);refresh();setAmbience();
+  arriveAt();for(let i=0;i<plots.length;i++)drawPlot(i,true);refresh();setAmbience();
 }
 function visit(n){visiting=n;nbPlots=n.plots();addNbIssues(n);mode="visit";applyMode();const k=nbNeeds();
   setTimeout(()=>toast(n.name+": "+n.greet+(k?" · 밭에 거들 일이 "+k+"가지 있어요. 거들면 품앗이 품이 쌓여요":"")),900)}

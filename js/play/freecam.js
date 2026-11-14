@@ -15,7 +15,7 @@ function freeCam(p,camPos,lookT){if(FC.mode!==mode){FC.mode=mode;FC.yaw=0;fcChan
   // 돌려 본 카메라가 집·지붕 속으로 들어가면 가리는 것 앞으로 다가와요 (세 장면에 한 번 재요)
   if(!FC.changed){FC.near=1;return}
   if(((FC.tick=(FC.tick||0)+1)%3)===0){const g=PLACES[mode]?PLACES[mode].g:land,o=_fcO.set(p.x,p.y+1.2,p.z),dir=_fcD.copy(camPos).sub(o),dist=dir.length();dir.normalize();
-    _fcRay.set(o,dir);_fcRay.far=dist;_fcRay.camera=camera;const hit=_fcRay.intersectObject(g,true).find(x=>x.object.visible&&!x.object.isSprite&&x.distance>1&&!(x.object.material&&x.object.material.transparent&&x.object.material.opacity<0.2));
+    _fcRay.set(o,dir);_fcRay.far=dist;_fcRay.camera=camera;const hit=_fcRay.intersectObject(g,true).find(x=>x.object.visible&&!x.object.isSprite&&!x.object.userData.see&&x.distance>1&&!(x.object.material&&x.object.material.transparent&&x.object.material.opacity<0.2));
     FC.nearT=hit?Math.max(0.15,(hit.distance-0.6)/dist):1}
   FC.near=(FC.near||1)+((FC.nearT||1)-(FC.near||1))*0.25;if(FC.near<0.999)camPos.sub(_fcO.set(p.x,p.y+1.2,p.z)).multiplyScalar(FC.near).add(_fcO)}
 const _fcRay=new THREE.Raycaster(),_fcO=new THREE.Vector3(),_fcD=new THREE.Vector3();

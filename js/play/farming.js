@@ -9,8 +9,8 @@ let workT=0;
 function usePlot(i){
   const p=S.plots[i];
   if(p&&p.dead){S.plots[i]=null;sweat(1);workT=0.5;sfx("scrape");drawPlot(i,true);save();refresh();toast("못 쓰게 된 "+CROPS[p.crop].name+"를 걷어 냈어요. 다시 심을 수 있어요");return}
-  const on=stormActive();if(on){toast(on.kind==="frost"?"벌써 서리가 내렸어요. 대비는 미리 해야 해요":"지금은 "+WX_EV[on.kind].name+" 때문에 밭일을 할 수 없어요. 대비는 미리 해야 해요");return}
-  const ev=stormWarn();
+  const on=i<15&&stormActive();if(on){toast(on.kind==="frost"?"벌써 서리가 내렸어요. 대비는 미리 해야 해요":"지금은 "+WX_EV[on.kind].name+" 때문에 밭일을 할 수 없어요. 대비는 미리 해야 해요");return}
+  const ev=i<15&&stormWarn();
   if(ev&&p&&!isPrepped(p,ev)&&stageOf(p)!=="ripe"){startWork(i,"prep");return} // 궂은 날씨 예보: 대비부터 (다 익은 건 거두면 돼요)
   if(!p){openSeedPick(i);return}
   else if(!p.wat)startWork(i,"water");
@@ -22,9 +22,9 @@ function usePlot(i){
 // 빈 밭을 누르면: 무엇을 심을지 고르고 → 손동작으로 심어요
 function openSeedPick(i){
   // 2026-11-14 철마다 심는 게 달라요: 이번 철 작물(가진 씨앗 먼저) → 씨앗은 있지만 철이 아닌 것(흐리게)
-  const se=SEASON_NAME[seasonOf(new Date())],now=sowCrops().sort((a,b)=>(S.seeds[b]>0)-(S.seeds[a]>0)),later=Object.keys(CROPS).filter(k=>!sowNow(k)&&S.seeds[k]>0),any=now.some(k=>S.seeds[k]>0);
+  const gh=i>=15,se=SEASON_NAME[seasonOf(new Date())],now=(gh?Object.keys(CROPS):sowCrops()).sort((a,b)=>(S.seeds[b]>0)-(S.seeds[a]>0)),later=gh?[]:Object.keys(CROPS).filter(k=>!sowNow(k)&&S.seeds[k]>0),any=now.some(k=>S.seeds[k]>0);
   const row=(k,ok)=>{const c=CROPS[k],n=S.seeds[k]||0;return `<div class="good ${n&&ok?"":"lack"}"><div class="gname">${c.name}<small>${ok?"씨앗 "+n+"봉지 · "+c.grow+"초면 자라요(초안) · 거두면 "+c.yield+"개쯤, 하나에 "+c.price+"원":"씨앗 "+n+"봉지 · "+sowText(k)+"에 심어요"}</small></div><div class="gbtn"><button class="go" data-plant="${k}" ${n&&ok?"":"disabled"}>${!ok?sowText(k)+"에":n?"심기":"씨앗 없음"}</button></div></div>`};
-  let h=`<h2>무엇을 심을까요?</h2><p class="hint">지금은 <b>${se}</b>이에요. 철에 맞는 걸 심어요</p><div class="goods">${now.map(k=>row(k,true)).join("")}</div>`;
+  let h=`<h2>무엇을 심을까요?</h2><p class="hint">${gh?"비닐하우스 안이라 <b>철 상관없이</b> 아무거나 심어요 · 비가 와도 물은 손으로 줘요":"지금은 <b>"+se+"</b>이에요. 철에 맞는 걸 심어요"}</p><div class="goods">${now.map(k=>row(k,true)).join("")}</div>`;
   if(later.length)h+=`<h3>철이 아니라 기다려요</h3><div class="goods">${later.map(k=>row(k,false)).join("")}</div>`;
   h+=`<p class="hint">${any?"고르면 밭 갈기부터 손으로 해요.":"이번 철 씨앗이 없어요."} 씨앗은 장터 씨앗가게 할아버지한테 사요.</p>`;
   openSheet(h);sheet.classList.add("seedpick");

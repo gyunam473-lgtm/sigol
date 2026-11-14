@@ -35,8 +35,8 @@ function openKitchen(){
     <span>가진 돈</span><b>${S.money.toLocaleString()}원</b><span>집</span><b>${L.name}</b><span>밭</span><b>${cols*3}칸</b>
     <span>닭장</span><b>${cL?COOP_LV[cL].name+" · 닭 "+S.hens+"/"+coopMax()+"마리":"없음"}</b>
     <span>외양간</span><b>${bL?BARN_LV[bL].name+" · 소 "+herdCount("cow")+" · 염소 "+herdCount("goat"):"없음"}</b>
-    <span>창고</span><b>${invN}개</b></div>`;
-  const row=(name,sub,cost,id,done)=>`<div class="lrow"><div>${name}<small>${sub}</small></div>${done?`<span class="done">${done}</span>`:`<span class="cost">${cost.toLocaleString()}원</span><button class="go" data-up="${id}" ${S.money>=cost?"":"disabled"}>${id==="coop"&&!cL||id==="barn"&&!bL?"짓기":"넓히기"}</button>`}</div>`;
+    <span>비닐하우스</span><b>${S.ghLv?GH_LV[S.ghLv].name+" · "+ghN()+"칸":"없음"}</b><span>창고</span><b>${invN}개</b></div>`;
+  const row=(name,sub,cost,id,done)=>`<div class="lrow"><div>${name}<small>${sub}</small></div>${done?`<span class="done">${done}</span>`:`<span class="cost">${cost.toLocaleString()}원</span><button class="go" data-up="${id}" ${S.money>=cost?"":"disabled"}>${id==="coop"&&!cL||id==="barn"&&!bL||id==="gh"&&!S.ghLv?"짓기":"넓히기"}</button>`}</div>`;
   h+=`<h3>짓고 넓히기</h3>`;
   h+=nx?row(josa(nx.name,"으로","로")+" 넓히기","방도 넓어지고 살림이 늘어요",nx.cost,"house"):row("집","마을에서 제일 큰 집",0,"",'다 지었어요');
   h+=fu?row(fu.n,"밭 3칸이 늘어나요",fu.cost,"field"):row("밭","15칸",0,"","다 넓혔어요");
@@ -45,12 +45,14 @@ function openKitchen(){
   h+=`<p class="hint">요리는 마당 부뚜막에서 · 닭은 장터 닭집 아저씨 · 송아지와 새끼 염소는 우시장 소장수 아저씨</p>`;
   h+=`<h3>체험용 · 정식 공개 전에 빼기</h3><div class="cheats"><button id="chReset">처음부터 (기록 지우기)</button>
     <button id="tlapse">하루 빨리 보기</button><button id="cheat">+1,000원</button><button data-storm="heavy">1분 반 뒤 큰비</button><button data-storm="typhoon">1분 반 뒤 태풍</button><button data-storm="frost">1분 반 뒤 서리</button><button id="sndTest">밤 소리 들어 보기</button></div>`;
+  {const gL=S.ghLv||0,gN=GH_LV[gL+1];h+=gN?row(gL?"비닐하우스 넓히기":"비닐하우스 짓기",gL?"하우스 칸 "+gN.n+"칸으로":"텃밭 오른쪽에 · 4칸 · 겨울에도 아무 작물이나, 궂은 날씨에도 끄떡없어요",gN.cost,"gh"):row("비닐하우스","6칸",0,"","다 넓혔어요")}
   openSheet(h);sheet.classList.add("ledger");
   sheet.querySelectorAll("[data-up]").forEach(b=>b.onclick=()=>{const t=b.dataset.up;let msg="";
     if(t==="house"){S.money-=nx.cost;S.houseLv=lv+1;applyHouse();msg=josa(nx.name,"으로","로")+" 넓혔어요!";
       if(inHouse){buildRoom();const [x,z]=HOUSE_IN==="main"?deskStand():doorStand();me.g.position.set(x,0,z);me.tx=x;me.tz=z;msg+=" 방도 넓어졌어요"}}
     if(t==="field"){S.money-=fu.cost;S.fieldCols=cols+1;msg="밭이 넓어졌어요. 새 칸에 씨앗을 심어보세요"}
     if(t==="coop"){S.money-=cN.cost;S.coopLv=cL+1;if(!cL){S.coop=true;S.hens=S.hens||0;S.eggT=Date.now();msg="닭장을 지었어요! 장터 닭집 아저씨한테 닭을 사 와요"}else msg="닭장을 넓혔어요. 닭집 아저씨한테 닭을 더 사 와요"}
+    if(t==="gh"){const gL=S.ghLv||0,gN=GH_LV[gL+1];S.money-=gN.cost;S.ghLv=gL+1;msg=gL?"비닐하우스를 넓혔어요. 칸이 "+gN.n+"개예요":"비닐하우스를 지었어요! 겨울에도 상추·딸기를 키워 봐요"}
     if(t==="barn"){S.money-=bN.cost;S.barnLv=bL+1;msg=bL?"외양간을 넓혔어요":"외양간을 지었어요! 우시장에서 송아지를 데려와요"}
     sfx("coin");save();applyLand();refresh();openKitchen();toast(msg)});
   $("tlapse").onclick=()=>{closeSheet();startTimelapse()};

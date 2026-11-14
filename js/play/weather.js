@@ -27,8 +27,8 @@ const rainG=new THREE.Group(),snowG=new THREE.Group();scene.add(rainG);scene.add
     const n=new THREE.Mesh(sg,sm);n.position.set((Math.random()-.5)*26,Math.random()*12,(Math.random()-.5)*26);snowG.add(n)}})();
 function wetFromWeather(silent){
   if(!(weather.kind==="비"||weather.kind==="눈"))return;
-  let n=0;S.plots.forEach(p=>{if(p&&!p.wat){p.wat=Date.now();if(!p.iss)planIssues(p);n++}});
-  if(n){save();for(let i=0;i<15;i++)drawPlot(i,true);if(!silent)toast((weather.kind==="비"?"비가 와서":"녹은 눈으로")+" 밭 "+n+"칸에 물이 들었어요")}}
+  let n=0;S.plots.forEach((p,i)=>{if(p&&!p.wat&&i<15){p.wat=Date.now();if(!p.iss)planIssues(p);n++}});
+  if(n){save();for(let i=0;i<plots.length;i++)drawPlot(i,true);if(!silent)toast((weather.kind==="비"?"비가 와서":"녹은 눈으로")+" 밭 "+n+"칸에 물이 들었어요")}}
 
 /* ---------- 하늘색 순서 (해 뜨고 지는 시간 기준으로 몇 시간 전후인지) ----------
    sky 하늘, hemi 주변 밝기, sun 햇빛(밤엔 달빛) 세기, sc 빛 색, glow 창호지 불, lamp 초롱 */

@@ -59,7 +59,7 @@ function makeFence(cols){
   f.add(box(fx-1.2-x0,0.08,0.06,P,(x0+fx-1.2)/2,0.6,fz+3.6));f.add(box(x1-fx-1.2,0.08,0.06,P,(fx+1.2+x1)/2,0.6,fz+3.6));
   land.add(f);return f}
 const fences={3:makeFence(3),4:makeFence(4),5:makeFence(5)};
-const plotPos=i=>i<9?[(i%3)-1,Math.floor(i/3)-1]:[2+Math.floor((i-9)/3),(i-9)%3-1];
+const plotPos=i=>i<9?[(i%3)-1,Math.floor(i/3)-1]:i<15?[2+Math.floor((i-9)/3),(i-9)%3-1]:[9,0]; // 15번부터는 비닐하우스 칸 (greenhouse.js)
 const plots=[];
 for(let i=0;i<15;i++){const [c,r]=plotPos(i),px=FIELD.x+c*2.2,pz=FIELD.z+r*2.2;
   const g=new THREE.Group();g.position.set(px,0,pz);g.userData={kind:"plot",i};

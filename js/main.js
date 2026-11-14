@@ -1,7 +1,7 @@
 /* 시작과 움직임: 처음 화면 준비, 매 순간 화면 다시 그리기, '다녀오셨어요' 요약. 다른 파일을 다 불러온 뒤 마지막에 실행돼요. */
 
 // 처음 화면 준비
-for(let i=0;i<15;i++)drawPlot(i,true);
+for(let i=0;i<plots.length;i++)drawPlot(i,true);
 applyLand();
 refresh();
 applyTime();setInterval(()=>{if(!timelapse)applyTime()},20000); // 하늘은 20초마다 조금씩 (빨리 보기 중엔 매 순간)
@@ -71,7 +71,7 @@ function loopBody(now){
   plots.forEach(P=>P.crop.children.forEach(c=>{if(c.userData.spark)c.position.y=1.3+Math.sin(now/300)*0.12}));
   riceG.children.forEach(c=>{if(c.userData.spark)c.position.y=1.4+Math.sin(now/300)*0.12});
   if(dwitsan.visible)forageG.children.forEach(g=>g.children.forEach(c=>{if(c.userData.spark)c.position.y=0.75+Math.sin(now/300)*0.08})); // (풀 묶음 안에서의 높이)
-  tick+=dt;if(tick>1){tick=0;for(let i=0;i<15;i++)drawPlot(i);updateEggs();if(!PD)drawPaddy()}
+  tick+=dt;if(tick>1){tick=0;for(let i=0;i<plots.length;i++)drawPlot(i);updateEggs();if(!PD)drawPaddy()}
   if(mode==="dwitsan"&&me&&!SIT){me.g.position.y=sanH(me.g.position.x,me.g.position.z);npcs.forEach(n=>{if(n.g.visible&&!n.saved)n.g.position.y=sanH(n.g.position.x,n.g.position.z)})} // 뒷산: 오르막 내리막
   if(timelapse)applyTime();skyFollow();stormFrame(dt,now);
   if(inHouse){rainG.visible=snowG.visible=false;if(tick===0&&!(LIE&&LIE.off))roomLighting()}
