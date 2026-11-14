@@ -30,7 +30,9 @@ function stepActor(a,dt){
   return false}
 const camPos=new THREE.Vector3(),look=new THREE.Vector3(0,0,4),lookT=new THREE.Vector3();
 let last=performance.now(),tick=0;
-function loop(now){
+// 2026-11-14 안정화: 한 장면에서 오류가 나도 다음 장면은 계속 그려요 (전엔 오류 한 번이면 화면이 멈췄어요)
+function loop(now){requestAnimationFrame(loop);try{loopBody(now)}catch(e){noteErr(e)}}
+function loopBody(now){
   const dt=Math.min(0.05,(now-last)/1000);last=now;
   if(me){
     if(!SIT&&!CK&&!LIE&&!FS&&stepActor(me,dt)){ // 돌아가는 길(입구 등)이 남았으면 다음 지점으로, 아니면 도착
@@ -78,8 +80,7 @@ function loop(now){
   fitFov();
   loop.n=(loop.n||0)+1;if(loop.n%2===0)renderer.shadowMap.needsUpdate=true;
   renderer.render(scene,camera);topColorFrame(now);
-  if(me&&!loop.shown){loop.shown=true;$("loading").classList.add("done")}
-  requestAnimationFrame(loop)}
+  if(me&&!loop.shown){loop.shown=true;$("loading").classList.add("done")}}
 camera.position.set(0,12,24);camera.lookAt(0,0,4);
 // 작은 물건(지름 30cm 아래)은 그림자를 안 드리워요. 그림자 계산이 훨씬 가벼워져요
 // 넓은 마당·운동장·장터 바닥(얇고 넓은 판)에 흙 질감을 입혀요. 판 크기만큼 질감을 반복(2m 한 장)

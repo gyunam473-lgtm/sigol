@@ -9,6 +9,14 @@
 <meta name="apple-mobile-web-app-title" content="시골살이">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#cfe6ee">
+<meta name="description" content="내 땅에서 농사짓고, 요리하고, 이웃과 장터에서 만나는 3D 귀농생활 게임">
+<meta property="og:title" content="시골살이">
+<meta property="og:description" content="텃밭·논농사·가마솥 요리·냇가 낚시·모닥불 불멍. 실제 시간과 절기를 따라 흐르는 시골 마을">
+<meta property="og:image" content="https://gyunam473-lgtm.github.io/sigol/icons/icon-512.png">
+<meta property="og:type" content="website">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@700&family=Gowun+Dodum&display=swap">
 <link rel="stylesheet" href="css/style.css">
 </head>
@@ -77,7 +85,9 @@
 <!-- 문제가 생기면 불러오는 화면에 안내 문구를 띄워요 -->
 <script>
 function showFail(t){var l=document.getElementById("loading"),m=document.getElementById("loadMsg");if(l&&m){l.classList.remove("done");m.textContent=t}}
-window.addEventListener("error",function(){showFail("화면을 그리다 문제가 생겼어요. 새로고침해 주세요.")});
+// 게임이 뜨기 전 오류만 안내 화면으로. 게임 중 오류는 기록만 하고 계속해요 (2026-11-14)
+window.addEventListener("error",function(e){var l=document.getElementById("loading");if(l&&!l.classList.contains("done"))showFail("화면을 그리다 문제가 생겼어요. 새로고침해 주세요.");else if(typeof noteErr==="function")noteErr(e.error||e.message)});
+window.addEventListener("unhandledrejection",function(e){if(typeof noteErr==="function")noteErr(e.reason)});
 </script>
 <!-- 3D 도구 (three.js r128) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
